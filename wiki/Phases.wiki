@@ -1,0 +1,17 @@
+#summary Roadmap
+#labels Phase-Requirements
+
+= Introduction =
+
+High level plan
+
+
+= Details =
+
+  # import existing work
+  #  check export and build on second machine
+  #  fix mouse-picking code
+  #  add a couple of spells (volcano?) for fun
+  #  add people
+  #  add buildings
+  #  set up java web start
