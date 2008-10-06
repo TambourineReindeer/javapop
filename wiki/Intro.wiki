@@ -8,7 +8,7 @@ An isometric god game
 = Details =
 
 I couldn't find a populous clone out there, so I'm starting one.
-javapop uses [https://jogl.dev.java.net/ jogl] for rendering, see instruction there for installing it for development.
+javapop uses [https://jogl.dev.java.net/ jogl] for rendering, see instructions there for installing it for development.
 
 To run the game, I'm envisioning using java web start, so downloading jogl separately shouldn't be necessary.
 
