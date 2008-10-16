@@ -15,6 +15,8 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector4f;
 
 import com.sun.opengl.util.Animator;
 
@@ -36,11 +38,14 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 
 	private Point dragOrigin;
 
-	private float xMouse, yMouse;
+//	private float xMouse, yMouse;
 	private Point selected;
 
 	private Boolean bMouseMoved;
 	private Vector<Peon> peons;
+
+	// private FloatBuffer mvp;
+	Matrix4f mvpInverse;
 
 	public static void main(final String[] args) {
 		HeightMap h = new HeightMap(128, 128);
@@ -48,6 +53,7 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 	}
 
 	public GLWindow(HeightMap h) {
+		mvpInverse = new Matrix4f();
 		heightMap = h;
 		Peon.h = h;
 		peons = new Vector<Peon>();
@@ -55,13 +61,13 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 		GLCanvas glC;
 		selected = new Point();
 		bMouseMoved = new Boolean(false);
-		
+
 		GLCapabilities caps = new GLCapabilities();
-	    caps.setSampleBuffers(true);
-	    caps.setNumSamples(8);
-	   
-	    glC = new GLCanvas(caps);
-		//glC = new GLCanvas();
+		caps.setSampleBuffers(true);
+		caps.setNumSamples(8);
+
+		glC = new GLCanvas(caps);
+		// glC = new GLCanvas();
 
 		glC.addGLEventListener(this);
 
@@ -92,55 +98,81 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 		gl.glMatrixMode(GL.GL_MODELVIEW);
 		gl.glPushMatrix();
-		
+
 		gl.glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
 		gl.glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
-		gl.glTranslatef((0.70711f*xPos-yPos/0.70711f), -(yPos/0.70711f)-xPos*0.70711f, -25);
+		gl.glTranslatef((0.70711f * xPos - yPos / 0.70711f), -(yPos / 0.70711f)
+				- xPos * 0.70711f, -25);
 
+		float[] buf = new float[16];
+		gl.glGetFloatv(GL.GL_MODELVIEW, buf, 0);
+
+		mvpInverse.set(buf);
+		mvpInverse.transpose();
+		mvpInverse.invert();
 		gl.glScalef(1.0f, 1.0f, fHeightScale);
 
 		gl.glEnable(GL.GL_BLEND);
 		gl.glEnable(GL.GL_MULTISAMPLE);
-		
-		heightMap.display(gl, bMouseMoved, xMouse, yMouse, selected);
+
+		heightMap.display(gl);
 		bMouseMoved = false;
-		
+
 		gl.glDisable(GL.GL_LIGHTING);
 		gl.glEnable(GL.GL_BLEND);
 		gl.glShadeModel(GL.GL_SMOOTH);
 		gl.glDisable(GL.GL_DEPTH_TEST);
 		gl.glBegin(GL.GL_TRIANGLES);
 
-		float cW,cH;
-		cW=0.02f;cH=0.1f;
-		
+		float cW, cH;
+		cW = 0.02f;
+		cH = 0.1f;
+
 		gl.glColor4f(1.0f, 1, 1, 1);
-		gl.glVertex3f(selected.x + cW, selected.y - cW, heightMap.getHeight(selected.x, selected.y));
-		gl.glVertex3f(selected.x - cW, selected.y + cW, heightMap.getHeight(selected.x, selected.y));
-		
+		gl.glVertex3f(selected.x + cW, selected.y - cW, heightMap.getHeight(
+				selected.x, selected.y));
+		gl.glVertex3f(selected.x - cW, selected.y + cW, heightMap.getHeight(
+				selected.x, selected.y));
+
 		gl.glColor4f(1.0f, 1, 1, 0.0f);
-		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x,selected.y) + 2.0f*cH / fHeightScale);
+		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x,
+				selected.y)
+				+ 2.0f * cH / fHeightScale);
 
 		gl.glColor4f(1.0f, 1, 1, 1);
-		gl.glVertex3f(selected.x + cW, selected.y - cW, heightMap.getHeight(selected.x, selected.y));
-		gl.glVertex3f(selected.x - cW, selected.y +cW, heightMap.getHeight(selected.x, selected.y));
-		
+		gl.glVertex3f(selected.x + cW, selected.y - cW, heightMap.getHeight(
+				selected.x, selected.y));
+		gl.glVertex3f(selected.x - cW, selected.y + cW, heightMap.getHeight(
+				selected.x, selected.y));
+
 		gl.glColor4f(1.0f, 1, 1, 0);
-		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x,selected.y) -2.0f* cH / fHeightScale);
+		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x,
+				selected.y)
+				- 2.0f * cH / fHeightScale);
 
 		gl.glColor4f(1.0f, 1, 1, 1);
-		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x, selected.y) + 2.0f*cW / fHeightScale);
-		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x, selected.y) - 2.0f*cW/fHeightScale);
-		
+		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x,
+				selected.y)
+				+ 2.0f * cW / fHeightScale);
+		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x,
+				selected.y)
+				- 2.0f * cW / fHeightScale);
+
 		gl.glColor4f(1.0f, 1, 1, 0);
-		gl.glVertex3f(selected.x -cH, selected.y+cH, heightMap.getHeight(selected.x,selected.y));
+		gl.glVertex3f(selected.x - cH, selected.y + cH, heightMap.getHeight(
+				selected.x, selected.y));
 
 		gl.glColor4f(1.0f, 1, 1, 1);
-		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x, selected.y) + 2.0f*cW / fHeightScale);
-		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x, selected.y) - 2.0f*cW/fHeightScale);
-		
+		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x,
+				selected.y)
+				+ 2.0f * cW / fHeightScale);
+		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x,
+				selected.y)
+				- 2.0f * cW / fHeightScale);
+
 		gl.glColor4f(1.0f, 1, 1, 0);
-		gl.glVertex3f(selected.x +cH, selected.y-cH, heightMap.getHeight(selected.x,selected.y));
+		gl.glVertex3f(selected.x + cH, selected.y - cH, heightMap.getHeight(
+				selected.x, selected.y));
 
 		gl.glEnd();
 
@@ -150,9 +182,11 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 		for (Iterator<Peon> i = peons.iterator(); i.hasNext();) {
 			p = i.next();
 			gl.glVertex3f(p.x, p.y, heightMap.getHeight(p.x, p.y) + 0.3f);
-			gl.glVertex3f(p.x + 0.1f, p.y - 0.1f, heightMap.getHeight(
+			gl
+					.glVertex3f(p.x + 0.1f, p.y - 0.1f, heightMap.getHeight(
 							p.x, p.y));
-			gl.glVertex3f(p.x - 0.1f, p.y + 0.1f, heightMap.getHeight(
+			gl
+					.glVertex3f(p.x - 0.1f, p.y + 0.1f, heightMap.getHeight(
 							p.x, p.y));
 
 			if (p.step() == Peon.DEAD) {
@@ -160,7 +194,7 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 			}
 		}
 		gl.glEnd();
-		
+
 		gl.glPopMatrix();
 		gl.glFlush();
 	}
@@ -173,12 +207,14 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 
 	public void init(final GLAutoDrawable glDrawable) {
 		final GL gl = glDrawable.getGL();
-	/*	final boolean VBOsupported = gl.isFunctionAvailable("glGenBuffersARB") &&
-        gl.isFunctionAvailable("glBindBufferARB") &&
-        gl.isFunctionAvailable("glBufferDataARB") &&
-        gl.isFunctionAvailable("glDeleteBuffersARB");
-*/
-		
+		/*
+		 * final boolean VBOsupported =
+		 * gl.isFunctionAvailable("glGenBuffersARB") &&
+		 * gl.isFunctionAvailable("glBindBufferARB") &&
+		 * gl.isFunctionAvailable("glBufferDataARB") &&
+		 * gl.isFunctionAvailable("glDeleteBuffersARB");
+		 */
+
 		gl.glEnable(GL.GL_LIGHTING);
 		float global_ambient[] = { 0.0f, 0.1f, 0.0f, 1.0f };
 		gl.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, FloatBuffer
@@ -192,7 +228,7 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 		gl.glColorMaterial(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT_AND_DIFFUSE);
 		gl.glEnable(GL.GL_DEPTH_TEST);
 		gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
-	
+
 		heightMap.init(glDrawable);
 	}
 
@@ -253,10 +289,25 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 
 	public void mouseMoved(MouseEvent e) {
 		// TODO Auto-generated method stub
-		xMouse = 2.0f * e.getX() / width - 1.0f;
-		yMouse = -2.0f * e.getY() / height + 1.0f;
+		float xMouse,yMouse;
+		xMouse = 16.0f*(2.0f * e.getX() / width - 1.0f);
+		yMouse = 16.0f*(-2.0f * e.getY() / height + 1.0f);
 
 		bMouseMoved = Boolean.TRUE;
+
+		float l;
+		Vector4f z0,z1, s;
+		z0 = new Vector4f(xMouse, yMouse, 0,1);
+		z1 = new Vector4f(xMouse, yMouse, 1,1);
+
+		mvpInverse.transform(z0);
+		mvpInverse.transform(z1);
+		z1.sub(z0);
+		l = -z0.z / z1.z;
+		s = new Vector4f();
+		s.scaleAdd(l, z1, z0);
+		selected.x = (int) s.x;
+		selected.y = (int) s.y;
 
 	}
 
