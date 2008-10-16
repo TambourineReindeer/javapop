@@ -12,6 +12,7 @@
 	<resources>
 		<j2se version="1.5+" initial-heap-size="64m" max-heap-size="256m"/>
 		<jar href="javapop.jar" main="true"/>
+		<extension name="jogl" href="http://download.java.net/media/jogl/builds/archive/jsr-231-webstart-current/jogl.jnlp" />
 	</resources>
 	<application-desc>
 		
