@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+"
+  codebase="http://javapop.googlecode.com/svn/wiki/"
+  href="rdv.jnlp">
+	<information>
+		<title>Javapop</title>
+		<vendor>Gef</vendor>
+		<homepage href="http://javapop.googlecode.com/"/>
+		<description>A Populous-like game in Java</description>
+		<offline-allowed/>
+	</information>
+	<resources>
+		<j2se version="1.5+" initial-heap-size="64m" max-heap-size="256m"/>
+		<jar href="javapop.jar" main="true"/>
+	</resources>
+	<application-desc>
+		
+	</application-desc>
+</jnlp>
