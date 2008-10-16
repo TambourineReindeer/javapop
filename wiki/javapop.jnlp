@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jnlp spec="1.0+"
   codebase="http://javapop.googlecode.com/svn/wiki/"
-  href="rdv.jnlp">
+  href="javapop.jnlp">
 	<information>
 		<title>Javapop</title>
 		<vendor>Gef</vendor>
