@@ -38,8 +38,8 @@ public class HeightMap {
 		// h = new int[width][breadth];
 		// h2 = new float[width - 1][breadth - 1];
 		int x, y;
-		for (x = 0; x < width; x++) {
-			for (y = 0; y < breadth; y++) {
+		for (y = 0; y < breadth; y++) {
+			for (x = 0; x < width; x++) {
 				// 0
 				b.put((float) x);
 				b.put((float) y);
@@ -276,12 +276,12 @@ public class HeightMap {
 				b.put(bufPos(x - 1, y - 1, 6, VZ), (float) height);
 			}
 			if (y >= 1) {
-				b.put(bufPos(x, y - 1, 1, VZ), (float) height);
-				b.put(bufPos(x, y - 1, 3, VZ), (float) height);
+				b.put(bufPos(x, y - 1, 7, VZ), (float) height);
+				b.put(bufPos(x, y - 1, 9, VZ), (float) height);
 			}
 			if (x >= 1) {
-				b.put(bufPos(x - 1, y, 7, VZ), (float) height);
-				b.put(bufPos(x - 1, y, 9, VZ), (float) height);
+				b.put(bufPos(x - 1, y, 1, VZ), (float) height);
+				b.put(bufPos(x - 1, y, 3, VZ), (float) height);
 			}
 		}
 	}
@@ -383,10 +383,9 @@ public class HeightMap {
 		return (a == b && b == c && c == d);
 	}
 
-	public void display(GL gl, boolean bMouseMoved, float xMouse, float yMouse,
-			Point selected) {
+	public void display(GL gl) {
 
-		Vector3f l = new Vector3f(new float[] { -5, 9, 10 });
+		Vector3f l = new Vector3f(new float[] { -9, -5, 10 });
 		l.normalize();
 
 		gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, FloatBuffer
