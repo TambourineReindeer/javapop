@@ -16,6 +16,7 @@ import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
 import com.sun.opengl.util.Animator;
@@ -105,11 +106,34 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 				- xPos * 0.70711f, -25);
 
 		float[] buf = new float[16];
-		gl.glGetFloatv(GL.GL_MODELVIEW, buf, 0);
+		gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, buf, 0);
 
-		mvpInverse.set(buf);
-		mvpInverse.transpose();
-		mvpInverse.invert();
+		Matrix4f m_mv,m_p;
+		m_mv = new Matrix4f(); m_p =new Matrix4f();
+		m_mv.set(buf);
+		m_mv.transpose();
+		gl.glGetFloatv(GL.GL_PROJECTION_MATRIX, buf, 0);
+		m_p.set(buf);
+		m_p.transpose();
+		mvpInverse.mul(m_p, m_mv);
+		mvpInverse.invert();		
+		
+		//mvpInverse.transpose();
+		
+		/*Vector3f t1,t2;
+		Vector4f t3,t4;
+		t1 = new Vector3f(0,0,0);
+		t2 = new Vector3f(1,0,0);
+		t3 = new Vector4f(0,0,0,1);
+		t4 = new Vector4f(1,0,0,1);
+		
+		mvpInverse.transform(t1);
+		mvpInverse.transform(t2);
+		mvpInverse.transform(t3);
+		mvpInverse.transform(t4);
+		
+
+		*/
 		gl.glScalef(1.0f, 1.0f, fHeightScale);
 
 		gl.glEnable(GL.GL_BLEND);
@@ -290,8 +314,8 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 	public void mouseMoved(MouseEvent e) {
 		// TODO Auto-generated method stub
 		float xMouse,yMouse;
-		xMouse = 16.0f*(2.0f * e.getX() / width - 1.0f);
-		yMouse = 16.0f*(-2.0f * e.getY() / height + 1.0f);
+		xMouse = (2.0f * e.getX() / width - 1.0f);
+		yMouse = (-2.0f * e.getY() / height + 1.0f);
 
 		bMouseMoved = Boolean.TRUE;
 
