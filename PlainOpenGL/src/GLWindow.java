@@ -39,10 +39,9 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 
 	private Point dragOrigin;
 
-//	private float xMouse, yMouse;
+	// private float xMouse, yMouse;
 	private Point selected;
 
-	private Boolean bMouseMoved;
 	private Vector<Peon> peons;
 
 	// private FloatBuffer mvp;
@@ -61,7 +60,6 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 		water = new Water(heightMap);
 		GLCanvas glC;
 		selected = new Point();
-		bMouseMoved = new Boolean(false);
 
 		GLCapabilities caps = new GLCapabilities();
 		caps.setSampleBuffers(true);
@@ -105,42 +103,37 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 		gl.glTranslatef((0.70711f * xPos - yPos / 0.70711f), -(yPos / 0.70711f)
 				- xPos * 0.70711f, -25);
 
+		gl.glScalef(1.0f, 1.0f, fHeightScale);
+		
 		float[] buf = new float[16];
 		gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, buf, 0);
 
-		Matrix4f m_mv,m_p;
-		m_mv = new Matrix4f(); m_p =new Matrix4f();
+		Matrix4f m_mv, m_p;
+		m_mv = new Matrix4f();
+		m_p = new Matrix4f();
 		m_mv.set(buf);
 		m_mv.transpose();
 		gl.glGetFloatv(GL.GL_PROJECTION_MATRIX, buf, 0);
 		m_p.set(buf);
 		m_p.transpose();
 		mvpInverse.mul(m_p, m_mv);
-		mvpInverse.invert();		
-		
-		//mvpInverse.transpose();
-		
-		/*Vector3f t1,t2;
-		Vector4f t3,t4;
-		t1 = new Vector3f(0,0,0);
-		t2 = new Vector3f(1,0,0);
-		t3 = new Vector4f(0,0,0,1);
-		t4 = new Vector4f(1,0,0,1);
-		
-		mvpInverse.transform(t1);
-		mvpInverse.transform(t2);
-		mvpInverse.transform(t3);
-		mvpInverse.transform(t4);
-		
+		mvpInverse.invert();
 
-		*/
-		gl.glScalef(1.0f, 1.0f, fHeightScale);
+		// mvpInverse.transpose();
+
+		/*
+		 * Vector3f t1,t2; Vector4f t3,t4; t1 = new Vector3f(0,0,0); t2 = new
+		 * Vector3f(1,0,0); t3 = new Vector4f(0,0,0,1); t4 = new
+		 * Vector4f(1,0,0,1);
+		 * 
+		 * mvpInverse.transform(t1); mvpInverse.transform(t2);
+		 * mvpInverse.transform(t3); mvpInverse.transform(t4);
+		 */
 
 		gl.glEnable(GL.GL_BLEND);
 		gl.glEnable(GL.GL_MULTISAMPLE);
 
 		heightMap.display(gl);
-		bMouseMoved = false;
 
 		gl.glDisable(GL.GL_LIGHTING);
 		gl.glEnable(GL.GL_BLEND);
@@ -313,26 +306,44 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 
 	public void mouseMoved(MouseEvent e) {
 		// TODO Auto-generated method stub
-		float xMouse,yMouse;
+		float xMouse, yMouse;
 		xMouse = (2.0f * e.getX() / width - 1.0f);
 		yMouse = (-2.0f * e.getY() / height + 1.0f);
 
-		bMouseMoved = Boolean.TRUE;
-
 		float l;
-		Vector4f z0,z1, s;
-		z0 = new Vector4f(xMouse, yMouse, 0,1);
-		z1 = new Vector4f(xMouse, yMouse, 1,1);
+		Vector4f z0, z1, s;
+		z0 = new Vector4f(xMouse, yMouse, 10, 1);
+		z1 = new Vector4f(xMouse, yMouse, 11, 1);
 
 		mvpInverse.transform(z0);
 		mvpInverse.transform(z1);
+		Vector3f v0, v1, p;
+		v0 = new Vector3f(z0.x, z0.y, z0.z);
+		v1 = new Vector3f(z1.x, z1.y, z1.z);
 		z1.sub(z0);
 		l = -z0.z / z1.z;
 		s = new Vector4f();
 		s.scaleAdd(l, z1, z0);
-		selected.x = (int) s.x;
-		selected.y = (int) s.y;
+		selected.x = Math.round(s.x);
+		selected.y = Math.round(s.y);
 
+		float d, oldD;
+		p = new Vector3f(selected.x, selected.y, heightMap.getHeight(
+				selected.x, selected.y));
+		d = Helpers.PointLineDistance(v0, v1, p);
+		oldD = 1000;
+		for (int x = 0; x < 128; x++)
+			for (int y = 0; y < 128; y++) {
+				p = new Vector3f(x, y, heightMap.getHeight(x, y));
+				d = Helpers.PointLineDistance(v0, v1, p);
+				if (d < oldD) {
+					selected.x = x;
+					selected.y = y;
+					oldD = d;
+				}
+			}
+
+		
 	}
 
 	public void mouseClicked(MouseEvent e) {
