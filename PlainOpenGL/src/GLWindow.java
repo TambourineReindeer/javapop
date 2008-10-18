@@ -21,8 +21,7 @@ import javax.vecmath.Vector4f;
 
 import com.sun.opengl.util.Animator;
 
-public class GLWindow extends Frame implements GLEventListener, KeyListener,
-		MouseMotionListener, MouseListener {
+public class GLWindow extends Frame implements GLEventListener, KeyListener, MouseMotionListener, MouseListener {
 	/**
 	 * 
 	 */
@@ -55,8 +54,9 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 	public GLWindow(HeightMap h) {
 		mvpInverse = new Matrix4f();
 		heightMap = h;
-		Peon.h = h;
-		peons = new Vector<Peon>();
+		Peon.init(h);
+		House.init(h);
+		
 		water = new Water(heightMap);
 		GLCanvas glC;
 		selected = new Point();
@@ -100,11 +100,10 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 
 		gl.glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
 		gl.glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
-		gl.glTranslatef((0.70711f * xPos - yPos / 0.70711f), -(yPos / 0.70711f)
-				- xPos * 0.70711f, -25);
+		gl.glTranslatef((0.70711f * xPos - yPos / 0.70711f), -(yPos / 0.70711f) - xPos * 0.70711f, -25);
 
 		gl.glScalef(1.0f, 1.0f, fHeightScale);
-		
+
 		float[] buf = new float[16];
 		gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, buf, 0);
 
@@ -122,12 +121,10 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 		// mvpInverse.transpose();
 
 		/*
-		 * Vector3f t1,t2; Vector4f t3,t4; t1 = new Vector3f(0,0,0); t2 = new
-		 * Vector3f(1,0,0); t3 = new Vector4f(0,0,0,1); t4 = new
-		 * Vector4f(1,0,0,1);
+		 * Vector3f t1,t2; Vector4f t3,t4; t1 = new Vector3f(0,0,0); t2 = new Vector3f(1,0,0); t3 = new
+		 * Vector4f(0,0,0,1); t4 = new Vector4f(1,0,0,1);
 		 * 
-		 * mvpInverse.transform(t1); mvpInverse.transform(t2);
-		 * mvpInverse.transform(t3); mvpInverse.transform(t4);
+		 * mvpInverse.transform(t1); mvpInverse.transform(t2); mvpInverse.transform(t3); mvpInverse.transform(t4);
 		 */
 
 		gl.glEnable(GL.GL_BLEND);
@@ -146,78 +143,45 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 		cH = 0.1f;
 
 		gl.glColor4f(1.0f, 1, 1, 1);
-		gl.glVertex3f(selected.x + cW, selected.y - cW, heightMap.getHeight(
-				selected.x, selected.y));
-		gl.glVertex3f(selected.x - cW, selected.y + cW, heightMap.getHeight(
-				selected.x, selected.y));
+		gl.glVertex3f(selected.x + cW, selected.y - cW, heightMap.getHeight(selected.x, selected.y));
+		gl.glVertex3f(selected.x - cW, selected.y + cW, heightMap.getHeight(selected.x, selected.y));
 
 		gl.glColor4f(1.0f, 1, 1, 0.0f);
-		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x,
-				selected.y)
-				+ 2.0f * cH / fHeightScale);
+		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x, selected.y) + 2.0f * cH / fHeightScale);
 
 		gl.glColor4f(1.0f, 1, 1, 1);
-		gl.glVertex3f(selected.x + cW, selected.y - cW, heightMap.getHeight(
-				selected.x, selected.y));
-		gl.glVertex3f(selected.x - cW, selected.y + cW, heightMap.getHeight(
-				selected.x, selected.y));
+		gl.glVertex3f(selected.x + cW, selected.y - cW, heightMap.getHeight(selected.x, selected.y));
+		gl.glVertex3f(selected.x - cW, selected.y + cW, heightMap.getHeight(selected.x, selected.y));
 
 		gl.glColor4f(1.0f, 1, 1, 0);
-		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x,
-				selected.y)
-				- 2.0f * cH / fHeightScale);
+		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x, selected.y) - 2.0f * cH / fHeightScale);
 
 		gl.glColor4f(1.0f, 1, 1, 1);
-		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x,
-				selected.y)
-				+ 2.0f * cW / fHeightScale);
-		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x,
-				selected.y)
-				- 2.0f * cW / fHeightScale);
+		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x, selected.y) + 2.0f * cW / fHeightScale);
+		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x, selected.y) - 2.0f * cW / fHeightScale);
 
 		gl.glColor4f(1.0f, 1, 1, 0);
-		gl.glVertex3f(selected.x - cH, selected.y + cH, heightMap.getHeight(
-				selected.x, selected.y));
+		gl.glVertex3f(selected.x - cH, selected.y + cH, heightMap.getHeight(selected.x, selected.y));
 
 		gl.glColor4f(1.0f, 1, 1, 1);
-		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x,
-				selected.y)
-				+ 2.0f * cW / fHeightScale);
-		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x,
-				selected.y)
-				- 2.0f * cW / fHeightScale);
+		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x, selected.y) + 2.0f * cW / fHeightScale);
+		gl.glVertex3f(selected.x, selected.y, heightMap.getHeight(selected.x, selected.y) - 2.0f * cW / fHeightScale);
 
 		gl.glColor4f(1.0f, 1, 1, 0);
-		gl.glVertex3f(selected.x + cH, selected.y - cH, heightMap.getHeight(
-				selected.x, selected.y));
+		gl.glVertex3f(selected.x + cH, selected.y - cH, heightMap.getHeight(selected.x, selected.y));
 
 		gl.glEnd();
 
-		gl.glBegin(GL.GL_TRIANGLES);
-		gl.glColor3f(0, 0, 1);
-		Peon p;
-		for (Iterator<Peon> i = peons.iterator(); i.hasNext();) {
-			p = i.next();
-			gl.glVertex3f(p.x, p.y, heightMap.getHeight(p.x, p.y) + 0.3f);
-			gl
-					.glVertex3f(p.x + 0.1f, p.y - 0.1f, heightMap.getHeight(
-							p.x, p.y));
-			gl
-					.glVertex3f(p.x - 0.1f, p.y + 0.1f, heightMap.getHeight(
-							p.x, p.y));
-
-			if (p.step() == Peon.DEAD) {
-				i.remove();
-			}
-		}
-		gl.glEnd();
-
+		Peon.stepall();
+		Peon.displayall(gl);
+	
+		House.display(gl);
+	
 		gl.glPopMatrix();
 		gl.glFlush();
 	}
 
-	public void displayChanged(final GLAutoDrawable arg0, final boolean arg1,
-			final boolean arg2) {
+	public void displayChanged(final GLAutoDrawable arg0, final boolean arg1, final boolean arg2) {
 		// TODO Auto-generated method stub
 
 	}
@@ -225,20 +189,16 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 	public void init(final GLAutoDrawable glDrawable) {
 		final GL gl = glDrawable.getGL();
 		/*
-		 * final boolean VBOsupported =
-		 * gl.isFunctionAvailable("glGenBuffersARB") &&
-		 * gl.isFunctionAvailable("glBindBufferARB") &&
-		 * gl.isFunctionAvailable("glBufferDataARB") &&
+		 * final boolean VBOsupported = gl.isFunctionAvailable("glGenBuffersARB") &&
+		 * gl.isFunctionAvailable("glBindBufferARB") && gl.isFunctionAvailable("glBufferDataARB") &&
 		 * gl.isFunctionAvailable("glDeleteBuffersARB");
 		 */
 
 		gl.glEnable(GL.GL_LIGHTING);
 		float global_ambient[] = { 0.0f, 0.1f, 0.0f, 1.0f };
-		gl.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, FloatBuffer
-				.wrap(global_ambient));
+		gl.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, FloatBuffer.wrap(global_ambient));
 
-		gl.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, FloatBuffer.wrap(new float[] {
-				0.8f, 0.8f, 0.8f, 1.0f }));
+		gl.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, FloatBuffer.wrap(new float[] { 0.8f, 0.8f, 0.8f, 1.0f }));
 
 		gl.glEnable(GL.GL_LIGHT1);
 		gl.glEnable(GL.GL_COLOR_MATERIAL);
@@ -249,8 +209,7 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 		heightMap.init(glDrawable);
 	}
 
-	public void reshape(final GLAutoDrawable glDrawable, final int x,
-			final int y, final int w, int h) {
+	public void reshape(final GLAutoDrawable glDrawable, final int x, final int y, final int w, int h) {
 		final GL gl = glDrawable.getGL();
 		height = h;
 		width = w;
@@ -260,8 +219,7 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 		gl.glViewport(0, 0, width, height);
 		gl.glMatrixMode(GL.GL_PROJECTION);
 		gl.glLoadIdentity();
-		gl.glOrtho(-width / 64.0f, width / 64.0f, -height / 64.0f,
-				height / 64.0f, 1, 100);
+		gl.glOrtho(-width / 64.0f, width / 64.0f, -height / 64.0f, height / 64.0f, 1, 100);
 		gl.glMatrixMode(GL.GL_MODELVIEW);
 		gl.glLoadIdentity();
 	}
@@ -270,7 +228,7 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 		// TODO Auto-generated method stub
 
 		if (e.getKeyCode() == KeyEvent.VK_N) {
-			peons.add(new Peon(selected.x, selected.y));
+			Peon.addPeon(selected.x, selected.y);
 		}
 
 		if (e.getKeyCode() == KeyEvent.VK_S) {
@@ -280,8 +238,7 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 		if (e.getKeyCode() == KeyEvent.VK_W) {
 			for (int n = 0; n < 10; n++) {
 				Random r = new Random();
-				water.drop(selected.x + r.nextFloat(), selected.y
-						+ r.nextFloat());
+				water.drop(selected.x + r.nextFloat(), selected.y + r.nextFloat());
 			}
 		}
 	}
@@ -328,8 +285,7 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 		selected.y = Math.round(s.y);
 
 		float d, oldD;
-		p = new Vector3f(selected.x, selected.y, heightMap.getHeight(
-				selected.x, selected.y));
+		p = new Vector3f(selected.x, selected.y, heightMap.getHeight(selected.x, selected.y));
 		d = Helpers.PointLineDistance(v0, v1, p);
 		oldD = 1000;
 		for (int x = 0; x < 128; x++)
@@ -343,7 +299,6 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 				}
 			}
 
-		
 	}
 
 	public void mouseClicked(MouseEvent e) {
@@ -373,8 +328,7 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener,
 
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
-		if (Math.abs(e.getX() - dragOrigin.x) < 16
-				&& Math.abs(e.getY() - dragOrigin.y) < 16) {
+		if (Math.abs(e.getX() - dragOrigin.x) < 16 && Math.abs(e.getY() - dragOrigin.y) < 16) {
 			if (e.getButton() == MouseEvent.BUTTON1) {
 				heightMap.up(selected.x, selected.y);
 			} else if (e.getButton() == MouseEvent.BUTTON3) {
