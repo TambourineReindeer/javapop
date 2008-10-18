@@ -12,7 +12,6 @@ public class Water {
 	private static HeightMap h;
 	private float[][] w, w2;
 	private float[][] mx, my;
-	private int[][] mc;
 	private Vector<Point2f> springs;
 
 	private int n = 0;
@@ -81,7 +80,7 @@ public class Water {
 				d += dw((float) h.getHeight(x, y), w[x][y], (float) h.getHeight2(x, y - 1), w2[x][y - 1]);
 				d += dw((float) h.getHeight(x, y), w[x][y], (float) h.getHeight2(x - 1, y - 1), w2[x - 1][y - 1]);
 
-				neww[x][y] = Math.max(0, w[x][y] + d/2.0f);
+				neww[x][y] = Math.max(0, w[x][y] + d / 2.0f);
 			}
 		}
 
@@ -92,7 +91,7 @@ public class Water {
 				d += dw((float) h.getHeight2(x, y), w2[x][y], (float) h.getHeight(x, y + 1), w[x][y + 1]);
 				d += dw((float) h.getHeight2(x, y), w2[x][y], (float) h.getHeight(x + 1, y + 1), w[x + 1][y + 1]);
 
-				neww2[x][y] = Math.max(0, w2[x][y] + d/2.0f);
+				neww2[x][y] = Math.max(0, w2[x][y] + d / 2.0f);
 			}
 		}
 		w = neww;
@@ -143,8 +142,7 @@ public class Water {
 			d.x += d.z;
 			d.y += d.w;
 
-			if (d.x < 0 || d.x >= h.getWidth() - 1 || d.y < 0
-					|| d.y >= h.getBreadth() - 1 || r.nextInt(200) == 0)
+			if (d.x < 0 || d.x >= h.getWidth() - 1 || d.y < 0 || d.y >= h.getBreadth() - 1 || r.nextInt(200) == 0)
 				i.remove();
 			else
 				neww[(int) d.x][(int) d.y]++;
@@ -152,21 +150,16 @@ public class Water {
 		}
 		for (int x = 1; x < h.getWidth() - 1; x++) {
 			for (int y = 1; y < h.getBreadth() - 1; y++) {
-				mx[x][y] = (9.0f * mx[x][y] + newmx[x - 1][y - 1]
-						+ newmx[x - 1][y] + newmx[x - 1][y + 1]
-						+ newmx[x][y - 1] + newmx[x][y] + newmx[x][y + 1]
-						+ newmx[x + 1][y - 1] + newmx[x + 1][y] + newmx[x + 1][y + 1]) / 18.0f;
-				my[x][y] = (9.0f * my[x][y] + newmy[x - 1][y - 1]
-						+ newmy[x - 1][y] + newmy[x - 1][y + 1]
-						+ newmy[x][y - 1] + newmy[x][y] + newmy[x][y + 1]
-						+ newmy[x + 1][y - 1] + newmy[x + 1][y] + newmy[x + 1][y + 1]) / 18.0f;
+				mx[x][y] = (9.0f * mx[x][y] + newmx[x - 1][y - 1] + newmx[x - 1][y] + newmx[x - 1][y + 1]
+						+ newmx[x][y - 1] + newmx[x][y] + newmx[x][y + 1] + newmx[x + 1][y - 1] + newmx[x + 1][y] + newmx[x + 1][y + 1]) / 18.0f;
+				my[x][y] = (9.0f * my[x][y] + newmy[x - 1][y - 1] + newmy[x - 1][y] + newmy[x - 1][y + 1]
+						+ newmy[x][y - 1] + newmy[x][y] + newmy[x][y + 1] + newmy[x + 1][y - 1] + newmy[x + 1][y] + newmy[x + 1][y + 1]) / 18.0f;
 			}
 		}
 
 		w = neww;
 		// mx = newmx;
 		// my = newmy;
-		mc = newmc;
 	}
 
 	public void display(GL gl) {
@@ -246,41 +239,36 @@ public class Water {
 					gl.glShadeModel(GL.GL_SMOOTH);
 					gl.glBegin(GL.GL_TRIANGLES);
 
-					
 					a = new Vector3f(x + 0.5f, y + 0.5f, midHeight + w2[x][y]);
 					// b already set
-					c = new Vector3f(x + 1, y, h.getHeight(x + 1, y)
-							+ w[x + 1][y]);
-					d = new Vector3f(x + 1, y + 1, h.getHeight(x + 1, y + 1)
-							+ w[x + 1][y + 1]);
-					e = new Vector3f(x, y + 1, h.getHeight(x, y + 1)
-							+ w[x][y + 1]);
-
+					c = new Vector3f(x + 1, y, h.getHeight(x + 1, y) + w[x + 1][y]);
+					d = new Vector3f(x + 1, y + 1, h.getHeight(x + 1, y + 1) + w[x + 1][y + 1]);
+					e = new Vector3f(x, y + 1, h.getHeight(x, y + 1) + w[x][y + 1]);
 
 					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(0.9f, w2[x][y]));
 					gl.glVertex3f(a.x, a.y, a.z);
 					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w[x][y]));
 					gl.glVertex3f(b.x, b.y, b.z);
-					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w[x+1][y]));
+					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w[x + 1][y]));
 					gl.glVertex3f(c.x, c.y, c.z);
 
 					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w2[x][y]));
 					gl.glVertex3f(a.x, a.y, a.z);
-					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w[x+1][y]));
+					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w[x + 1][y]));
 					gl.glVertex3f(c.x, c.y, c.z);
-					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w[x+1][y+1]));
+					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w[x + 1][y + 1]));
 					gl.glVertex3f(d.x, d.y, d.z);
 
 					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w2[x][y]));
 					gl.glVertex3f(a.x, a.y, a.z);
-					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w[x+1][y+1]));
+					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w[x + 1][y + 1]));
 					gl.glVertex3f(d.x, d.y, d.z);
-					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w[x][y+1]));
+					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w[x][y + 1]));
 					gl.glVertex3f(e.x, e.y, e.z);
 
 					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w2[x][y]));
 					gl.glVertex3f(a.x, a.y, a.z);
-					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w[x][y+1]));
+					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w[x][y + 1]));
 					gl.glVertex3f(e.x, e.y, e.z);
 					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(1, w[x][y]));
 					gl.glVertex3f(b.x, b.y, b.z);

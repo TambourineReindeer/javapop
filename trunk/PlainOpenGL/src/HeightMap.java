@@ -20,8 +20,18 @@ public class HeightMap {
 	 * 
 	 * 12 vertices per tile:
 	 * 
-	 * 7-------6 9 \ / 4 |\ \ / /| | \ \ / / | | \ 8 / | | 11 5 | | / 2 \ | | /
-	 * / \ \ | |/ / \ \| 10/ \ 3 0-------1
+	 *  7-------6 
+	 * 9 \     / 4 
+	 * |\ \   / /| 
+	 * | \ \ / / | 
+	 * |  \ 8 /  | 
+	 * |  11 5   | 
+	 * |  / 2 \  | 
+	 * | / / \ \ |
+	 * |/ /   \ \|
+	 *10 /     \ 3 
+	 *  0-------1
+	 *  
 	 */
 
 	public HeightMap(int width, int breadth) {
@@ -289,10 +299,10 @@ public class HeightMap {
 		if (x < 0 || y < 0 || x + 1 >= width || y + 1 >= breadth)
 			return;
 		float m;
-		m = Math.max(Math.max(getHeight(x, y), getHeight(x, y + 1)), Math.max(
-				getHeight(x + 1, y), getHeight(x + 1, y + 1)))
-				+ Math.min(Math.min(getHeight(x, y), getHeight(x, y + 1)), Math
-						.min(getHeight(x + 1, y), getHeight(x + 1, y + 1)));
+		m = Math.max(Math.max(getHeight(x, y), getHeight(x, y + 1)), Math.max(getHeight(x + 1, y), getHeight(x + 1,
+				y + 1)))
+				+ Math.min(Math.min(getHeight(x, y), getHeight(x, y + 1)), Math.min(getHeight(x + 1, y), getHeight(
+						x + 1, y + 1)));
 
 		b.put(bufPos(x, y, 2, VZ), m * 0.5f);
 		b.put(bufPos(x, y, 5, VZ), m * 0.5f);
@@ -387,8 +397,7 @@ public class HeightMap {
 		Vector3f l = new Vector3f(new float[] { -9, -5, 10 });
 		l.normalize();
 
-		gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, FloatBuffer
-				.wrap(new float[] { l.x, l.y, l.z, 0.0f }));
+		gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, FloatBuffer.wrap(new float[] { l.x, l.y, l.z, 0.0f }));
 
 		gl.glColor3f(0, 1, 0);
 
@@ -396,8 +405,7 @@ public class HeightMap {
 
 	}
 
-	private Vector3f calcNormal(final Vector3f a, final Vector3f b,
-			final Vector3f c) {
+	private Vector3f calcNormal(final Vector3f a, final Vector3f b, final Vector3f c) {
 		Vector3f ab, ac, n;
 		ab = (Vector3f) b.clone();
 		ab.sub(a);
