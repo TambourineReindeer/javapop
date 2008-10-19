@@ -39,12 +39,34 @@ public class House {
 			for (House h : houses) {
 			gl.glPushMatrix();
 				gl.glTranslatef(h.pos.x, h.pos.y, heightMap.getHeight(h.pos.x, h.pos.y));
+				
+				gl.glEnable(GL.GL_LIGHTING);
 				gl.glBegin(GL.GL_QUADS);
 				gl.glColor3f(1, 1, 1);
+				gl.glNormal3f(-1,0,0);
 				gl.glVertex3f(0.2f, 0.2f, 0.0f);
 				gl.glVertex3f(0.2f, 0.8f, 0.0f);
 				gl.glVertex3f(0.2f, 0.8f, 0.8f);
 				gl.glVertex3f(0.2f, 0.2f, 0.8f);
+				
+				gl.glNormal3f(1,0,0);
+				gl.glVertex3f(0.8f, 0.2f, 0.0f);
+				gl.glVertex3f(0.8f, 0.8f, 0.0f);
+				gl.glVertex3f(0.8f, 0.8f, 0.8f);
+				gl.glVertex3f(0.8f, 0.2f, 0.8f);
+				
+				gl.glNormal3f(0,-1,0);
+				gl.glVertex3f(0.2f, 0.2f, 0.0f);
+				gl.glVertex3f(0.8f, 0.2f, 0.0f);
+				gl.glVertex3f(0.8f, 0.2f, 0.8f);
+				gl.glVertex3f(0.2f, 0.2f, 0.8f);
+				
+				gl.glNormal3f(0,1,0);
+				gl.glVertex3f(0.2f, 0.8f, 0.0f);
+				gl.glVertex3f(0.8f, 0.8f, 0.0f);
+				gl.glVertex3f(0.8f, 0.8f, 0.8f);
+				gl.glVertex3f(0.2f, 0.8f, 0.8f);
+
 				gl.glEnd();
 				gl.glPopMatrix();
 			}
