@@ -118,8 +118,9 @@ public class GLWindow extends Frame implements GLEventListener, KeyListener, Mou
 		heightMap.display(gl);
 
 		Peon.stepall();
+		House.stepAll();
+		
 		Peon.displayall(gl);
-
 		House.display(gl);
 
 		displayCursor(gl);

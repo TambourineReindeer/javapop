@@ -25,11 +25,10 @@ public class Peon {
 		peons = new Vector<Peon>();
 	}
 
-	public static void addPeon(float x, float y)
-	{
-		peons.add(new Peon(x,y));
+	public static void addPeon(float x, float y) {
+		peons.add(new Peon(x, y));
 	}
-	
+
 	private Peon(float x, float y) {
 		this.x = x;
 		this.y = y;
@@ -41,8 +40,8 @@ public class Peon {
 			int status;
 			Peon p;
 			for (Iterator<Peon> i = peons.iterator(); i.hasNext();) {
-				p = i.next();
 
+				p = i.next();
 				status = p.step();
 				if (status == Peon.DEAD) {
 					i.remove();
@@ -77,10 +76,11 @@ public class Peon {
 				return DEAD;
 			} else {
 				// we're on flat ground
-				return SETTLED;
+				if (House.canBuild(x1, y1))
+					return SETTLED;
 			}
 		}
-		// We're on a hill of some sort. Find a flat place to live.
+		// We're on a hill or farm of some sort. Find a flat place to live.
 		findFlatLand();
 
 		float fdx = destX + 0.5f - x;
@@ -131,7 +131,9 @@ public class Peon {
 				deltax = searchRadius * (float) Math.sin(arc);
 				deltay = searchRadius * (float) Math.cos(arc);
 
-				if (h.isFlat((int) (x + 0.5f + deltax), (int) (y + 0.5f + deltay))) {
+				if (h.getHeight((int) (x + 0.5f + deltax), (int) (y + 0.5f + deltay)) > 0 
+						&& h.isFlat((int) (x + 0.5f + deltax), (int) (y + 0.5f + deltay))
+						&& House.canBuild((int) (x + 0.5f + deltax), (int) (y + 0.5f + deltay))) {
 					destX = (int) (x + 0.5f + deltax);
 					destY = (int) (y + 0.5f + deltay);
 					searchRadius = 0;

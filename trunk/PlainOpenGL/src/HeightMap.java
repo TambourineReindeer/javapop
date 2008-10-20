@@ -18,7 +18,7 @@ public class HeightMap {
 	private FloatBuffer b;
 
 	private static int rowstride, tilestride, vertexstride;
-	private static final int VX = 0, VY = 1, VZ = 2, NX = 3, NY = 4, NZ = 5, TX=6, TY=7;
+	private static final int VX = 0, VY = 1, VZ = 2, NX = 3, NY = 4, NZ = 5, TX = 6, TY = 7;
 
 	/*
 	 * b layout: float x,y,z,nx,ny,nz,tx,ty;
@@ -50,117 +50,117 @@ public class HeightMap {
 
 		this.breadth = breadth;
 		this.width = width;
-		
+
 		int x, y;
 		for (y = 0; y < breadth; y++) {
 			for (x = 0; x < width; x++) {
 				// 0
-				b.put((float) x);
-				b.put((float) y);
-				b.put(1.0f);
+				b.put(x);
+				b.put(y);
+				b.put(0.0f);
 				b.put(0);
 				b.put(0);
 				b.put(1);
-				b.put(1);
+				b.put(0);
 				b.put(0);
 				// 1
 				b.put((float) x + 1);
-				b.put((float) y);
-				b.put(1.0f);
+				b.put(y);
+				b.put(0.0f);
 				b.put(0);
 				b.put(0);
 				b.put(1);
-				b.put(2);
+				b.put(1);
 				b.put(0);
 				// 2
-				b.put((float) x + 0.5f);
-				b.put((float) y + 0.5f);
-				b.put(1.0f);
+				b.put(x + 0.5f);
+				b.put(y + 0.5f);
+				b.put(0.0f);
 				b.put(0);
 				b.put(0);
 				b.put(1);
-				b.put(1.5f);
+				b.put(0.5f);
 				b.put(0.5f);
 				// 3
 				b.put((float) x + 1);
-				b.put((float) y);
-				b.put(1.0f);
+				b.put(y);
+				b.put(0.0f);
 				b.put(0);
 				b.put(0);
 				b.put(1);
-				b.put(2);
+				b.put(1);
 				b.put(0);
 				// 4
 				b.put((float) x + 1);
 				b.put((float) y + 1);
-				b.put(1.0f);
+				b.put(0.0f);
 				b.put(0);
 				b.put(0);
 				b.put(1);
-				b.put(2);
+				b.put(1);
 				b.put(1);
 				// 5
-				b.put((float) x + 0.5f);
-				b.put((float) y + 0.5f);
-				b.put(1.0f);
+				b.put(x + 0.5f);
+				b.put(y + 0.5f);
+				b.put(0.0f);
 				b.put(0);
 				b.put(0);
 				b.put(1);
-				b.put(1.5f);
+				b.put(0.5f);
 				b.put(0.5f);
 				// 6
 				b.put((float) x + 1);
 				b.put((float) y + 1);
-				b.put(1.0f);
+				b.put(0.0f);
 				b.put(0);
 				b.put(0);
 				b.put(1);
-				b.put(2);
+				b.put(1);
 				b.put(1);
 				// 7
-				b.put((float) x);
+				b.put(x);
 				b.put((float) y + 1);
-				b.put(1.0f);
+				b.put(0.0f);
 				b.put(0);
 				b.put(0);
 				b.put(1);
-				b.put(1);
+				b.put(0);
 				b.put(1);
 				// 8
-				b.put((float) x + 0.5f);
-				b.put((float) y + 0.5f);
-				b.put(1.0f);
+				b.put(x + 0.5f);
+				b.put(y + 0.5f);
+				b.put(0.0f);
 				b.put(0);
 				b.put(0);
 				b.put(1);
-				b.put(1.5f);
+				b.put(0.5f);
 				b.put(0.5f);
 				// 9
-				b.put((float) x);
+				b.put(x);
 				b.put((float) y + 1);
-				b.put(1.0f);
+				b.put(0.0f);
 				b.put(0);
 				b.put(0);
 				b.put(1);
-				b.put(1);
+				b.put(0);
 				b.put(1);
 				// 10
-				b.put((float) x);
-				b.put((float) y);
-				b.put(1.0f);
+				b.put(x);
+				b.put(y);
+				b.put(0.0f);
 				b.put(0);
 				b.put(0);
 				b.put(1);
-				b.put(1);
+				b.put(0);
 				b.put(0);
 				// 11
-				b.put((float) x + 0.5f);
-				b.put((float) y + 0.5f);
-				b.put(1.0f);
+				b.put(x + 0.5f);
+				b.put(y + 0.5f);
+				b.put(0.0f);
 				b.put(0);
 				b.put(0);
 				b.put(1);
-				b.put(1.5f);
+				b.put(0.5f);
 				b.put(0.5f);
 			}
 		}
@@ -287,11 +287,20 @@ public class HeightMap {
 	}
 
 	public void randomize() {
-		int n;
+		int n, m;
+		int x, y;
 		Random r = new Random();
-		for (n = 0; n < 1000; n++) {
-			up(r.nextInt(width), r.nextInt(breadth));
-			down(r.nextInt(width), r.nextInt(breadth));
+		for (n = 0; n < 100; n++) {
+			x = r.nextInt(width);
+			y = r.nextInt(breadth);
+			for (m = 0; m < r.nextInt(8); m++)
+				up(x, y);
+			for (m = 0; m < r.nextInt(8); m++)
+				up(x - 5 + r.nextInt(10), y - 5 + r.nextInt(10));
+			for (m = 0; m < r.nextInt(2); m++)
+				down(x - 5 + r.nextInt(10), -5 + r.nextInt(10));
+			for (m = 0; m < r.nextInt(2); m++)
+				down(x, y);
 		}
 	}
 
@@ -306,20 +315,22 @@ public class HeightMap {
 	}
 
 	private void setHeight(int x, int y, int height) {
-		if (x >= 0 && y >= 0 && x < width && y < breadth) {
-			b.put(bufPos(x, y, 0, VZ), (float) height);
-			b.put(bufPos(x, y, 10, VZ), (float) height);
+		if (x >= 0 && y >= 0 && x <= width && y <= breadth) {
+			if (x < width && y < width) {
+				b.put(bufPos(x, y, 0, VZ), height);
+				b.put(bufPos(x, y, 10, VZ), height);
+			}
 			if (x >= 1 && y >= 1) {
-				b.put(bufPos(x - 1, y - 1, 4, VZ), (float) height);
-				b.put(bufPos(x - 1, y - 1, 6, VZ), (float) height);
+				b.put(bufPos(x - 1, y - 1, 4, VZ), height);
+				b.put(bufPos(x - 1, y - 1, 6, VZ), height);
 			}
-			if (y >= 1) {
-				b.put(bufPos(x, y - 1, 7, VZ), (float) height);
-				b.put(bufPos(x, y - 1, 9, VZ), (float) height);
+			if (y >= 1 && x < width) {
+				b.put(bufPos(x, y - 1, 7, VZ), height);
+				b.put(bufPos(x, y - 1, 9, VZ), height);
 			}
-			if (x >= 1) {
-				b.put(bufPos(x - 1, y, 1, VZ), (float) height);
-				b.put(bufPos(x - 1, y, 3, VZ), (float) height);
+			if (x >= 1 && y < width) {
+				b.put(bufPos(x - 1, y, 1, VZ), height);
+				b.put(bufPos(x - 1, y, 3, VZ), height);
 			}
 		}
 	}
@@ -328,10 +339,8 @@ public class HeightMap {
 		if (x < 0 || y < 0 || x + 1 >= width || y + 1 >= breadth)
 			return;
 		float m;
-		m = Math.max(Math.max(getHeight(x, y), getHeight(x, y + 1)), Math.max(getHeight(x + 1, y), getHeight(x + 1,
-				y + 1)))
-				+ Math.min(Math.min(getHeight(x, y), getHeight(x, y + 1)), Math.min(getHeight(x + 1, y), getHeight(
-						x + 1, y + 1)));
+		m = Math.max(Math.max(getHeight(x, y), getHeight(x, y + 1)), Math.max(getHeight(x + 1, y), getHeight(x + 1, y + 1)))
+				+ Math.min(Math.min(getHeight(x, y), getHeight(x, y + 1)), Math.min(getHeight(x + 1, y), getHeight(x + 1, y + 1)));
 
 		b.put(bufPos(x, y, 2, VZ), m * 0.5f);
 		b.put(bufPos(x, y, 5, VZ), m * 0.5f);
@@ -339,33 +348,29 @@ public class HeightMap {
 		b.put(bufPos(x, y, 11, VZ), m * 0.5f);
 
 		setNormals(x, y);
-		
-		if(getHeight(x,y) ==0 &&getHeight(x,y+1) ==0 &&getHeight(x+1,y) ==0 &&getHeight(x+1,y+1) ==0 )
-		{
+
+		if (getHeight(x, y) == 0 && getHeight(x, y + 1) == 0 && getHeight(x + 1, y) == 0 && getHeight(x + 1, y + 1) == 0) {
 			setTexture(x, y, 0);
-		}
-		else
-		{
+		} else {
 			setTexture(x, y, 1);
 		}
 
 	}
-	
-	private void setTexture(int x, int y, int t)
-	{
-		b.put(bufPos(x,y,0,TX),t);
-		b.put(bufPos(x,y,1,TX),t+1);
-		b.put(bufPos(x,y,2,TX),t+0.5f);
-		b.put(bufPos(x,y,3,TX),t+1);
-		b.put(bufPos(x,y,4,TX),t+1);
-		b.put(bufPos(x,y,5,TX),t+0.5f);
-		b.put(bufPos(x,y,6,TX),t+1);
-		b.put(bufPos(x,y,7,TX),t);
-		b.put(bufPos(x,y,8,TX),t+0.5f);
-		b.put(bufPos(x,y,9,TX),t);
-		b.put(bufPos(x,y,10,TX),t);
-		b.put(bufPos(x,y,11,TX),t+0.5f);
-		
+
+	public void setTexture(int x, int y, int t) {
+		b.put(bufPos(x, y, 0, TX), t);
+		b.put(bufPos(x, y, 1, TX), t + 1);
+		b.put(bufPos(x, y, 2, TX), t + 0.5f);
+		b.put(bufPos(x, y, 3, TX), t + 1);
+		b.put(bufPos(x, y, 4, TX), t + 1);
+		b.put(bufPos(x, y, 5, TX), t + 0.5f);
+		b.put(bufPos(x, y, 6, TX), t + 1);
+		b.put(bufPos(x, y, 7, TX), t);
+		b.put(bufPos(x, y, 8, TX), t + 0.5f);
+		b.put(bufPos(x, y, 9, TX), t);
+		b.put(bufPos(x, y, 10, TX), t);
+		b.put(bufPos(x, y, 11, TX), t + 0.5f);
+
 	}
 
 	private void setNormals(int x, int y) {
@@ -406,7 +411,7 @@ public class HeightMap {
 		b.put(bufPos(x, y, vertC, NX), vn.x);
 		b.put(bufPos(x, y, vertC, NY), vn.y);
 		b.put(bufPos(x, y, vertC, NZ), vn.z);
-		
+
 	}
 
 	private void conform(int x, int y, int height, int radius) {
@@ -414,7 +419,7 @@ public class HeightMap {
 		boolean bChanged = false;
 		for (ex = x - radius; ex <= x + radius; ex++) {
 			for (wy = y - radius; wy <= y + radius; wy++) {
-				if (ex >= 0 && ex < width && wy >= 0 && wy < breadth)
+				if (ex >= 0 && ex <= width && wy >= 0 && wy <= breadth)
 					if (getHeight(ex, wy) - height > radius) {
 						bChanged = true;
 						setHeight(ex, wy, height + radius);
@@ -456,13 +461,13 @@ public class HeightMap {
 		gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, FloatBuffer.wrap(new float[] { l.x, l.y, l.z, 0.0f }));
 
 		gl.glColor3f(1, 1, 1);
-		
+
 		/*gl.glBindTexture(GL.GL_TEXTURE_2D, texture[0]);
 		gl.glEnable(GL.GL_TEXTURE_2D);
 		*/
 		tex.enable();
 		tex.bind();
-		
+
 		gl.glDrawArrays(GL.GL_TRIANGLES, 0, width * breadth * 4 * 3);
 
 		tex.disable();
@@ -493,18 +498,17 @@ public class HeightMap {
 		b.position(NX);
 		gl.glNormalPointer(GL.GL_FLOAT, vertexstride * 4, b);
 		b.position(TX);
-		gl.glTexCoordPointer(2,GL.GL_FLOAT,vertexstride * 4,b);
-		
+		gl.glTexCoordPointer(2, GL.GL_FLOAT, vertexstride * 4, b);
+
 		gl.glMatrixMode(GL.GL_TEXTURE);
 		gl.glLoadIdentity();
-		gl.glScalef(32.0f/256.0f, 32.0f/256.0f, 1.0f);
-		
+		gl.glScalef(32.0f / 256.0f, 32.0f / 256.0f, 1.0f);
+
 		try {
-			tex = TextureIO.newTexture(new File("//tex.png"),false);
+			tex = TextureIO.newTexture(new File("//tex.png"), false);
 			tex.enable();
 			tex.bind();
-	
-			
+
 		} catch (GLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -512,7 +516,7 @@ public class HeightMap {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 }

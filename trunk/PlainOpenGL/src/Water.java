@@ -9,7 +9,7 @@ import javax.vecmath.Vector3f;
 
 public class Water {
 
-	private static HeightMap h;
+	private HeightMap h;
 	private float[][] w, w2;
 	private float[][] mx, my;
 	private Vector<Point2f> springs;
@@ -58,7 +58,6 @@ public class Water {
 	}
 
 	public void step2() {
-		Random r = new Random();
 		float[][] neww = new float[h.getWidth()][h.getBreadth()];
 		float[][] neww2 = new float[h.getWidth() - 1][h.getBreadth() - 1];
 
@@ -112,7 +111,6 @@ public class Water {
 		float[][] neww = new float[h.getWidth()][h.getBreadth()];
 		float[][] newmx = new float[h.getWidth()][h.getBreadth()];
 		float[][] newmy = new float[h.getWidth()][h.getBreadth()];
-		int[][] newmc = new int[h.getWidth()][h.getBreadth()];
 
 		Point2f s;
 		Point4f d;
@@ -163,8 +161,6 @@ public class Water {
 	}
 
 	public void display(GL gl) {
-		// TODO Auto-generated method stub
-		Random r = new Random();
 		n++;
 		int m = 0;
 		float s = 0.5f;
