@@ -12,6 +12,7 @@ import javax.vecmath.Vector3f;
 
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.TextureIO;
+import java.net.URL;
 
 public class HeightMap {
 	private int width, breadth;
@@ -506,7 +507,8 @@ public class HeightMap {
 		gl.glScalef(32.0f / 256.0f, 32.0f / 256.0f, 1.0f);
 
 		try {
-			tex = TextureIO.newTexture(new File("//tex.png"), false);
+                    URL u = getClass().getResource("/com/novusradix/javapop/textures/tex.png");
+			tex = TextureIO.newTexture(u, false, "png");
 			tex.enable();
 			tex.bind();
 

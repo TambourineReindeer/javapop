@@ -1,6 +1,7 @@
 package com.novusradix.JavaPop;
 
 
+import java.awt.GridLayout;
 import javax.media.opengl.GLCapabilities;
 import javax.swing.JFrame;
 public class JavaPop {
@@ -18,6 +19,7 @@ public class JavaPop {
                 f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 f.setSize(1024, 768);
                 f.setTitle("JavaPop");
+                f.setLayout(new GridLayout());
                 MainCanvas c = new MainCanvas(h, caps);
                 
                 f.add(c);
