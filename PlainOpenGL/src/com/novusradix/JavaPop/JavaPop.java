@@ -26,7 +26,7 @@ public class JavaPop {
                 f.setVisible(true);
                
                 ControlFrame cf = new ControlFrame();
-           
+                cf.setBounds(1024, 0, cf.getWidth(), cf.getHeight());
                 cf.setVisible(true);
         }
 	
