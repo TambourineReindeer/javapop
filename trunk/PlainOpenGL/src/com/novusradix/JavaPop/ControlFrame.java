@@ -31,7 +31,6 @@ public class ControlFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("JavaPop"); // NOI18N
-        setAlwaysOnTop(true);
         setFocusableWindowState(false);
         setResizable(false);
         getContentPane().setLayout(new java.awt.GridLayout());
