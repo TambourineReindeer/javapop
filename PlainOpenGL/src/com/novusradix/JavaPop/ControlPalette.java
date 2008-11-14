@@ -33,33 +33,20 @@ public class ControlPalette extends javax.swing.JPanel {
         setMaximumSize(new java.awt.Dimension(128, 64));
         setMinimumSize(new java.awt.Dimension(128, 64));
         setPreferredSize(new java.awt.Dimension(128, 64));
+        setLayout(new java.awt.GridLayout());
 
         ToolGroup.add(UpDownButton);
         UpDownButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/novusradix/JavaPop/icons/UpDown.png"))); // NOI18N
         UpDownButton.setSelected(true);
         UpDownButton.setToolTipText("Raise and lower land");
         UpDownButton.setPreferredSize(new java.awt.Dimension(64, 64));
+        add(UpDownButton);
 
         ToolGroup.add(LightningButton);
         LightningButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/novusradix/JavaPop/icons/Lightning.png"))); // NOI18N
         LightningButton.setToolTipText("Lightning");
         LightningButton.setPreferredSize(new java.awt.Dimension(64, 64));
-
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(UpDownButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(LightningButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                .add(UpDownButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(LightningButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-        );
+        add(LightningButton);
     }// </editor-fold>//GEN-END:initComponents
 
 
