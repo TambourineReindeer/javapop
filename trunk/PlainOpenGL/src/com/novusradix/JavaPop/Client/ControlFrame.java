@@ -4,7 +4,7 @@
  * Created on November 13, 2008, 8:55 PM
  */
 
-package com.novusradix.JavaPop;
+package com.novusradix.JavaPop.Client;
 
 /**
  *
@@ -26,14 +26,14 @@ public class ControlFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        controlPalette1 = new com.novusradix.JavaPop.ControlPalette();
-        controlPalette2 = new com.novusradix.JavaPop.ControlPalette();
+        controlPalette1 = new com.novusradix.JavaPop.Client.ControlPalette();
+        controlPalette2 = new com.novusradix.JavaPop.Client.ControlPalette();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("JavaPop"); // NOI18N
         setFocusableWindowState(false);
         setResizable(false);
-        getContentPane().setLayout(new java.awt.GridLayout());
+        getContentPane().setLayout(new java.awt.GridLayout(1, 0));
         getContentPane().add(controlPalette2);
 
         pack();
@@ -41,8 +41,8 @@ public class ControlFrame extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private com.novusradix.JavaPop.ControlPalette controlPalette1;
-    private com.novusradix.JavaPop.ControlPalette controlPalette2;
+    private com.novusradix.JavaPop.Client.ControlPalette controlPalette1;
+    private com.novusradix.JavaPop.Client.ControlPalette controlPalette2;
     // End of variables declaration//GEN-END:variables
 
 }

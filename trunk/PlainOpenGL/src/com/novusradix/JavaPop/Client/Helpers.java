@@ -1,4 +1,4 @@
-package com.novusradix.JavaPop;
+package com.novusradix.JavaPop.Client;
 import javax.vecmath.Vector3f;
 
 public class Helpers {
