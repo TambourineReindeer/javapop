@@ -1,4 +1,4 @@
-package com.novusradix.JavaPop;
+package com.novusradix.JavaPop.Client;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;

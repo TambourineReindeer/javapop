@@ -1,6 +1,9 @@
 package com.novusradix.JavaPop;
 
 
+import com.novusradix.JavaPop.Client.ControlFrame;
+import com.novusradix.JavaPop.Client.HeightMap;
+import com.novusradix.JavaPop.Client.MainCanvas;
 import java.awt.GridLayout;
 import javax.media.opengl.GLCapabilities;
 import javax.swing.JFrame;

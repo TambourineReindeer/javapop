@@ -2,9 +2,8 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.novusradix.JavaPop;
+package com.novusradix.JavaPop.Client;
 
-import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -12,7 +11,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
-import java.awt.event.WindowEvent;
 import java.nio.FloatBuffer;
 import java.util.Random;
 
@@ -27,8 +25,6 @@ import javax.vecmath.Vector4f;
 
 import com.sun.opengl.util.Animator;
 import java.awt.event.MouseWheelListener;
-import java.awt.event.WindowListener;
-import javax.swing.JFrame;
 
 public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener, MouseMotionListener, MouseListener, MouseWheelListener {
 
@@ -313,11 +309,11 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     public void mouseReleased(MouseEvent e) {
         // TODO Auto-generated method stub
         if (Math.abs(e.getX() - dragOrigin.x) < 16 && Math.abs(e.getY() - dragOrigin.y) < 16) {
-            if (e.getButton() == MouseEvent.BUTTON1) {
+           /* if (e.getButton() == MouseEvent.BUTTON1) {
                 heightMap.up(selected.x, selected.y);
             } else if (e.getButton() == MouseEvent.BUTTON3) {
                 heightMap.down(selected.x, selected.y);
-            }
+            }*/
         } else {
             mouseMoved(e);
 

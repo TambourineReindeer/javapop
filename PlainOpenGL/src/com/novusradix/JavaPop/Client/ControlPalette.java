@@ -4,7 +4,7 @@
  * Created on November 13, 2008, 7:49 PM
  */
 
-package com.novusradix.JavaPop;
+package com.novusradix.JavaPop.Client;
 
 /**
  *
