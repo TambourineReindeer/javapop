@@ -13,7 +13,7 @@ import java.nio.IntBuffer;
  *
  * @author mom
  */
-public class HeightMapUpdate implements Serializable {
+public class HeightMapUpdate extends Message implements Serializable {
 
     public Rectangle dirtyRegion;
     public int heightData[];
@@ -26,5 +26,10 @@ public class HeightMapUpdate implements Serializable {
             b.position(x + n * breadth);
             b.get(heightData, 0, width);
         }
+    }
+    
+    public void execute()
+    {
+        
     }
 }
