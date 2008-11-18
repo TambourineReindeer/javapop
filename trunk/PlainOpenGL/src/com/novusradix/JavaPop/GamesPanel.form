@@ -20,7 +20,7 @@
                   <Component id="btnNewGame" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="btnJoinGame" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="35" max="32767" attributes="0"/>
+              <EmptySpace pref="51" max="32767" attributes="0"/>
           </Group>
           <Component id="jScrollPane1" alignment="0" pref="145" max="32767" attributes="0"/>
       </Group>

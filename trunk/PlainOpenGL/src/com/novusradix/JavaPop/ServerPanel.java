@@ -6,6 +6,7 @@
 
 package com.novusradix.JavaPop;
 
+import com.novusradix.JavaPop.Client.PlayerState;
 import java.util.Vector;
 import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
@@ -16,7 +17,8 @@ import javax.swing.event.ListDataListener;
  * @author  mom
  */
 public class ServerPanel extends javax.swing.JPanel {
-        DefaultListModel serverNames;
+   private DefaultListModel serverNames;
+   public LobbyFrame parent;
    
     /** Creates new form ServerPanel */
     public ServerPanel() {
@@ -115,9 +117,14 @@ private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
 private void lstServerListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstServerListValueChanged
     
-    if(lstServerList.getSelectedValue() != null)
+    if(lstServerList.getSelectedValue() != null && !evt.getValueIsAdjusting())
     {
         String s = (String)lstServerList.getSelectedValue();
+        
+        GamesPanel gsp = parent.getGamesPanel();
+        GamePanel gp = parent.getGamePanel();
+        
+        parent.p = new PlayerState(s, gsp, gp);
         
     }
 }//GEN-LAST:event_lstServerListValueChanged

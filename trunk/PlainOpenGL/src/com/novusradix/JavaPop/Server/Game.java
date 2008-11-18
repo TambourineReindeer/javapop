@@ -18,15 +18,10 @@ public class Game implements Runnable {
     private Player owner;
     private HeightMap h;
 
-    public Game(Player p) {
+    public Game(Player owner) {
         players = new Vector<Player>();
-        players.add(p);
-        owner = p;
-
-        h = new HeightMap(128, 128);
-        h.randomize(1);
-        id = nextId++;
-        h.sendUpdates(players);
+        players.add(owner);
+        this.owner = owner;
     }
 
     public int getId() {
@@ -35,9 +30,15 @@ public class Game implements Runnable {
 
     public void addPlayer(Player p) {
         players.add(p);
+        
+        
     }
 
     public void startGame() {
+        h = new HeightMap(128, 128);
+        h.randomize(1);
+        id = nextId++;
+        h.sendUpdates(players);
         new Thread(this).start();
     }
 

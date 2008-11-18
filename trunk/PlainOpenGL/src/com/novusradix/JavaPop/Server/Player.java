@@ -23,14 +23,19 @@ public class Player implements Runnable {
     public Game currentGame;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
-
+    public String name;
+    enum PlayerState{InServerLobby, InGameLobby, InGame};
+    
     public Player(Server s, Socket socket) {
         this.s = s;
         this.socket = socket;
+        name = "No name";
         try {
-            ois = new ObjectInputStream(socket.getInputStream());
             oos = new ObjectOutputStream(socket.getOutputStream());
-            (new Thread(this)).start();
+            oos.flush();
+                    
+            ois = new ObjectInputStream(socket.getInputStream());
+            (new Thread(this, "Server Player")).start();
         } catch (IOException ioe) {
         }
     }
@@ -46,6 +51,7 @@ public class Player implements Runnable {
                 message = (Message) ois.readObject();
                 message.server = s;
                 message.serverGame = currentGame;
+                message.serverPlayer = this;
                 message.execute();
             }
         } catch (IOException ioe) {
