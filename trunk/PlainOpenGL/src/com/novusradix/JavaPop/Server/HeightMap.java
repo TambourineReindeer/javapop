@@ -4,13 +4,15 @@
  */
 package com.novusradix.JavaPop.Server;
 
-import java.nio.FloatBuffer;
+import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import java.util.Random;
 
 import javax.vecmath.Point2f;
 
 import com.sun.opengl.util.BufferUtil;
+import java.awt.Rectangle;
 import java.nio.IntBuffer;
+import java.util.Collection;
 
 /**
  *
@@ -22,6 +24,8 @@ public class HeightMap {
     private IntBuffer b;
     private static int rowstride;
     private static int VZ = 0;
+    private Rectangle dirty;
+    private Rectangle bounds;
 
     public HeightMap(int width, int breadth) {
 
@@ -30,6 +34,8 @@ public class HeightMap {
         this.breadth = breadth;
         this.width = width;
         rowstride = width;
+        bounds = new Rectangle(0, 0, width, breadth);
+
         int x, y;
         for (y = 0; y < breadth; y++) {
             for (x = 0; x < width; x++) {
@@ -40,7 +46,6 @@ public class HeightMap {
             }
         }
         b.flip();
-        randomize();
     }
 
     public int getWidth() {
@@ -54,6 +59,7 @@ public class HeightMap {
     private static int bufPos(int x, int y, int vertex, int index) {
         return y * rowstride + x;
     }
+
     private static int bufPos(int x, int y) {
         return y * rowstride + x;
     }
@@ -62,22 +68,22 @@ public class HeightMap {
         try {
             return (int) b.get(bufPos(x, y, 0, VZ));
         } catch (Exception e) {
-            System.out.println("Array out of bounds in getHeight:" + x + ", " + y);           
+            System.out.println("Array out of bounds in getHeight:" + x + ", " + y);
         }
         return 0;
     }
 
     public float getHeight2(int x, int y) {
         try {
-            int ha,hb,hc,hd;
-            ha = getHeight(x,y);
-            hb = getHeight(x,y);
-            hc = getHeight(x,y);
-            hd = getHeight(x,y);
-            
-            return (Math.max(Math.max(ha,hb),Math.max(hb,hc)) + Math.min(Math.min(ha,hb),Math.min(hc,hd))) / 2.0f;
+            int ha, hb, hc, hd;
+            ha = getHeight(x, y);
+            hb = getHeight(x, y);
+            hc = getHeight(x, y);
+            hd = getHeight(x, y);
+
+            return (Math.max(Math.max(ha, hb), Math.max(hb, hc)) + Math.min(Math.min(ha, hb), Math.min(hc, hd))) / 2.0f;
         } catch (Exception e) {
-             System.out.println("Array out of bounds in getHeight2:" + x + ", " + y);           
+            System.out.println("Array out of bounds in getHeight2:" + x + ", " + y);
 
         }
         return 0;
@@ -85,7 +91,7 @@ public class HeightMap {
 
     public float getHeight(float x, float y) {
         int x1, x2, y1, y2;
-        float ha, hb, hc, hd, hm; 
+        float ha, hb, hc, hd, hm;
         x1 = (int) Math.floor(x);
         x2 = (int) Math.ceil(x);
         y1 = (int) Math.floor(y);
@@ -169,10 +175,11 @@ public class HeightMap {
         }
     }
 
-    public void randomize() {
+    public void randomize(int seed) {
         int n, m;
         int x, y;
-        Random r = new Random();
+        Random r = new Random(seed);
+
         for (n = 0; n < 100; n++) {
             x = r.nextInt(width);
             y = r.nextInt(breadth);
@@ -220,16 +227,77 @@ public class HeightMap {
         }
     }
 
+    private void conform(int x, int y, int height, int radius) {
+        int ex, wy;
+        boolean bChanged = false;
+        for (ex = x - radius; ex <= x + radius; ex++) {
+            for (wy = y - radius; wy <= y + radius; wy++) {
+                if (ex >= 0 && ex <= width && wy >= 0 && wy <= breadth) {
+                    if (getHeight(ex, wy) - height > radius) {
+                        bChanged = true;
+                        setHeight(ex, wy, height + radius);
+                    } else if (height - getHeight(ex, wy) > radius) {
+                        bChanged = true;
+                        setHeight(ex, wy, height - radius);
+                    }
+                }
+            }
+        }
+        if (bChanged) {
+            conform(x, y, height, radius + 1);
+        } else {
+            markDirty(new Rectangle(x - radius, y - radius, radius * 2 + 1, radius * 2 + 1));
+        }
+    }
+
     public boolean isFlat(int x, int y) {
-        int a = 0, b = 0, c = 0, d = 0;
+        int ha = 0, hb = 0, hc = 0, hd = 0;
         if (x < 0 || y < 0 || x + 1 >= width || y + 1 >= breadth) {
             return false;
         }
-        a = getHeight(x, y);
-        b = getHeight(x, y + 1);
-        c = getHeight(x + 1, y);
-        d = getHeight(x + 1, y + 1);
-        return (a == b && b == c && c == d);
+        ha = getHeight(x, y);
+        hb = getHeight(x, y + 1);
+        hc = getHeight(x + 1, y);
+        hd = getHeight(x + 1, y + 1);
+        return (ha == hb && hb == hc && hc == hd);
     }
 
-   }
+    private void markDirty(int x, int y) {
+        if (dirty == null) {
+            dirty = new Rectangle(x, y);
+        }
+        if (x < dirty.x) {
+            dirty.width += dirty.x - x;
+            dirty.x = x;
+        }
+        if (x > dirty.x + dirty.width) {
+            dirty.width = x - dirty.x;
+        }
+        if (y < dirty.y) {
+            dirty.height += dirty.y - y;
+            dirty.y = y;
+        }
+        if (y > dirty.height) {
+            dirty.height = y - dirty.y;
+        }
+        dirty = dirty.intersection(bounds);
+    }
+
+    private void markDirty(Rectangle r) {
+        dirty = dirty.union(r);
+        dirty = dirty.intersection(bounds);
+    }
+    
+    public void sendUpdates(Collection<Player> players)
+    {
+        HeightMapUpdate m = new HeightMapUpdate(dirty, b);
+        
+        for(Player p:players)
+        {
+                p.sendMessage(m);
+        }
+        
+        dirty = null;
+    }
+    
+}

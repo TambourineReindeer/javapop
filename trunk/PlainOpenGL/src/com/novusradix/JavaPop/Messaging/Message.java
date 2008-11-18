@@ -17,6 +17,7 @@ public abstract class Message implements Serializable {
     public transient com.novusradix.JavaPop.Server.Game serverGame;
    
     public transient com.novusradix.JavaPop.Client.Game clientGame;
+    public transient com.novusradix.JavaPop.Client.PlayerState playerState;
     
     public abstract void execute();
 
