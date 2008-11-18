@@ -45,6 +45,8 @@ public class ServerPanel extends javax.swing.JPanel {
         btnConnect = new javax.swing.JButton();
         btnNewLocalServer = new javax.swing.JButton();
 
+        setBorder(javax.swing.BorderFactory.createTitledBorder("Server"));
+
         lstServerList.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
@@ -81,18 +83,18 @@ public class ServerPanel extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(btnNewLocalServer)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(txtServerName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
+                .add(txtServerName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(btnConnect))
             .add(lblConnect)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(btnNewLocalServer)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(lblConnect)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -125,7 +127,7 @@ private void lstServerListValueChanged(javax.swing.event.ListSelectionEvent evt)
         GamePanel gp = parent.getGamePanel();
         
         parent.p = new PlayerState(s, gsp, gp);
-        
+        gsp.setEnabled(true);
     }
 }//GEN-LAST:event_lstServerListValueChanged
 
