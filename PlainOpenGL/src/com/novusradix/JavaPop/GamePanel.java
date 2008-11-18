@@ -12,6 +12,8 @@ package com.novusradix.JavaPop;
  */
 public class GamePanel extends javax.swing.JPanel {
 
+    public LobbyFrame parent;
+   
     /** Creates new form GamePanel */
     public GamePanel() {
         initComponents();

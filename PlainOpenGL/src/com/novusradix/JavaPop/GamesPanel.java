@@ -6,6 +6,10 @@
 
 package com.novusradix.JavaPop;
 
+import com.novusradix.JavaPop.Client.PlayerState;
+import com.novusradix.JavaPop.Messaging.LobbyNewGame;
+import com.novusradix.JavaPop.Server.GameInfo;
+import java.util.Vector;
 import javax.swing.DefaultListModel;
 
 /**
@@ -14,8 +18,9 @@ import javax.swing.DefaultListModel;
  */
 public class GamesPanel extends javax.swing.JPanel {
 
-    DefaultListModel gameList;
-    
+    private DefaultListModel gameList;
+    public LobbyFrame parent;
+   
     /** Creates new form GamesPanel */
     public GamesPanel() {
         initComponents();
@@ -23,6 +28,11 @@ public class GamesPanel extends javax.swing.JPanel {
         lstGames.setModel(gameList);
     }
 
+    public void setGames(Vector<GameInfo> gs)
+    {
+        lstGames.setListData(gs);
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -76,6 +86,8 @@ public class GamesPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
 private void btnNewGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewGameActionPerformed
+LobbyNewGame lng = new LobbyNewGame();
+parent.p.sendMessage(lng);
 
 }//GEN-LAST:event_btnNewGameActionPerformed
 

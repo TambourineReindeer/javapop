@@ -12,8 +12,8 @@ public class LobbyNewGame extends Message{
 
     public void execute()
     {
-        com.novusradix.JavaPop.Server.Game g;
-        g = server.newGame(serverPlayer); 
+        
+        server.newGame(serverPlayer); 
        
     }
 }

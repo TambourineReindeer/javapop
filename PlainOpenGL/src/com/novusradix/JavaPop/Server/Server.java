@@ -5,6 +5,7 @@
 
 package com.novusradix.JavaPop.Server;
 
+import com.novusradix.JavaPop.Messaging.GameList;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Vector;
@@ -16,12 +17,15 @@ import java.util.Vector;
 public class Server implements Runnable {
 
     private Vector<Game> games;
+    private Vector<Player> players;
     
     private int port;
     public Server(int port)
     {
+        games=new Vector<Game>();
+        players = new Vector<Player>();
         this.port = port;
-        new Thread(this).start();
+        new Thread(this,"Server").start();
     }
     
     public void run() {
@@ -31,17 +35,21 @@ public class Server implements Runnable {
         
         while(s.isBound())
         {
-            new Player(this, s.accept());
+            players.add(new Player(this, s.accept()));
         }
         }
         catch (IOException ioe)
         {}
-        port=0;
+        System.out.print("Server quitting.\n");
     }
     
-    public Game newGame(Player p)
+    public void newGame(Player p)
     {
-        return new Game(p);
+        games.add(new Game(p));
+        
+        GameList gl = new GameList(games);
+        for( Player pl:players)
+            pl.sendMessage(gl);
     }
 
 }

@@ -4,6 +4,8 @@
  */
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.GamePanel;
+import com.novusradix.JavaPop.GamesPanel;
 import com.novusradix.JavaPop.Messaging.Message;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -22,10 +24,15 @@ public class PlayerState implements Runnable {
     private int mana;
     public BaseTool currentTool;
     private Socket socket;
+    public GamesPanel gamesPanel;
+    public GamePanel gamePanel;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
 
-    public PlayerState(String host) {
+    public PlayerState(String host, GamesPanel gsp, GamePanel gp) {
+        gamesPanel = gsp;
+        gamePanel = gp;
+
         try {
 
             socket = new Socket(host, 13579);
@@ -34,9 +41,15 @@ public class PlayerState implements Runnable {
         } catch (IOException ex) {
             Logger.getLogger(PlayerState.class.getName()).log(Level.SEVERE, null, ex);
         }
+        try {
+            oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.flush();
+            ois = new ObjectInputStream(socket.getInputStream());
+            (new Thread(this,"Client Player")).start();
+        } catch (IOException ioe) {
+        }
 
 
-        new Thread(this).start();
     }
 
     public void run() {
@@ -50,6 +63,15 @@ public class PlayerState implements Runnable {
             }
         } catch (IOException ioe) {
         } catch (ClassNotFoundException cnfe) {
+        }
+    }
+    
+    public synchronized void sendMessage(Message m)  {
+        try {
+            oos.writeObject(m);
+            oos.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(PlayerState.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
