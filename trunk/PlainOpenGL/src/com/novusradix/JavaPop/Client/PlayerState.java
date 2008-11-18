@@ -62,7 +62,13 @@ public class PlayerState implements Runnable {
                 message.execute();
             }
         } catch (IOException ioe) {
+        int i = 0;
         } catch (ClassNotFoundException cnfe) {
+       int i = 0;
+        }
+        catch (Exception e)
+        {
+        int i =0;
         }
     }
     

@@ -35,7 +35,10 @@ public class Server implements Runnable {
         
         while(s.isBound())
         {
-            players.add(new Player(this, s.accept()));
+            Player p = new Player(this, s.accept());
+            players.add(p);
+            GameList gl = new GameList(games);
+            p.sendMessage(gl);
         }
         }
         catch (IOException ioe)

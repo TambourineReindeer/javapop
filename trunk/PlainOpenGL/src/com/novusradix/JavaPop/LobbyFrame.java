@@ -21,6 +21,8 @@ public class LobbyFrame extends javax.swing.JFrame {
         serverPanel1.parent = this;
         gamesPanel1.parent = this;
         gamePanel1.parent = this;
+        gamesPanel1.setEnabled(false);
+        gamePanel1.setEnabled(false);
     }
 
     /** This method is called from within the constructor to
