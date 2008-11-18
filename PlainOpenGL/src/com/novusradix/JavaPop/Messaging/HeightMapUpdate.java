@@ -6,7 +6,6 @@ package com.novusradix.JavaPop.Messaging;
 
 import java.awt.Rectangle;
 import java.io.Serializable;
-import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 /**
@@ -18,13 +17,13 @@ public class HeightMapUpdate extends Message implements Serializable {
     public Rectangle dirtyRegion;
     public int heightData[];
 
-    public HeightMapUpdate(int x, int y, int width, int breadth, IntBuffer b) {
-        dirtyRegion = new Rectangle(x, y, width, breadth);
-        heightData = new int[width * breadth];
+    public HeightMapUpdate(Rectangle dirty, IntBuffer b) {
+        dirtyRegion = dirty;
+        heightData = new int[dirty.width * dirty.height];
 
-        for (int n = 0; n < breadth; n++) {
-            b.position(x + n * breadth);
-            b.get(heightData, 0, width);
+        for (int n = 0; n < dirty.height; n++) {
+            b.position(dirty.x + n * dirty.height);
+            b.get(heightData, 0, dirty.width);
         }
     }
     

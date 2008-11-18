@@ -21,7 +21,7 @@ public class Server implements Runnable {
     public Server(int port)
     {
         this.port = port;
-        new Thread(this).run();
+        new Thread(this).start();
     }
     
     public void run() {
@@ -36,11 +36,12 @@ public class Server implements Runnable {
         }
         catch (IOException ioe)
         {}
+        port=0;
     }
     
-    public Game newGame()
+    public Game newGame(Player p)
     {
-        return new Game();
+        return new Game(p);
     }
 
 }
