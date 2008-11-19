@@ -5,22 +5,25 @@
 
 package com.novusradix.JavaPop.Messaging;
 
+import com.novusradix.JavaPop.Server.GameInfo;
+
 /**
  *
- * @author mom
+ * @author gef
  */
 public class JoinedGame extends Message {
 
-    public int gameId;
+    public GameInfo g;
     
-    public JoinedGame(com.novusradix.JavaPop.Server.Game g)
+    public JoinedGame(com.novusradix.JavaPop.Server.Game game)
     {
-        gameId = g.getId();
+        g = new GameInfo(game);
     }
     
     @Override
     public void execute() {
-       
+        this.playerState.gamePanel.setGame(g);
+        this.playerState.gamesPanel.setGame(g);
     }
 
 }
