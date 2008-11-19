@@ -23,6 +23,7 @@ public class Game implements Runnable {
         players = new Vector<Player>();
         players.add(owner);
         this.owner = owner;
+        owner.currentGame = this;
         owner.sendMessage(new JoinedGame(this));
     }
 
@@ -32,12 +33,14 @@ public class Game implements Runnable {
 
     public void addPlayer(Player p) {
         players.add(p);
+        p.currentGame = this;
         p.sendMessage(new JoinedGame(this));
         
     }
 
     public void removePlayer(Player p){
         players.remove(p);
+        p.currentGame = null;
         //TODO: send a message?
     }
     
@@ -50,5 +53,7 @@ public class Game implements Runnable {
     }
 
     public void run() {
+        //start a clock,
+        //move people.
     }
 }

@@ -20,7 +20,15 @@ public class JoinGame extends Message{
     
     @Override
     public void execute() {
-        this.server.joinGame(gameId, serverPlayer);
+        if(serverGame == null){
+            server.joinGame(gameId, serverPlayer);
+        }
+        else if(serverGame.getId() != gameId)
+        {
+            serverGame.removePlayer(serverPlayer);
+            server.joinGame(gameId, serverPlayer);
+        }
+            
     }
 
 }
