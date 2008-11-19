@@ -71,6 +71,7 @@ public class PlayerState implements Runnable {
         try {
             oos.writeObject(m);
             oos.flush();
+            System.out.println("Client sending "+ m.getClass().getSimpleName());
         } catch (IOException ex) {
             Logger.getLogger(PlayerState.class.getName()).log(Level.SEVERE, null, ex);
         }

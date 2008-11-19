@@ -44,6 +44,12 @@ public class Server implements Runnable {
     }
 
     public void newGame(Player p) {
+        
+        if(p.currentGame!=null)
+        {
+            p.currentGame.removePlayer(p);
+        }
+        
         Game g = new Game(p);
 
         games.put(g.getId(), g);

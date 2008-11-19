@@ -25,6 +25,8 @@ public class Player implements Runnable {
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
     public String name;
+    private static int nextId = 1;
+    private int id;
 
     enum PlayerState {
 
@@ -34,7 +36,8 @@ public class Player implements Runnable {
     public Player(Server s, Socket socket) {
         this.s = s;
         this.socket = socket;
-        name = "No name";
+        id = nextId++;
+        name = "Player " + id;
         try {
             oos = new ObjectOutputStream(socket.getOutputStream());
             oos.flush();
@@ -43,6 +46,10 @@ public class Player implements Runnable {
             (new Thread(this, "Server Player")).start();
         } catch (IOException ioe) {
         }
+    }
+
+    public int getId() {
+        return id;
     }
 
     public void run() {
@@ -76,6 +83,7 @@ public class Player implements Runnable {
         try {
             oos.writeObject(m);
             oos.flush();
+            System.out.println("Server sending " + name + m.getClass().getSimpleName());
         } catch (IOException ex) {
             Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
         }
