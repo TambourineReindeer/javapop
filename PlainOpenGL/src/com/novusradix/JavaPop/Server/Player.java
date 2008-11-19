@@ -12,6 +12,7 @@ import java.net.Socket;
  */
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 /**
  *
  * @author erinhowie
@@ -24,8 +25,12 @@ public class Player implements Runnable {
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
     public String name;
-    enum PlayerState{InServerLobby, InGameLobby, InGame};
-    
+
+    enum PlayerState {
+
+        InServerLobby, InGameLobby, InGame
+    };
+
     public Player(Server s, Socket socket) {
         this.s = s;
         this.socket = socket;
@@ -33,7 +38,7 @@ public class Player implements Runnable {
         try {
             oos = new ObjectOutputStream(socket.getOutputStream());
             oos.flush();
-                    
+
             ois = new ObjectInputStream(socket.getInputStream());
             (new Thread(this, "Server Player")).start();
         } catch (IOException ioe) {
@@ -47,20 +52,27 @@ public class Player implements Runnable {
         try {
 
             Message message;
-            while (socket.isConnected()) {
+            do {
                 message = (Message) ois.readObject();
-                message.server = s;
-                message.serverGame = currentGame;
-                message.serverPlayer = this;
-                message.execute();
-            }
+                if (message != null) {
+                    message.server = s;
+                    message.serverGame = currentGame;
+                    message.serverPlayer = this;
+                    message.execute();
+                }
+            } while (message != null);
         } catch (IOException ioe) {
         } catch (ClassNotFoundException cnfe) {
         }
+
+        if (currentGame != null) {
+            currentGame.removePlayer(this);
+        }
+        s.removePlayer(this);
     //Disconnect
     }
 
-    public synchronized void sendMessage(Message m)  {
+    public synchronized void sendMessage(Message m) {
         try {
             oos.writeObject(m);
             oos.flush();

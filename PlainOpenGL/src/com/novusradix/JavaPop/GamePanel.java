@@ -3,8 +3,10 @@
  *
  * Created on November 17, 2008, 12:01 PM
  */
-
 package com.novusradix.JavaPop;
+
+import com.novusradix.JavaPop.Server.GameInfo;
+import javax.swing.DefaultListModel;
 
 /**
  *
@@ -13,10 +15,20 @@ package com.novusradix.JavaPop;
 public class GamePanel extends javax.swing.JPanel {
 
     public LobbyFrame parent;
-   
+    public GameInfo game;
+
     /** Creates new form GamePanel */
     public GamePanel() {
         initComponents();
+    }
+
+    public void setGame(GameInfo gi) {
+        game = gi;
+        if (game != null) {
+            lstPlayers.setListData(game.players);
+        } else {
+            lstPlayers.setModel(new DefaultListModel());
+        }
     }
 
     /** This method is called from within the constructor to
@@ -95,8 +107,6 @@ public class GamePanel extends javax.swing.JPanel {
             .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnKick;
     private javax.swing.JButton btnStart;
@@ -105,5 +115,4 @@ public class GamePanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JList lstPlayers;
     // End of variables declaration//GEN-END:variables
-
 }

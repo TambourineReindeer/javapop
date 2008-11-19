@@ -13,8 +13,8 @@ import java.util.Vector;
  * @author erinhowie
  */
 public class GameInfo implements Serializable{
-    int id;
-    Vector<String> players;
+    public int id;
+    public Vector<String> players;
     
     public GameInfo(Game g)
     {

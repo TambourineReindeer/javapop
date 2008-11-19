@@ -4,6 +4,7 @@
  */
 package com.novusradix.JavaPop.Server;
 
+import com.novusradix.JavaPop.Messaging.JoinedGame;
 import java.util.Vector;
 
 /**
@@ -22,6 +23,7 @@ public class Game implements Runnable {
         players = new Vector<Player>();
         players.add(owner);
         this.owner = owner;
+        owner.sendMessage(new JoinedGame(this));
     }
 
     public int getId() {
@@ -30,10 +32,15 @@ public class Game implements Runnable {
 
     public void addPlayer(Player p) {
         players.add(p);
-        
+        p.sendMessage(new JoinedGame(this));
         
     }
 
+    public void removePlayer(Player p){
+        players.remove(p);
+        //TODO: send a message?
+    }
+    
     public void startGame() {
         h = new HeightMap(128, 128);
         h.randomize(1);

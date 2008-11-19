@@ -3,10 +3,10 @@
  *
  * Created on November 17, 2008, 11:58 AM
  */
-
 package com.novusradix.JavaPop;
 
 import com.novusradix.JavaPop.Client.PlayerState;
+import com.novusradix.JavaPop.Messaging.JoinGame;
 import com.novusradix.JavaPop.Messaging.LobbyNewGame;
 import com.novusradix.JavaPop.Server.GameInfo;
 import java.util.Vector;
@@ -20,7 +20,7 @@ public class GamesPanel extends javax.swing.JPanel {
 
     private DefaultListModel gameList;
     public LobbyFrame parent;
-   
+
     /** Creates new form GamesPanel */
     public GamesPanel() {
         initComponents();
@@ -28,11 +28,14 @@ public class GamesPanel extends javax.swing.JPanel {
         lstGames.setModel(gameList);
     }
 
-    public void setGames(Vector<GameInfo> gs)
-    {
+    public void setGames(Vector<GameInfo> gs) {
         lstGames.setListData(gs);
     }
-    
+
+    public void setGame(GameInfo gi) {
+        lstGames.setSelectedValue(gi, true);
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -54,6 +57,11 @@ public class GamesPanel extends javax.swing.JPanel {
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
+        lstGames.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                lstGamesValueChanged(evt);
+            }
+        });
         jScrollPane1.setViewportView(lstGames);
 
         btnNewGame.setText("New Game");
@@ -74,7 +82,7 @@ public class GamesPanel extends javax.swing.JPanel {
                     .add(btnNewGame)
                     .add(btnJoinGame))
                 .addContainerGap(39, Short.MAX_VALUE))
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -88,17 +96,23 @@ public class GamesPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
 private void btnNewGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewGameActionPerformed
-LobbyNewGame lng = new LobbyNewGame();
-parent.p.sendMessage(lng);
+    LobbyNewGame lng = new LobbyNewGame();
+    parent.p.sendMessage(lng);
 
 }//GEN-LAST:event_btnNewGameActionPerformed
 
-
+private void lstGamesValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstGamesValueChanged
+    if (!evt.getValueIsAdjusting()) {
+        GameInfo g = (GameInfo) lstGames.getSelectedValue();
+        if (g != null) {
+            parent.p.sendMessage(new JoinGame(g.id));
+        }
+    }
+}//GEN-LAST:event_lstGamesValueChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnJoinGame;
     private javax.swing.JButton btnNewGame;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JList lstGames;
     // End of variables declaration//GEN-END:variables
-
 }

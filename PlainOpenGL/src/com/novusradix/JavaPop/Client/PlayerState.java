@@ -45,11 +45,9 @@ public class PlayerState implements Runnable {
             oos = new ObjectOutputStream(socket.getOutputStream());
             oos.flush();
             ois = new ObjectInputStream(socket.getInputStream());
-            (new Thread(this,"Client Player")).start();
+            (new Thread(this, "Client Player")).start();
         } catch (IOException ioe) {
         }
-
-
     }
 
     public void run() {
@@ -62,17 +60,14 @@ public class PlayerState implements Runnable {
                 message.execute();
             }
         } catch (IOException ioe) {
-        int i = 0;
         } catch (ClassNotFoundException cnfe) {
-       int i = 0;
         }
-        catch (Exception e)
-        {
-        int i =0;
-        }
+    //disconnected
+        gamesPanel.setGames(null);
+        gamePanel.setGame(null);
     }
-    
-    public synchronized void sendMessage(Message m)  {
+
+    public synchronized void sendMessage(Message m) {
         try {
             oos.writeObject(m);
             oos.flush();
