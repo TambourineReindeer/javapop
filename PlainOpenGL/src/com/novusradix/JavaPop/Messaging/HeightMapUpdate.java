@@ -17,13 +17,13 @@ public class HeightMapUpdate extends Message implements Serializable {
     public Rectangle dirtyRegion;
     public int[] heightData;
 
-    public HeightMapUpdate(Rectangle dirty, IntBuffer b) {
+    public HeightMapUpdate(Rectangle dirty, IntBuffer b, int stride) {
         dirtyRegion = dirty;
         heightData = new int[dirty.width * dirty.height];
 
         for (int n = 0; n < dirty.height; n++) {
-            b.position(dirty.x + n * dirty.height);
-            b.get(heightData, 0, dirty.width);
+            b.position(dirty.x + (dirty.y+n) * stride);
+            b.get(heightData, n*dirty.width, dirty.width);
         }
     }
     
