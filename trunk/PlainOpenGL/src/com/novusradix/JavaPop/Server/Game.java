@@ -6,13 +6,15 @@ package com.novusradix.JavaPop.Server;
 
 import com.novusradix.JavaPop.Messaging.GameStarted;
 import com.novusradix.JavaPop.Messaging.JoinedGame;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 /**
  *
  * @author mom
  */
-public class Game implements Runnable {
+public class Game extends TimerTask {
 
     public static int nextId = 0;
     private int id;
@@ -20,7 +22,8 @@ public class Game implements Runnable {
     private Player owner;
     private Server server;
     public HeightMap h;
-
+    private Timer timer;
+    
     public Game(Player owner) {
         this.owner = owner;
         server = owner.s;
@@ -65,12 +68,16 @@ public class Game implements Runnable {
         server.sendAllPlayers(go);
         h.sendUpdates(players);
         
-        
-        new Thread(this).start();
+        timer = new Timer("Game " + id);
+        timer.scheduleAtFixedRate(this, 0, 1000/20);
     }
+
 
     public void run() {
         //start a clock,
         //move people.
+        h.sendUpdates(players);
+        
+        
     }
 }

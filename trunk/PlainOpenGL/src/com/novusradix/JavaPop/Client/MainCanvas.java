@@ -4,6 +4,7 @@
  */
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Messaging.UpDown;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -41,10 +42,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Point dragOrigin;
     private Point selected;
     private Matrix4f mvpInverse;
+    private Client client;
 
-    public MainCanvas(HeightMap h, GLCapabilities caps) {
+    public MainCanvas(HeightMap h, GLCapabilities caps, Client c) {
         super(caps);
 
+        this.client = c;
         mvpInverse = new Matrix4f();
         heightMap = h;
         Peon.init(h);
@@ -309,11 +312,19 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     public void mouseReleased(MouseEvent e) {
         // TODO Auto-generated method stub
         if (Math.abs(e.getX() - dragOrigin.x) < 16 && Math.abs(e.getY() - dragOrigin.y) < 16) {
-           /* if (e.getButton() == MouseEvent.BUTTON1) {
-                heightMap.up(selected.x, selected.y);
+            boolean primary;
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                if ((e.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) != 0) {
+                    primary = false;
+                } else {
+                    primary = true;
+                }
             } else if (e.getButton() == MouseEvent.BUTTON3) {
-                heightMap.down(selected.x, selected.y);
-            }*/
+                primary = false;
+            } else {
+                return;
+            }
+            client.sendMessage(new UpDown(selected.x, selected.y, primary));
         } else {
             mouseMoved(e);
 
@@ -322,12 +333,9 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     public void mouseWheelMoved(MouseWheelEvent e) {
-        if (e.isShiftDown())
-        {
+        if (e.isShiftDown()) {
             xPos -= e.getWheelRotation();
-        }
-        else
-        {
+        } else {
             yPos -= e.getWheelRotation();
         }
     }

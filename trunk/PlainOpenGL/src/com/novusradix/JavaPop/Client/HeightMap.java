@@ -53,7 +53,7 @@ public class HeightMap {
         rowstride = tilestride * width;
 
         b = BufferUtil.newFloatBuffer(width * breadth * tilestride);
-        
+
         int x, y;
         for (y = 0; y < breadth; y++) {
             for (x = 0; x < width; x++) {
@@ -171,7 +171,7 @@ public class HeightMap {
         b.flip();
 
 
-        
+
     }
 
     public int getWidth() {
@@ -420,9 +420,9 @@ public class HeightMap {
          */
         tex.enable();
         tex.bind();
-
-        gl.glDrawArrays(GL.GL_TRIANGLES, 0, width * breadth * 4 * 3);
-
+        synchronized (this) {
+            gl.glDrawArrays(GL.GL_TRIANGLES, 0, width * breadth * 4 * 3);
+        }
         tex.disable();
     }
 
@@ -473,18 +473,19 @@ public class HeightMap {
     }
 
     public void applyUpdate(HeightMapUpdate u) {
-        int x, y;
-        for (y = 0; y < u.dirtyRegion.height; y++) {
-            for (x = 0; x < u.dirtyRegion.width; x++) {
-                setHeight(u.dirtyRegion.x + x, u.dirtyRegion.y + y, u.heightData[x + y * u.dirtyRegion.width]);
+        synchronized (this) {
+            int x, y;
+            for (y = 0; y < u.dirtyRegion.height; y++) {
+                for (x = 0; x < u.dirtyRegion.width; x++) {
+                    setHeight(u.dirtyRegion.x + x, u.dirtyRegion.y + y, u.heightData[x + y * u.dirtyRegion.width]);
+                }
             }
-        }
-        for (y = -1; y < u.dirtyRegion.height + 1; y++) {
-            for (x = -1; x < u.dirtyRegion.width + 1; x++) {
-                setMidTile(u.dirtyRegion.x + x, u.dirtyRegion.y + y);
+            for (y = -1; y < u.dirtyRegion.height + 1; y++) {
+                for (x = -1; x < u.dirtyRegion.width + 1; x++) {
+                    setMidTile(u.dirtyRegion.x + x, u.dirtyRegion.y + y);
+                }
             }
+
         }
-
-
     }
 }

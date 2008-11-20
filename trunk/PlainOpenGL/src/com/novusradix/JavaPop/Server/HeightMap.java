@@ -187,36 +187,44 @@ public class HeightMap {
     }
 
     public void randomize(int seed) {
-        int n, m;
-        int x, y;
-        Random r = new Random(seed);
+        synchronized (this) {
 
-        for (n = 0; n < 100; n++) {
-            x = r.nextInt(width);
-            y = r.nextInt(breadth);
-            for (m = 0; m < r.nextInt(8); m++) {
-                up(x, y);
-            }
-            for (m = 0; m < r.nextInt(8); m++) {
-                up(x - 5 + r.nextInt(10), y - 5 + r.nextInt(10));
-            }
-            for (m = 0; m < r.nextInt(2); m++) {
-                down(x - 5 + r.nextInt(10), -5 + r.nextInt(10));
-            }
-            for (m = 0; m < r.nextInt(2); m++) {
-                down(x, y);
+
+            int n, m;
+            int x, y;
+            Random r = new Random(seed);
+
+            for (n = 0; n < 100; n++) {
+                x = r.nextInt(width);
+                y = r.nextInt(breadth);
+                for (m = 0; m < r.nextInt(8); m++) {
+                    up(x, y);
+                }
+                for (m = 0; m < r.nextInt(8); m++) {
+                    up(x - 5 + r.nextInt(10), y - 5 + r.nextInt(10));
+                }
+                for (m = 0; m < r.nextInt(2); m++) {
+                    down(x - 5 + r.nextInt(10), -5 + r.nextInt(10));
+                }
+                for (m = 0; m < r.nextInt(2); m++) {
+                    down(x, y);
+                }
             }
         }
     }
 
     public void up(int x, int y) {
-        setHeight(x, y, getHeight(x, y) + 1);
-        conform(x, y);
+        synchronized (this) {
+            setHeight(x, y, getHeight(x, y) + 1);
+            conform(x, y);
+        }
     }
 
     public void down(int x, int y) {
-        setHeight(x, y, Math.max(getHeight(x, y) - 1, 0));
-        conform(x, y);
+        synchronized (this) {
+            setHeight(x, y, Math.max(getHeight(x, y) - 1, 0));
+            conform(x, y);
+        }
     }
 
     private void setHeight(int x, int y, int height) {
@@ -296,13 +304,15 @@ public class HeightMap {
     }
 
     public void sendUpdates(Collection<Player> players) {
-        if (dirty != null) {
-            HeightMapUpdate m = new HeightMapUpdate(dirty, b);
+        synchronized (this) {
+            if (dirty != null) {
+                HeightMapUpdate m = new HeightMapUpdate(dirty, b, width);
 
-            for (Player p : players) {
-                p.sendMessage(m);
+                for (Player p : players) {
+                    p.sendMessage(m);
+                }
             }
+            dirty = null;
         }
-        dirty = null;
     }
 }

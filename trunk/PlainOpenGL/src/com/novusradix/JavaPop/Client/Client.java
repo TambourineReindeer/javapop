@@ -80,7 +80,7 @@ public class Client implements Runnable {
     
     public void newGame(GameStarted g){
         lobby.hide();
-        game = new Game(g);
+        game = new Game(g, this);
         
         
     }

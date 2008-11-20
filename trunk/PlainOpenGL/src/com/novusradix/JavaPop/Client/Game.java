@@ -17,10 +17,12 @@ import javax.swing.ListModel;
 public class Game {
 
     public HeightMap h;
- 
-    public Game(GameStarted g) {
+    public Client client;
+    
+    public Game(GameStarted g, Client c) {
         h = new HeightMap(g.gi.mapSize);
-       GLCapabilities caps = new GLCapabilities();
+       client = c;
+        GLCapabilities caps = new GLCapabilities();
         caps.setSampleBuffers(true);
         caps.setNumSamples(8);
         
@@ -28,9 +30,9 @@ public class Game {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setSize(1024, 768);
         f.setTitle("JavaPop");
-        MainCanvas c = new MainCanvas(h, caps);
+        MainCanvas mc = new MainCanvas(h, caps, client);
         
-        f.add(c);
+        f.add(mc);
         
         
         f.setVisible(true);
