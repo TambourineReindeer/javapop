@@ -5,8 +5,6 @@
  */
 package com.novusradix.JavaPop.Client.Lobby;
 
-import com.novusradix.JavaPop.Client.Client;
-import com.novusradix.JavaPop.Client.Player;
 
 /**
  *
