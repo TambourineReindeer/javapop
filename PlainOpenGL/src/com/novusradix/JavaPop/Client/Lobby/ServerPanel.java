@@ -4,13 +4,10 @@
  * Created on November 17, 2008, 11:55 AM
  */
 
-package com.novusradix.JavaPop;
+package com.novusradix.JavaPop.Client.Lobby;
 
-import com.novusradix.JavaPop.Client.PlayerState;
-import java.util.Vector;
+import com.novusradix.JavaPop.Client.Client;
 import javax.swing.DefaultListModel;
-import javax.swing.ListModel;
-import javax.swing.event.ListDataListener;
 
 /**
  *
@@ -18,7 +15,7 @@ import javax.swing.event.ListDataListener;
  */
 public class ServerPanel extends javax.swing.JPanel {
    private DefaultListModel serverNames;
-   public LobbyFrame parent;
+   public Lobby lobby;
    
     /** Creates new form ServerPanel */
     public ServerPanel() {
@@ -27,6 +24,11 @@ public class ServerPanel extends javax.swing.JPanel {
         serverNames = new DefaultListModel();
         
     lstServerList.setModel(serverNames);
+    }
+
+    void setLobby(Lobby lobby) {
+        this.lobby = lobby;
+        
     }
 
     /** This method is called from within the constructor to
@@ -122,12 +124,9 @@ private void lstServerListValueChanged(javax.swing.event.ListSelectionEvent evt)
     if(lstServerList.getSelectedValue() != null && !evt.getValueIsAdjusting())
     {
         String s = (String)lstServerList.getSelectedValue();
+        lobby.client = new Client(s,lobby);
+       
         
-        GamesPanel gsp = parent.getGamesPanel();
-        GamePanel gp = parent.getGamePanel();
-        
-        parent.p = new PlayerState(s, gsp, gp);
-        gsp.setEnabled(true);
     }
 }//GEN-LAST:event_lstServerListValueChanged
 

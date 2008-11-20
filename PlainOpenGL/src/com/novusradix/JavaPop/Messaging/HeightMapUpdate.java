@@ -15,7 +15,7 @@ import java.nio.IntBuffer;
 public class HeightMapUpdate extends Message implements Serializable {
 
     public Rectangle dirtyRegion;
-    public int heightData[];
+    public int[] heightData;
 
     public HeightMapUpdate(Rectangle dirty, IntBuffer b) {
         dirtyRegion = dirty;
@@ -29,6 +29,6 @@ public class HeightMapUpdate extends Message implements Serializable {
     
     public void execute()
     {
-        
+        client.game.h.applyUpdate(this);
     }
 }

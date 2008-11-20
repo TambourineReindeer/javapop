@@ -5,6 +5,7 @@
 package com.novusradix.JavaPop.Server;
 
 import com.novusradix.JavaPop.Messaging.GameList;
+import com.novusradix.JavaPop.Messaging.Message;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.HashMap;
@@ -55,9 +56,7 @@ public class Server implements Runnable {
         games.put(g.getId(), g);
 
         GameList gl = new GameList(games.values());
-        for (Player pl : players) {
-            pl.sendMessage(gl);
-        }
+        sendAllPlayers(gl);
     }
 
     public void joinGame(int gId, Player p) {
@@ -66,16 +65,18 @@ public class Server implements Runnable {
         g.addPlayer(p);
 
         GameList gl = new GameList(games.values());
-        for (Player pl : players) {
-            pl.sendMessage(gl);
-        }
+        sendAllPlayers(gl);
     }
     
     public void removePlayer(Player p){
         players.remove(p);
         GameList gl = new GameList(games.values());
+        sendAllPlayers(gl);
+    }
+    
+    public void sendAllPlayers(Message m){
         for (Player pl : players) {
-            pl.sendMessage(gl);
+            pl.sendMessage(m);
         }
     }
 }

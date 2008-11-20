@@ -27,7 +27,9 @@ public class Player implements Runnable {
     public String name;
     private static int nextId = 1;
     private int id;
+public boolean ready = false;
 
+    
     enum PlayerState {
 
         InServerLobby, InGameLobby, InGame
@@ -83,7 +85,7 @@ public class Player implements Runnable {
         try {
             oos.writeObject(m);
             oos.flush();
-            System.out.println("Server sending " + name + m.getClass().getSimpleName());
+            System.out.println("Server sending " + name + " " + m.getClass().getSimpleName());
         } catch (IOException ex) {
             Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
         }

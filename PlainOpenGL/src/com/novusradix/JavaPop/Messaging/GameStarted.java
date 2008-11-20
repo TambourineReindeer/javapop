@@ -5,24 +5,28 @@
 
 package com.novusradix.JavaPop.Messaging;
 
+import com.novusradix.JavaPop.Server.Game;
 import com.novusradix.JavaPop.Server.GameInfo;
+import java.awt.Dimension;
 
 /**
  *
- * @author gef
+ * @author erinhowie
  */
-public class JoinedGame extends Message {
+public class GameStarted extends Message{
 
     public GameInfo gi;
     
-    public JoinedGame(com.novusradix.JavaPop.Server.Game game)
+    public GameStarted(Game g)
     {
-        gi = new GameInfo(game);
-    }
+      gi = new GameInfo(g);
     
-    @Override
-    public void execute() {
-        client.lobby.newGame(gi);
     }
 
+    @Override
+    public void execute() {
+        client.newGame(this);
+    }
+    
+    
 }

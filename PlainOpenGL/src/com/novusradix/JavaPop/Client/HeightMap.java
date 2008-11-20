@@ -13,7 +13,9 @@ import javax.vecmath.Vector3f;
 
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.TextureIO;
+import java.awt.Dimension;
 import java.net.URL;
+import java.nio.IntBuffer;
 
 public class HeightMap {
 
@@ -42,20 +44,20 @@ public class HeightMap {
      */
     com.sun.opengl.util.texture.Texture tex;
 
-    public HeightMap(int width, int breadth) {
+    public HeightMap(Dimension mapSize) {
+        this.breadth = mapSize.height;
+        this.width = mapSize.width;
 
         vertexstride = 8;
         tilestride = 12 * vertexstride;
         rowstride = tilestride * width;
 
         b = BufferUtil.newFloatBuffer(width * breadth * tilestride);
-
-        this.breadth = breadth;
-        this.width = width;
-
+        
         int x, y;
         for (y = 0; y < breadth; y++) {
             for (x = 0; x < width; x++) {
+
                 // 0
                 b.put(x);
                 b.put(y);
@@ -167,6 +169,9 @@ public class HeightMap {
             }
         }
         b.flip();
+
+
+        
     }
 
     public int getWidth() {
@@ -471,15 +476,15 @@ public class HeightMap {
         int x, y;
         for (y = 0; y < u.dirtyRegion.height; y++) {
             for (x = 0; x < u.dirtyRegion.width; x++) {
-                setHeight(u.dirtyRegion.x + x, u.dirtyRegion.y + y, u.heightData[x+y*u.dirtyRegion.width]);
+                setHeight(u.dirtyRegion.x + x, u.dirtyRegion.y + y, u.heightData[x + y * u.dirtyRegion.width]);
             }
         }
-        for (y = -1; y < u.dirtyRegion.height +1; y++) {
-            for (x = -1; x < u.dirtyRegion.width+1; x++) {
+        for (y = -1; y < u.dirtyRegion.height + 1; y++) {
+            for (x = -1; x < u.dirtyRegion.width + 1; x++) {
                 setMidTile(u.dirtyRegion.x + x, u.dirtyRegion.y + y);
             }
         }
-        
-        
+
+
     }
 }
