@@ -16,7 +16,7 @@
         <extension name="jogl" href="http://download.java.net/media/jogl/builds/archive/jsr-231-webstart-current/jogl.jnlp" />
     </resources>
     <security>
-        <j2ee-application-client-permissions/>
+        <all-permissions/>
     </security>
     <application-desc>
     </application-desc>
