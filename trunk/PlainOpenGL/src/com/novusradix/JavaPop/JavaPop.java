@@ -1,22 +1,13 @@
 package com.novusradix.JavaPop;
 
-import com.novusradix.JavaPop.Client.PlayerState;
-
-/*import com.novusradix.JavaPop.Client.ControlFrame;
-import com.novusradix.JavaPop.Client.HeightMap;
-import com.novusradix.JavaPop.Client.MainCanvas;
-import java.awt.GridLayout;
-import javax.media.opengl.GLCapabilities;
-import javax.swing.JFrame;*/
+import com.novusradix.JavaPop.Client.Lobby.Lobby;
 
 
 public class JavaPop {
 
     public static void main(final String[] args) {
 
-        LobbyFrame f = new LobbyFrame();
-        
-        f.setVisible(true);
+        new Lobby();
 
 
         /*HeightMap h = new HeightMap(128, 128);

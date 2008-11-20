@@ -28,14 +28,8 @@ public class GameList extends Message implements Serializable {
     @Override
     public void execute() {
 
-        this.playerState.gamesPanel.setGames(games);
+        client.lobby.setGames(games);
 
-        if (playerState.gamePanel.game != null) {
-            for (GameInfo gi : games) {
-                if (gi.id == playerState.gamePanel.game.id) {
-                    playerState.gamePanel.setGame(gi);
-                }
-            }
-        }
+        
     }
 }

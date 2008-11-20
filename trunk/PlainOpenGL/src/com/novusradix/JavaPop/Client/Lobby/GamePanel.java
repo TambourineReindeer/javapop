@@ -3,8 +3,9 @@
  *
  * Created on November 17, 2008, 12:01 PM
  */
-package com.novusradix.JavaPop;
+package com.novusradix.JavaPop.Client.Lobby;
 
+import com.novusradix.JavaPop.Messaging.Ready;
 import com.novusradix.JavaPop.Server.GameInfo;
 import javax.swing.DefaultListModel;
 
@@ -14,7 +15,7 @@ import javax.swing.DefaultListModel;
  */
 public class GamePanel extends javax.swing.JPanel {
 
-    public LobbyFrame parent;
+    public Lobby lobby;
     public GameInfo game;
 
     /** Creates new form GamePanel */
@@ -28,6 +29,13 @@ public class GamePanel extends javax.swing.JPanel {
             lstPlayers.setListData(game.players);
         } else {
             lstPlayers.setModel(new DefaultListModel());
+        }
+    }
+
+    void setLobby(Lobby lobby) {
+        this.lobby = lobby;
+        if (lobby.currentGame != null) {
+            lstPlayers.setModel(lobby.currentGame.getPlayerList());
         }
     }
 
@@ -49,11 +57,6 @@ public class GamePanel extends javax.swing.JPanel {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Players"));
 
-        lstPlayers.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
         jScrollPane1.setViewportView(lstPlayers);
 
         btnKick.setText("Kick");
@@ -78,6 +81,11 @@ public class GamePanel extends javax.swing.JPanel {
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Level"));
 
         btnStart.setText("Start");
+        btnStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStartActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -107,6 +115,10 @@ public class GamePanel extends javax.swing.JPanel {
             .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
+    lobby.client.sendMessage(new Ready());
+}//GEN-LAST:event_btnStartActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnKick;
     private javax.swing.JButton btnStart;

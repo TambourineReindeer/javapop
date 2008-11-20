@@ -3,9 +3,10 @@
  *
  * Created on November 17, 2008, 11:09 AM
  */
-package com.novusradix.JavaPop;
+package com.novusradix.JavaPop.Client.Lobby;
 
-import com.novusradix.JavaPop.Client.PlayerState;
+import com.novusradix.JavaPop.Client.Client;
+import com.novusradix.JavaPop.Client.Player;
 
 /**
  *
@@ -13,14 +14,17 @@ import com.novusradix.JavaPop.Client.PlayerState;
  */
 public class LobbyFrame extends javax.swing.JFrame {
 
-    public PlayerState p;
+    public Lobby lobby;
+   // public PlayerState player;
     
     /** Creates new form LobbyFrame */
-    public LobbyFrame() {
+    public LobbyFrame(Lobby l) {
         initComponents();
-        serverPanel1.parent = this;
-        gamesPanel1.parent = this;
-        gamePanel1.parent = this;
+        lobby = l;
+        
+        serverPanel1.setLobby(lobby);
+        gamesPanel1.setLobby(lobby);
+        gamePanel1.setLobby(lobby);
         gamesPanel1.setEnabled(false);
         gamePanel1.setEnabled(false);
     }
@@ -34,9 +38,9 @@ public class LobbyFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        serverPanel1 = new com.novusradix.JavaPop.ServerPanel();
-        gamesPanel1 = new com.novusradix.JavaPop.GamesPanel();
-        gamePanel1 = new com.novusradix.JavaPop.GamePanel();
+        serverPanel1 = new com.novusradix.JavaPop.Client.Lobby.ServerPanel();
+        gamesPanel1 = new com.novusradix.JavaPop.Client.Lobby.GamesPanel();
+        gamePanel1 = new com.novusradix.JavaPop.Client.Lobby.GamePanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -65,20 +69,20 @@ public class LobbyFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    public com.novusradix.JavaPop.GamePanel getGamePanel() {
+    public com.novusradix.JavaPop.Client.Lobby.GamePanel getGamePanel() {
         return gamePanel1;
     }
 
-    public com.novusradix.JavaPop.GamesPanel getGamesPanel() {
+    public com.novusradix.JavaPop.Client.Lobby.GamesPanel getGamesPanel() {
         return gamesPanel1;
     }
 
-    public com.novusradix.JavaPop.ServerPanel getServerPanel() {
+    public com.novusradix.JavaPop.Client.Lobby.ServerPanel getServerPanel() {
         return serverPanel1;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private com.novusradix.JavaPop.GamePanel gamePanel1;
-    private com.novusradix.JavaPop.GamesPanel gamesPanel1;
-    private com.novusradix.JavaPop.ServerPanel serverPanel1;
+    private com.novusradix.JavaPop.Client.Lobby.GamePanel gamePanel1;
+    private com.novusradix.JavaPop.Client.Lobby.GamesPanel gamesPanel1;
+    private com.novusradix.JavaPop.Client.Lobby.ServerPanel serverPanel1;
     // End of variables declaration//GEN-END:variables
 }

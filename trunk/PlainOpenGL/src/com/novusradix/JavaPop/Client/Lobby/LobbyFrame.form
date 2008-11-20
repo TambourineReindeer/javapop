@@ -45,7 +45,7 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="com.novusradix.JavaPop.ServerPanel" name="serverPanel1">
+    <Component class="com.novusradix.JavaPop.LobbyClient.ServerPanel" name="serverPanel1">
     </Component>
     <Component class="com.novusradix.JavaPop.GamesPanel" name="gamesPanel1">
     </Component>

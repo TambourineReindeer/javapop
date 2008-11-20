@@ -2,11 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.GamePanel;
-import com.novusradix.JavaPop.GamesPanel;
+import com.novusradix.JavaPop.Client.Lobby.Lobby;
+import com.novusradix.JavaPop.Messaging.GameStarted;
 import com.novusradix.JavaPop.Messaging.Message;
+import java.awt.Frame;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,32 +16,32 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.media.opengl.GLCapabilities;
+import javax.swing.JFrame;
 
 /**
  *
- * @author mom
+ * @author erinhowie
  */
-public class PlayerState implements Runnable {
+public class Client implements Runnable {
 
-    private int mana;
-    public BaseTool currentTool;
     private Socket socket;
-    public GamesPanel gamesPanel;
-    public GamePanel gamePanel;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
-
-    public PlayerState(String host, GamesPanel gsp, GamePanel gp) {
-        gamesPanel = gsp;
-        gamePanel = gp;
-
+    public Player player;
+    public Lobby lobby;
+    public Game game;
+    
+    public Client(String host, Lobby l) {
+        lobby =l;
+       
         try {
 
             socket = new Socket(host, 13579);
         } catch (UnknownHostException ex) {
-            Logger.getLogger(PlayerState.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(PlayerState.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             oos = new ObjectOutputStream(socket.getOutputStream());
@@ -55,25 +57,31 @@ public class PlayerState implements Runnable {
         try {
             while (socket.isConnected()) {
                 message = (Message) ois.readObject();
-                message.playerState = this;
-
+                message.client=this;
+                
                 message.execute();
             }
         } catch (IOException ioe) {
         } catch (ClassNotFoundException cnfe) {
         }
-    //disconnected
-        gamesPanel.setGames(null);
-        gamePanel.setGame(null);
+        //disconnected
+        
     }
 
     public synchronized void sendMessage(Message m) {
         try {
             oos.writeObject(m);
             oos.flush();
-            System.out.println("Client sending "+ m.getClass().getSimpleName());
+            System.out.println("Client sending " + m.getClass().getSimpleName());
         } catch (IOException ex) {
-            Logger.getLogger(PlayerState.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public void newGame(GameStarted g){
+        lobby.hide();
+        game = new Game(g);
+        
+        
     }
 }

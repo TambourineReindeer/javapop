@@ -48,6 +48,17 @@ public class HeightMap {
         b.flip();
     }
 
+    public int[] getData() {
+        int[] buf = new int[width * breadth];
+        getData(buf);
+        return buf;
+    }
+
+    public void getData(int[] buf) {
+        b.position(0);
+        b.get(buf);
+    }
+
     public int getWidth() {
         return width;
     }
@@ -200,35 +211,27 @@ public class HeightMap {
 
     public void up(int x, int y) {
         setHeight(x, y, getHeight(x, y) + 1);
+        conform(x, y);
     }
 
     public void down(int x, int y) {
         setHeight(x, y, Math.max(getHeight(x, y) - 1, 0));
+        conform(x, y);
     }
 
     private void setHeight(int x, int y, int height) {
-        if (x >= 0 && y >= 0 && x <= width && y <= breadth) {
-            if (x < width && y < width) {
-                b.put(bufPos(x, y, 0, VZ), height);
-                b.put(bufPos(x, y, 10, VZ), height);
-            }
-            if (x >= 1 && y >= 1) {
-                b.put(bufPos(x - 1, y - 1, 4, VZ), height);
-                b.put(bufPos(x - 1, y - 1, 6, VZ), height);
-            }
-            if (y >= 1 && x < width) {
-                b.put(bufPos(x, y - 1, 7, VZ), height);
-                b.put(bufPos(x, y - 1, 9, VZ), height);
-            }
-            if (x >= 1 && y < width) {
-                b.put(bufPos(x - 1, y, 1, VZ), height);
-                b.put(bufPos(x - 1, y, 3, VZ), height);
-            }
+        if (x >= 0 && x < width && y >= 0 && y < breadth) {
+            b.put(bufPos(x, y), height);
         }
     }
 
-    private void conform(int x, int y, int height, int radius) {
+    private void conform(int x, int y) {
+        conform(x, y, 1);
+    }
+
+    private void conform(int x, int y, int radius) {
         int ex, wy;
+        int height = getHeight(x, y);
         boolean bChanged = false;
         for (ex = x - radius; ex <= x + radius; ex++) {
             for (wy = y - radius; wy <= y + radius; wy++) {
@@ -244,7 +247,7 @@ public class HeightMap {
             }
         }
         if (bChanged) {
-            conform(x, y, height, radius + 1);
+            conform(x, y, radius + 1);
         } else {
             markDirty(new Rectangle(x - radius, y - radius, radius * 2 + 1, radius * 2 + 1));
         }
@@ -284,20 +287,22 @@ public class HeightMap {
     }
 
     private void markDirty(Rectangle r) {
-        dirty = dirty.union(r);
+        if (dirty == null) {
+            dirty = r;
+        } else {
+            dirty = dirty.union(r);
+        }
         dirty = dirty.intersection(bounds);
     }
-    
-    public void sendUpdates(Collection<Player> players)
-    {
-        HeightMapUpdate m = new HeightMapUpdate(dirty, b);
-        
-        for(Player p:players)
-        {
+
+    public void sendUpdates(Collection<Player> players) {
+        if (dirty != null) {
+            HeightMapUpdate m = new HeightMapUpdate(dirty, b);
+
+            for (Player p : players) {
                 p.sendMessage(m);
+            }
         }
-        
         dirty = null;
     }
-    
 }

@@ -3,9 +3,10 @@
  *
  * Created on November 17, 2008, 11:58 AM
  */
-package com.novusradix.JavaPop;
+package com.novusradix.JavaPop.Client.Lobby;
 
-import com.novusradix.JavaPop.Client.PlayerState;
+import com.novusradix.JavaPop.Client.Client;
+import com.novusradix.JavaPop.Client.Player;
 import com.novusradix.JavaPop.Messaging.JoinGame;
 import com.novusradix.JavaPop.Messaging.LobbyNewGame;
 import com.novusradix.JavaPop.Server.GameInfo;
@@ -18,22 +19,18 @@ import javax.swing.DefaultListModel;
  */
 public class GamesPanel extends javax.swing.JPanel {
 
-    private DefaultListModel gameList;
-    public LobbyFrame parent;
+   public Lobby lobby;
 
     /** Creates new form GamesPanel */
     public GamesPanel() {
         initComponents();
-        gameList = new DefaultListModel();
-        lstGames.setModel(gameList);
     }
 
-    public void setGames(Vector<GameInfo> gs) {
-        lstGames.setListData(gs);
-    }
+   
 
-    public void setGame(GameInfo gi) {
-        lstGames.setSelectedValue(gi, true);
+    public void setLobby(Lobby lobby) {
+        this.lobby = lobby;
+        lstGames.setModel(lobby.getGameList());
     }
 
     /** This method is called from within the constructor to
@@ -52,11 +49,6 @@ public class GamesPanel extends javax.swing.JPanel {
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Lobby"));
 
-        lstGames.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
         lstGames.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 lstGamesValueChanged(evt);
@@ -81,7 +73,7 @@ public class GamesPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(btnNewGame)
                     .add(btnJoinGame))
-                .addContainerGap(39, Short.MAX_VALUE))
+                .addContainerGap(55, Short.MAX_VALUE))
             .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -97,7 +89,7 @@ public class GamesPanel extends javax.swing.JPanel {
 
 private void btnNewGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewGameActionPerformed
     LobbyNewGame lng = new LobbyNewGame();
-    parent.p.sendMessage(lng);
+    lobby.client.sendMessage(lng);
 
 }//GEN-LAST:event_btnNewGameActionPerformed
 
@@ -105,7 +97,7 @@ private void lstGamesValueChanged(javax.swing.event.ListSelectionEvent evt) {//G
     if (!evt.getValueIsAdjusting()) {
         GameInfo g = (GameInfo) lstGames.getSelectedValue();
         if (g != null) {
-            parent.p.sendMessage(new JoinGame(g.id));
+            lobby.client.sendMessage(new JoinGame(g.id));
         }
     }
 }//GEN-LAST:event_lstGamesValueChanged
