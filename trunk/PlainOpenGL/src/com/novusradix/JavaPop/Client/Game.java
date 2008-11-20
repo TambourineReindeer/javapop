@@ -4,11 +4,10 @@
  */
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Messaging.GameStarted;
 import javax.media.opengl.GLCapabilities;
-import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
-import javax.swing.ListModel;
+
+import com.novusradix.JavaPop.Messaging.GameStarted;
 
 /**
  *

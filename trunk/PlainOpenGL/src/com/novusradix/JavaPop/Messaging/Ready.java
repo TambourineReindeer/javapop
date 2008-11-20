@@ -11,7 +11,12 @@ package com.novusradix.JavaPop.Messaging;
  */
 public class Ready extends Message{
 
-    public Ready(){}
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public Ready(){}
     
     @Override
     public void execute() {

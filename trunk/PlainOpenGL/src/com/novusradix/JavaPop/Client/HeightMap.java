@@ -1,9 +1,9 @@
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
+import java.awt.Dimension;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.FloatBuffer;
-import java.util.Random;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
@@ -11,11 +11,9 @@ import javax.media.opengl.GLException;
 import javax.vecmath.Point2f;
 import javax.vecmath.Vector3f;
 
+import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.TextureIO;
-import java.awt.Dimension;
-import java.net.URL;
-import java.nio.IntBuffer;
 
 public class HeightMap {
 

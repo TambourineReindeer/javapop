@@ -7,7 +7,6 @@ package com.novusradix.JavaPop.Messaging;
 
 import com.novusradix.JavaPop.Server.Game;
 import com.novusradix.JavaPop.Server.GameInfo;
-import java.awt.Dimension;
 
 /**
  *
@@ -15,7 +14,11 @@ import java.awt.Dimension;
  */
 public class GameStarted extends Message{
 
-    public GameInfo gi;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public GameInfo gi;
     
     public GameStarted(Game g)
     {

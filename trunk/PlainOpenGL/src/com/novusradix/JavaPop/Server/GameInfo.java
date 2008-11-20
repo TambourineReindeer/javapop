@@ -14,7 +14,11 @@ import java.util.Vector;
  */
 public class GameInfo implements Serializable {
 
-    public int id;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public int id;
     public Dimension mapSize;
     public Vector<String> players;
 

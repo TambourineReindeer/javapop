@@ -10,7 +10,11 @@ package com.novusradix.JavaPop.Messaging;
  */
 public class UpDown extends Message {
 
-    public int x,  y;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public int x,  y;
     public boolean primaryAction;
     
     public UpDown(int x, int y, boolean primary) {

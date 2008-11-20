@@ -14,7 +14,11 @@ import java.nio.IntBuffer;
  */
 public class HeightMapUpdate extends Message implements Serializable {
 
-    public Rectangle dirtyRegion;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public Rectangle dirtyRegion;
     public int[] heightData;
 
     public HeightMapUpdate(Rectangle dirty, IntBuffer b, int stride) {

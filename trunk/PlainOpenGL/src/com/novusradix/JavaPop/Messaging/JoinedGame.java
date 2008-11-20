@@ -13,7 +13,12 @@ import com.novusradix.JavaPop.Server.GameInfo;
  */
 public class JoinedGame extends Message {
 
-    public GameInfo gi;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public GameInfo gi;
     
     public JoinedGame(com.novusradix.JavaPop.Server.Game game)
     {
