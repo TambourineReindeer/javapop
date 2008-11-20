@@ -27,26 +27,26 @@ public class Player implements Runnable {
     public String name;
     private static int nextId = 1;
     private int id;
-public boolean ready = false;
+    public boolean ready = false;
 
-    
     enum PlayerState {
 
         InServerLobby, InGameLobby, InGame
     };
 
-    public Player(Server s, Socket socket) {
+    public Player(Server s, Socket sock) {
         this.s = s;
-        this.socket = socket;
+        this.socket = sock;
         id = nextId++;
         name = "Player " + id;
         try {
+            socket.setTcpNoDelay(true);
             oos = new ObjectOutputStream(socket.getOutputStream());
             oos.flush();
-
             ois = new ObjectInputStream(socket.getInputStream());
             (new Thread(this, "Server Player")).start();
         } catch (IOException ioe) {
+            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ioe);
         }
     }
 

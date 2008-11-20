@@ -36,6 +36,7 @@ public class Client implements Runnable {
         try {
 
             socket = new Socket(host, 13579);
+            socket.setTcpNoDelay(true);
         } catch (UnknownHostException ex) {
             Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -47,7 +48,9 @@ public class Client implements Runnable {
             ois = new ObjectInputStream(socket.getInputStream());
             (new Thread(this, "Client Player")).start();
         } catch (IOException ioe) {
-        }
+            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ioe);
+           }
+        
     }
 
     public void run() {
