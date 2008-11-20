@@ -5,13 +5,9 @@
  */
 package com.novusradix.JavaPop.Client.Lobby;
 
-import com.novusradix.JavaPop.Client.Client;
-import com.novusradix.JavaPop.Client.Player;
 import com.novusradix.JavaPop.Messaging.JoinGame;
 import com.novusradix.JavaPop.Messaging.LobbyNewGame;
 import com.novusradix.JavaPop.Server.GameInfo;
-import java.util.Vector;
-import javax.swing.DefaultListModel;
 
 /**
  *
