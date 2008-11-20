@@ -4,10 +4,10 @@
  */
 package com.novusradix.JavaPop.Client.Lobby;
 
-import com.novusradix.JavaPop.Messaging.JoinedGame;
-import com.novusradix.JavaPop.Server.GameInfo;
 import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
+
+import com.novusradix.JavaPop.Server.GameInfo;
 
 /**
  *

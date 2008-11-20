@@ -10,7 +10,12 @@ package com.novusradix.JavaPop.Messaging;
  */
 public class LobbyNewGame extends Message{
 
-    public void execute()
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public void execute()
     {
         
         server.newGame(serverPlayer); 

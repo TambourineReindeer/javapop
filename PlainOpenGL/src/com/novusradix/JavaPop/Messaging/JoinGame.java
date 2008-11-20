@@ -11,7 +11,11 @@ package com.novusradix.JavaPop.Messaging;
  */
 public class JoinGame extends Message{
 
-    int gameId;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	int gameId;
     
     public JoinGame(int gameId)
     {

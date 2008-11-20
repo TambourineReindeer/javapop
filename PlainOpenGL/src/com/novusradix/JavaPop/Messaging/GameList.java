@@ -16,7 +16,11 @@ import java.util.Vector;
  */
 public class GameList extends Message implements Serializable {
 
-    public Vector<GameInfo> games;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public Vector<GameInfo> games;
 
     public GameList(Collection<Game> gs) {
         games = new Vector<GameInfo>();

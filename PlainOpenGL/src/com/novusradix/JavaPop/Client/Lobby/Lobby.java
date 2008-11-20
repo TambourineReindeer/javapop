@@ -4,12 +4,13 @@
  */
 package com.novusradix.JavaPop.Client.Lobby;
 
-import com.novusradix.JavaPop.Client.Client;
-import com.novusradix.JavaPop.Messaging.*;
-import com.novusradix.JavaPop.Server.GameInfo;
 import java.util.Vector;
+
 import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
+
+import com.novusradix.JavaPop.Client.Client;
+import com.novusradix.JavaPop.Server.GameInfo;
 
 /**
  *

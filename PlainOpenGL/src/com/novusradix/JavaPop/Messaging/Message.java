@@ -12,7 +12,11 @@ import java.io.Serializable;
  */
 public abstract class Message implements Serializable {
 
-    public transient com.novusradix.JavaPop.Server.Server server;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	public transient com.novusradix.JavaPop.Server.Server server;
     public transient com.novusradix.JavaPop.Server.Player serverPlayer;
     public transient com.novusradix.JavaPop.Server.Game serverGame;
    

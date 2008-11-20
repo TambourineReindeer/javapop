@@ -5,10 +5,6 @@
 
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Client.Lobby.Lobby;
-import com.novusradix.JavaPop.Messaging.GameStarted;
-import com.novusradix.JavaPop.Messaging.Message;
-import java.awt.Frame;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,8 +12,10 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.media.opengl.GLCapabilities;
-import javax.swing.JFrame;
+
+import com.novusradix.JavaPop.Client.Lobby.Lobby;
+import com.novusradix.JavaPop.Messaging.GameStarted;
+import com.novusradix.JavaPop.Messaging.Message;
 
 /**
  *
