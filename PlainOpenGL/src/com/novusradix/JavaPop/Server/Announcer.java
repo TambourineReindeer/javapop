@@ -1,0 +1,65 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.novusradix.JavaPop.Server;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ *
+ * @author mom
+ */
+public class Announcer implements Runnable {
+
+    byte[] buf;
+    boolean keepAlive = true;
+    DatagramSocket socket;
+
+    Announcer(int port) {
+        buf = new byte[2];
+        buf[0] = (byte) (port >> 1);
+        buf[1] = (byte) (port);
+        try {
+            socket = new DatagramSocket();
+            new Thread(this, "Server Announce").start();
+        } catch (SocketException ex) {
+            Logger.getLogger(Announcer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    void kill() {
+        keepAlive = false;
+        socket.close();
+    }
+
+    public void run() {
+        try {
+            DatagramSocket socket = new DatagramSocket();
+            InetAddress group = InetAddress.getByName("230.0.0.1");
+            DatagramPacket packet;
+            packet = new DatagramPacket(buf, buf.length, group, 4446);
+            while (keepAlive) {
+                socket.send(packet);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                }
+            }
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(Announcer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SocketException ex) {
+            Logger.getLogger(Announcer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Announcer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+}

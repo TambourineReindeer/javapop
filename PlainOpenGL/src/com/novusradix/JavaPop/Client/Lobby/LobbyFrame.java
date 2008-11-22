@@ -5,21 +5,28 @@
  */
 package com.novusradix.JavaPop.Client.Lobby;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
 
 /**
  *
  * @author  mom
  */
-public class LobbyFrame extends javax.swing.JFrame {
+public class LobbyFrame extends javax.swing.JFrame implements WindowListener {
 
     public Lobby lobby;
+    AnnounceListener a;
    // public PlayerState player;
     
     /** Creates new form LobbyFrame */
     public LobbyFrame(Lobby l) {
+        this.addWindowListener(this);
         initComponents();
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+
         lobby = l;
-        
+        a = new AnnounceListener(serverPanel1);
         serverPanel1.setLobby(lobby);
         gamesPanel1.setLobby(lobby);
         gamePanel1.setLobby(lobby);
@@ -83,4 +90,27 @@ public class LobbyFrame extends javax.swing.JFrame {
     private com.novusradix.JavaPop.Client.Lobby.GamesPanel gamesPanel1;
     private com.novusradix.JavaPop.Client.Lobby.ServerPanel serverPanel1;
     // End of variables declaration//GEN-END:variables
+
+    public void windowOpened(WindowEvent e) {
+        }
+
+    public void windowClosing(WindowEvent e) {
+        a.kill();
+        this.dispose();
+    }
+
+    public void windowClosed(WindowEvent e) {
+        }
+
+    public void windowIconified(WindowEvent e) {
+        }
+
+    public void windowDeiconified(WindowEvent e) {
+        }
+
+    public void windowActivated(WindowEvent e) {
+        }
+
+    public void windowDeactivated(WindowEvent e) {
+        }
 }

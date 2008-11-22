@@ -3,7 +3,6 @@
  *
  * Created on November 17, 2008, 11:55 AM
  */
-
 package com.novusradix.JavaPop.Client.Lobby;
 
 import com.novusradix.JavaPop.Client.Client;
@@ -14,21 +13,25 @@ import javax.swing.DefaultListModel;
  * @author  mom
  */
 public class ServerPanel extends javax.swing.JPanel {
-   private DefaultListModel serverNames;
-   public Lobby lobby;
-   
+
+    private DefaultListModel serverNames;
+    public Lobby lobby;
+
     /** Creates new form ServerPanel */
     public ServerPanel() {
         initComponents();
-       
         serverNames = new DefaultListModel();
-        
-    lstServerList.setModel(serverNames);
+        lstServerList.setModel(serverNames);
     }
 
     void setLobby(Lobby lobby) {
         this.lobby = lobby;
-        
+    }
+
+    public void addServer(String server) {
+        if (serverNames.indexOf(server) == -1) {
+            serverNames.addElement(server);
+        }
     }
 
     /** This method is called from within the constructor to
@@ -109,28 +112,29 @@ public class ServerPanel extends javax.swing.JPanel {
 private void btnNewLocalServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewLocalServerActionPerformed
 
     new com.novusradix.JavaPop.Server.Server(13579);
-    serverNames.addElement("localhost");
-    
+// addServer("localhost");
+
 }//GEN-LAST:event_btnNewLocalServerActionPerformed
 
 private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
-// TODO add your handling code here:
-    if(serverNames.indexOf(txtServerName.getText()) ==-1)
+
+        addServer(txtServerName.getText());
+
+    }
+
+    public void deleteme() {
         serverNames.addElement(txtServerName.getText());//GEN-LAST:event_btnConnectActionPerformed
-}
+    }
 
 private void lstServerListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstServerListValueChanged
-    
-    if(lstServerList.getSelectedValue() != null && !evt.getValueIsAdjusting())
-    {
-        String s = (String)lstServerList.getSelectedValue();
-        lobby.client = new Client(s,lobby);
-       
-        
+
+    if (lstServerList.getSelectedValue() != null && !evt.getValueIsAdjusting()) {
+        String s = (String) lstServerList.getSelectedValue();
+        lobby.client = new Client(s, lobby);
+
+
     }
 }//GEN-LAST:event_lstServerListValueChanged
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnConnect;
     private javax.swing.JButton btnNewLocalServer;
@@ -139,5 +143,4 @@ private void lstServerListValueChanged(javax.swing.event.ListSelectionEvent evt)
     private javax.swing.JList lstServerList;
     private javax.swing.JTextField txtServerName;
     // End of variables declaration//GEN-END:variables
-
 }
