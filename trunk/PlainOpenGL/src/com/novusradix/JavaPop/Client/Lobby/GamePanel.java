@@ -23,15 +23,6 @@ public class GamePanel extends javax.swing.JPanel {
         initComponents();
     }
 
-    public void setGame(GameInfo gi) {
-        game = gi;
-        if (game != null) {
-            lstPlayers.setListData(game.players);
-        } else {
-            lstPlayers.setModel(new DefaultListModel());
-        }
-    }
-
     void setLobby(Lobby lobby) {
         this.lobby = lobby;
         if (lobby.currentGame != null) {

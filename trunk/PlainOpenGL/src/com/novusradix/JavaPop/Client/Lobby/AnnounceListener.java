@@ -51,8 +51,7 @@ public class AnnounceListener implements Runnable {
                 byte[] buf = new byte[256];
                 packet = new DatagramPacket(buf, buf.length);
                 socket.receive(packet);
-                int received = packet.getData()[0] * 255 + packet.getData()[1];
-                System.out.println("Announce: " + received);
+                int received = (int)packet.getData()[0] * 256 + (int)packet.getData()[1];
                 lobby.addServer(packet.getAddress().getHostName());
             }
 

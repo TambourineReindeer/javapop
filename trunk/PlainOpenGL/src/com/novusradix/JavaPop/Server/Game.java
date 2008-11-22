@@ -16,7 +16,7 @@ import java.util.Vector;
  */
 public class Game extends TimerTask {
 
-    public static int nextId = 0;
+    public volatile static int nextId = 0;
     private int id;
     public Vector<Player> players;
     private Player owner;
@@ -79,6 +79,8 @@ public class Game extends TimerTask {
         //move people.
         h.sendUpdates(players);
         
+        if(players.isEmpty())
+            timer.cancel();
         
     }
 }

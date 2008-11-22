@@ -48,13 +48,13 @@ public class HeightMap {
 
         vertexstride = 8;
         tilestride = 12 * vertexstride;
-        rowstride = tilestride * width;
+        rowstride = tilestride * (width - 1);
 
-        b = BufferUtil.newFloatBuffer(width * breadth * tilestride);
+        b = BufferUtil.newFloatBuffer((width - 1) * (breadth - 1) * tilestride);
 
         int x, y;
-        for (y = 0; y < breadth; y++) {
-            for (x = 0; x < width; x++) {
+        for (y = 0; y < (breadth - 1); y++) {
+            for (x = 0; x < (width - 1); x++) {
 
                 // 0
                 b.put(x);
@@ -186,10 +186,18 @@ public class HeightMap {
 
     public int getHeight(int x, int y) {
         try {
+            if (x == width - 1 && y == breadth - 1) {
+                return (int) b.get(bufPos(x - 1, y-1, 4, VZ));
+            }
+            if (x == width - 1) {
+                return (int) b.get(bufPos(x - 1, y, 3, VZ));
+            }
+            if (y == breadth - 1) {
+                return (int) b.get(bufPos(x, y - 1, 7, VZ));
+            }
             return (int) b.get(bufPos(x, y, 0, VZ));
-        } catch (Exception e) {
-            System.out.println(x);
-            System.out.println(y);
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Array out of bounds in Client getHeight:" + x + ", " + y);
 
         }
         return 0;
@@ -198,9 +206,8 @@ public class HeightMap {
     public float getHeight2(int x, int y) {
         try {
             return b.get(bufPos(x, y, 2, VZ));
-        } catch (Exception e) {
-            System.out.println(x);
-            System.out.println(y);
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Array out of bounds in Client getHeight2:" + x + ", " + y);
 
         }
         return 0;
@@ -293,38 +300,45 @@ public class HeightMap {
     }
 
     private void setHeight(int x, int y, int height) {
-        if (x >= 0 && y >= 0 && x <= width && y <= breadth) {
-            if (x < width && y < width) {
-                b.put(bufPos(x, y, 0, VZ), height);
-                b.put(bufPos(x, y, 10, VZ), height);
+        try {
+            if (x >= 0 && y >= 0 && x < width && y < breadth) {
+                if (x < width - 1 && y < width - 1) {
+                    b.put(bufPos(x, y, 0, VZ), height);
+                    b.put(bufPos(x, y, 10, VZ), height);
+                }
+                if (x >= 1 && y >= 1) {
+                    b.put(bufPos(x - 1, y - 1, 4, VZ), height);
+                    b.put(bufPos(x - 1, y - 1, 6, VZ), height);
+                }
+                if (y >= 1 && x < width - 1) {
+                    b.put(bufPos(x, y - 1, 7, VZ), height);
+                    b.put(bufPos(x, y - 1, 9, VZ), height);
+                }
+                if (x >= 1 && y < width - 1) {
+                    b.put(bufPos(x - 1, y, 1, VZ), height);
+                    b.put(bufPos(x - 1, y, 3, VZ), height);
+                }
             }
-            if (x >= 1 && y >= 1) {
-                b.put(bufPos(x - 1, y - 1, 4, VZ), height);
-                b.put(bufPos(x - 1, y - 1, 6, VZ), height);
-            }
-            if (y >= 1 && x < width) {
-                b.put(bufPos(x, y - 1, 7, VZ), height);
-                b.put(bufPos(x, y - 1, 9, VZ), height);
-            }
-            if (x >= 1 && y < width) {
-                b.put(bufPos(x - 1, y, 1, VZ), height);
-                b.put(bufPos(x - 1, y, 3, VZ), height);
-            }
+        } catch (IndexOutOfBoundsException e) {
+            System.out.print(x + ", " + y + ": out of bounds in SetHeight()");
         }
     }
 
     private void setMidTile(int x, int y) {
-        if (x < 0 || y < 0 || x + 1 >= width || y + 1 >= breadth) {
+        if (x < 0 || y < 0 || x >= width - 1 || y >= breadth - 1) {
             return;
         }
         float m;
         m = Math.max(Math.max(getHeight(x, y), getHeight(x, y + 1)), Math.max(getHeight(x + 1, y), getHeight(x + 1, y + 1))) + Math.min(Math.min(getHeight(x, y), getHeight(x, y + 1)), Math.min(getHeight(x + 1, y), getHeight(x + 1, y + 1)));
 
-        b.put(bufPos(x, y, 2, VZ), m * 0.5f);
-        b.put(bufPos(x, y, 5, VZ), m * 0.5f);
-        b.put(bufPos(x, y, 8, VZ), m * 0.5f);
-        b.put(bufPos(x, y, 11, VZ), m * 0.5f);
-
+        try {
+            b.put(bufPos(x, y, 2, VZ), m * 0.5f);
+            b.put(bufPos(x, y, 5, VZ), m * 0.5f);
+            b.put(bufPos(x, y, 8, VZ), m * 0.5f);
+            b.put(bufPos(x, y, 11, VZ), m * 0.5f);
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Array out of bounds in Client setMidTile:" + x + ", " + y);
+        }
         setNormals(x, y);
 
         if (getHeight(x, y) == 0 && getHeight(x, y + 1) == 0 && getHeight(x + 1, y) == 0 && getHeight(x + 1, y + 1) == 0) {
@@ -364,32 +378,35 @@ public class HeightMap {
         vb = new Vector3f();
         vc = new Vector3f();
 
-        va.x = b.get(bufPos(x, y, vertA, VX));
-        va.y = b.get(bufPos(x, y, vertA, VY));
-        va.z = b.get(bufPos(x, y, vertA, VZ));
+        try {
+            va.x = b.get(bufPos(x, y, vertA, VX));
+            va.y = b.get(bufPos(x, y, vertA, VY));
+            va.z = b.get(bufPos(x, y, vertA, VZ));
 
-        vb.x = b.get(bufPos(x, y, vertB, VX));
-        vb.y = b.get(bufPos(x, y, vertB, VY));
-        vb.z = b.get(bufPos(x, y, vertB, VZ));
+            vb.x = b.get(bufPos(x, y, vertB, VX));
+            vb.y = b.get(bufPos(x, y, vertB, VY));
+            vb.z = b.get(bufPos(x, y, vertB, VZ));
 
-        vc.x = b.get(bufPos(x, y, vertC, VX));
-        vc.y = b.get(bufPos(x, y, vertC, VY));
-        vc.z = b.get(bufPos(x, y, vertC, VZ));
+            vc.x = b.get(bufPos(x, y, vertC, VX));
+            vc.y = b.get(bufPos(x, y, vertC, VY));
+            vc.z = b.get(bufPos(x, y, vertC, VZ));
 
-        vn = calcNormal(vc, va, vb);
+            vn = calcNormal(vc, va, vb);
 
-        b.put(bufPos(x, y, vertA, NX), vn.x);
-        b.put(bufPos(x, y, vertA, NY), vn.y);
-        b.put(bufPos(x, y, vertA, NZ), vn.z);
+            b.put(bufPos(x, y, vertA, NX), vn.x);
+            b.put(bufPos(x, y, vertA, NY), vn.y);
+            b.put(bufPos(x, y, vertA, NZ), vn.z);
 
-        b.put(bufPos(x, y, vertB, NX), vn.x);
-        b.put(bufPos(x, y, vertB, NY), vn.y);
-        b.put(bufPos(x, y, vertB, NZ), vn.z);
+            b.put(bufPos(x, y, vertB, NX), vn.x);
+            b.put(bufPos(x, y, vertB, NY), vn.y);
+            b.put(bufPos(x, y, vertB, NZ), vn.z);
 
-        b.put(bufPos(x, y, vertC, NX), vn.x);
-        b.put(bufPos(x, y, vertC, NY), vn.y);
-        b.put(bufPos(x, y, vertC, NZ), vn.z);
-
+            b.put(bufPos(x, y, vertC, NX), vn.x);
+            b.put(bufPos(x, y, vertC, NY), vn.y);
+            b.put(bufPos(x, y, vertC, NZ), vn.z);
+        } catch (IndexOutOfBoundsException e) {
+           System.out.println("Array out of bounds in Client SetNormal:" + x + ", " + y);
+        }
     }
 
     public boolean isFlat(int x, int y) {
@@ -419,7 +436,7 @@ public class HeightMap {
         tex.enable();
         tex.bind();
         synchronized (this) {
-            gl.glDrawArrays(GL.GL_TRIANGLES, 0, width * breadth * 4 * 3);
+            gl.glDrawArrays(GL.GL_TRIANGLES, 0, (width - 1) * (breadth - 1) * 4 * 3);
         }
         tex.disable();
     }

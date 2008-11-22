@@ -34,7 +34,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
      */
     private static final long serialVersionUID = 1L;
     private static final float fHeightScale = 0.4082f;
-    private Animator a;
     private HeightMap heightMap;
     private Water water;
     private float xPos,  yPos,  xOrig,  yOrig;
@@ -67,9 +66,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         getBounds();
 
         requestFocus();
-        a = new Animator(this);
-        
-        a.start();
         xPos = 0;
         yPos = 0;
     }
@@ -268,8 +264,8 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         l = -z0.z / z1.z;
         s = new Vector4f();
         s.scaleAdd(l, z1, z0);
-        selected.x = Math.round(s.x);
-        selected.y = Math.round(s.y);
+        selected.x = Math.max(Math.min((int)Math.round(s.x), heightMap.getWidth()-1),0);
+        selected.y = Math.max(Math.min((int)Math.round(s.y), heightMap.getBreadth()-1),0);
 
         float d, oldD;
         p = new Vector3f(selected.x, selected.y, heightMap.getHeight(selected.x, selected.y));

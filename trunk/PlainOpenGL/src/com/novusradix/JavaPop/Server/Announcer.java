@@ -26,7 +26,7 @@ public class Announcer implements Runnable {
     
     Announcer(int port) {
         buf = new byte[2];
-        buf[0] = (byte) (port >> 1);
+        buf[0] = (byte) (port >> 8);
         buf[1] = (byte) (port);
         try {
             socket = new DatagramSocket();
