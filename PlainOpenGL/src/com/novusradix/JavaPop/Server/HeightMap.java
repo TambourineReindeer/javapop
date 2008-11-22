@@ -79,7 +79,7 @@ public class HeightMap {
         try {
             return (int) b.get(bufPos(x, y, 0, VZ));
         } catch (Exception e) {
-            System.out.println("Array out of bounds in getHeight:" + x + ", " + y);
+            System.out.println("Array out of bounds in Server getHeight:" + x + ", " + y);
         }
         return 0;
     }

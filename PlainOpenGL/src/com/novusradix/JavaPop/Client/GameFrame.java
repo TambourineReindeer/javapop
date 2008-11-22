@@ -4,6 +4,9 @@
  */
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Messaging.Bye;
+import com.novusradix.JavaPop.Messaging.LeaveGame;
+import com.sun.opengl.util.Animator;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import javax.media.opengl.GLCapabilities;
@@ -17,6 +20,7 @@ public class GameFrame extends JFrame implements WindowListener {
 
     ControlFrame cf;
     Client client;
+    private Animator a;
 
     GameFrame(HeightMap h, Client c) {
         client = c;
@@ -33,14 +37,21 @@ public class GameFrame extends JFrame implements WindowListener {
         cf = new ControlFrame();
         cf.setBounds(1024, 0, cf.getWidth(), cf.getHeight());
         cf.setVisible(true);
+        
+                a = new Animator(mc);
+        
+        a.start();
+
     }
 
     public void windowOpened(WindowEvent e) {
     }
 
     public void windowClosing(WindowEvent e) {
+        a.stop();
         this.dispose();
         cf.dispose();
+        client.sendMessage(new LeaveGame());
         client.lobby.show();
     }
 

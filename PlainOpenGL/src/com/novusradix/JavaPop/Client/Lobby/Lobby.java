@@ -62,7 +62,7 @@ public class Lobby {
 
     public void hide() {
         f.setVisible(false);
-
+        this.currentGame = null;
     }
 
     public void show() {
@@ -76,12 +76,18 @@ public class Lobby {
     }
 
     void newClient(String s) {
-        client = new Client(s,this);
+        client = new Client(s, this);
     }
 
     void quit() {
-        a.kill();
-        f.dispose();
-        client.quit();
+        if (a != null) {
+            a.kill();
+        }
+        if (f != null) {
+            f.dispose();
+        }
+        if (client != null) {
+            client.quit();
+        }
     }
 }
