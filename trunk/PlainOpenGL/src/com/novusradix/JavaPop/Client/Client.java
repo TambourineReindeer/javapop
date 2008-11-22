@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.novusradix.JavaPop.Client.Lobby.Lobby;
+import com.novusradix.JavaPop.Messaging.Bye;
 import com.novusradix.JavaPop.Messaging.GameStarted;
 import com.novusradix.JavaPop.Messaging.Message;
 
@@ -84,5 +85,14 @@ public class Client implements Runnable {
         game = new Game(g, this);
         
         
+    }
+
+    void quit() {
+        sendMessage(new Bye());
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            //probably already quit...
+        }
     }
 }
