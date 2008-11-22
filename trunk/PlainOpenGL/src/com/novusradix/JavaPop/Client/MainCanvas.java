@@ -68,6 +68,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         requestFocus();
         a = new Animator(this);
+        
         a.start();
         xPos = 0;
         yPos = 0;

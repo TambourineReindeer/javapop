@@ -11,6 +11,8 @@ import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -21,19 +23,36 @@ public class Server implements Runnable {
     private Map<Integer, Game> games;
     private Vector<Player> players;
     private int port;
+    private boolean keepAlive = true;
+    Announcer a;
+    ServerForm form;
+    ServerSocket s;
 
     public Server(int port) {
         games = new HashMap<Integer, Game>();
         players = new Vector<Player>();
         this.port = port;
+        form = new ServerForm(this);
         new Thread(this, "Server").start();
+        a = new Announcer(13579);
+        form.setVisible(true);
+    }
+
+    void kill() {
+        keepAlive = false;
+        form.dispose();
+        a.kill();
+        try {
+            s.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void run() {
         try {
-            ServerSocket s = new ServerSocket(port);
-
-            while (s.isBound()) {
+            s = new ServerSocket(port);
+            while (keepAlive) {
                 Player p = new Player(this, s.accept());
                 players.add(p);
                 GameList gl = new GameList(games.values());
@@ -41,16 +60,16 @@ public class Server implements Runnable {
             }
         } catch (IOException ioe) {
         }
+
         System.out.print("Server quitting.\n");
     }
 
     public void newGame(Player p) {
-        
-        if(p.currentGame!=null)
-        {
+
+        if (p.currentGame != null) {
             p.currentGame.removePlayer(p);
         }
-        
+
         Game g = new Game(p);
 
         games.put(g.getId(), g);
@@ -67,14 +86,14 @@ public class Server implements Runnable {
         GameList gl = new GameList(games.values());
         sendAllPlayers(gl);
     }
-    
-    public void removePlayer(Player p){
+
+    public void removePlayer(Player p) {
         players.remove(p);
         GameList gl = new GameList(games.values());
         sendAllPlayers(gl);
     }
-    
-    public void sendAllPlayers(Message m){
+
+    public void sendAllPlayers(Message m) {
         for (Player pl : players) {
             pl.sendMessage(m);
         }
