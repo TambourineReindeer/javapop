@@ -5,34 +5,26 @@
  */
 package com.novusradix.JavaPop.Client.Lobby;
 
-import com.novusradix.JavaPop.Client.Client;
-import javax.swing.DefaultListModel;
-
 /**
  *
- * @author  mom
+ * @author  gef
  */
 public class ServerPanel extends javax.swing.JPanel {
 
-    private DefaultListModel serverNames;
     public Lobby lobby;
 
     /** Creates new form ServerPanel */
     public ServerPanel() {
         initComponents();
-        serverNames = new DefaultListModel();
-        lstServerList.setModel(serverNames);
+       
     }
 
     void setLobby(Lobby lobby) {
         this.lobby = lobby;
+        lstServerList.setModel(lobby.getServerList());
     }
 
-    public void addServer(String server) {
-        if (serverNames.indexOf(server) == -1) {
-            serverNames.addElement(server);
-        }
-    }
+   
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -116,21 +108,18 @@ private void btnNewLocalServerActionPerformed(java.awt.event.ActionEvent evt) {/
 
 }//GEN-LAST:event_btnNewLocalServerActionPerformed
 
-private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConnectActionPerformed
+private void btnConnectActionPerformed(java.awt.event.ActionEvent evt) {                                           
 
-        addServer(txtServerName.getText());
+        lobby.addServer(txtServerName.getText());
 
-    }
-
-    public void deleteme() {
-        serverNames.addElement(txtServerName.getText());//GEN-LAST:event_btnConnectActionPerformed
     }
 
 private void lstServerListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstServerListValueChanged
 
     if (lstServerList.getSelectedValue() != null && !evt.getValueIsAdjusting()) {
         String s = (String) lstServerList.getSelectedValue();
-        lobby.client = new Client(s, lobby);
+        
+        lobby.newClient(s);
 
 
     }

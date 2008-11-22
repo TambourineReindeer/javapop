@@ -16,7 +16,8 @@ import javax.swing.JFrame;
 public class GameFrame extends JFrame implements WindowListener {
 
     ControlFrame cf;
-Client client;
+    Client client;
+
     GameFrame(HeightMap h, Client c) {
         client = c;
         GLCapabilities caps = new GLCapabilities();
@@ -27,6 +28,7 @@ Client client;
         setTitle("JavaPop");
         MainCanvas mc = new MainCanvas(h, caps, client);
         add(mc);
+        addWindowListener(this);
         setVisible(true);
         cf = new ControlFrame();
         cf.setBounds(1024, 0, cf.getWidth(), cf.getHeight());
@@ -39,7 +41,7 @@ Client client;
     public void windowClosing(WindowEvent e) {
         this.dispose();
         cf.dispose();
-        client.quit();
+        client.lobby.show();
     }
 
     public void windowClosed(WindowEvent e) {

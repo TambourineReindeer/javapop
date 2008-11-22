@@ -8,6 +8,7 @@ import com.novusradix.JavaPop.Messaging.GameList;
 import com.novusradix.JavaPop.Messaging.Message;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -36,6 +37,10 @@ public class Server implements Runnable {
         new Thread(this, "Server").start();
         a = new Announcer(13579);
         form.setVisible(true);
+    }
+
+    Collection<Game> getGames() {
+        return games.values();
     }
 
     void kill() {

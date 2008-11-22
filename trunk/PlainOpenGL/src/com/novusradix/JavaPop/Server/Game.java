@@ -31,6 +31,7 @@ public class Game extends TimerTask {
         players.add(owner);
         owner.currentGame = this;
         owner.sendMessage(new JoinedGame(this));
+        id = nextId++;
     }
 
     public int getId() {
