@@ -22,14 +22,16 @@ public class Announcer implements Runnable {
     byte[] buf;
     boolean keepAlive = true;
     DatagramSocket socket;
-
+    Thread t;
+    
     Announcer(int port) {
         buf = new byte[2];
         buf[0] = (byte) (port >> 1);
         buf[1] = (byte) (port);
         try {
             socket = new DatagramSocket();
-            new Thread(this, "Server Announce").start();
+            t = new Thread(this, "Server Announce");
+            t.start();
         } catch (SocketException ex) {
             Logger.getLogger(Announcer.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -39,6 +41,7 @@ public class Announcer implements Runnable {
     void kill() {
         keepAlive = false;
         socket.close();
+        t.interrupt();
     }
 
     public void run() {

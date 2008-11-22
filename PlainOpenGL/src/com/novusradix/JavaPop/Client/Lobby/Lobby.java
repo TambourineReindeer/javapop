@@ -50,9 +50,12 @@ public class Lobby {
         }
     }
     
-    
-
     public void hide() {
         f.setVisible(false);
+    }
+
+    void quit() {
+        f.dispose();
+        client.quit();
     }
 }

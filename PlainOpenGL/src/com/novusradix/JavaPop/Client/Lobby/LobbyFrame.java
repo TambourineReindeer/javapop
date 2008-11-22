@@ -96,7 +96,7 @@ public class LobbyFrame extends javax.swing.JFrame implements WindowListener {
 
     public void windowClosing(WindowEvent e) {
         a.kill();
-        this.dispose();
+        lobby.quit();
     }
 
     public void windowClosed(WindowEvent e) {
