@@ -17,32 +17,35 @@ import java.util.logging.Logger;
  */
 public class AnnounceListener implements Runnable {
 
-    ServerPanel serverPanel;
+    Lobby lobby;
     boolean keepAlive = true;
     MulticastSocket socket;
+    InetAddress group = null;
 
-    public AnnounceListener(ServerPanel sp) {
-        serverPanel = sp;
+    AnnounceListener(Lobby l) {
+        lobby = l;
         try {
             socket = new MulticastSocket(4446);
+            group = InetAddress.getByName("230.0.0.1");
+            socket.joinGroup(group);
             new Thread(this, "Announce Listener").start();
         } catch (IOException ex) {
             Logger.getLogger(AnnounceListener.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
     void kill() {
         keepAlive = false;
+        try {
+            socket.leaveGroup(group);
+        } catch (IOException ex) {
+            Logger.getLogger(AnnounceListener.class.getName()).log(Level.SEVERE, null, ex);
+        }
         socket.close();
     }
 
     public void run() {
-        InetAddress group = null;
         try {
-            group = InetAddress.getByName("230.0.0.1");
-            socket.joinGroup(group);
-
             DatagramPacket packet;
             while (keepAlive) {
                 byte[] buf = new byte[256];
@@ -50,20 +53,21 @@ public class AnnounceListener implements Runnable {
                 socket.receive(packet);
                 int received = packet.getData()[0] * 255 + packet.getData()[1];
                 System.out.println("Announce: " + received);
-                serverPanel.addServer(packet.getAddress().getHostName());
+                lobby.addServer(packet.getAddress().getHostName());
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(AnnounceListener.class.getName()).log(Level.SEVERE, null, ex);
+            //no problems, almost certainly caused by kill()
         }
-        
-        try {
-            if(group!=null)
-            socket.leaveGroup(group);
-        } catch (IOException ex) {
-            Logger.getLogger(AnnounceListener.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        socket.close();
 
+        //but just in case let's leave the group and close the socket.
+        if (!socket.isClosed()) {
+            try {
+                socket.leaveGroup(group);
+            } catch (IOException ex) {
+                Logger.getLogger(AnnounceListener.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            socket.close();
+        }
     }
 }

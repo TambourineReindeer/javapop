@@ -94,5 +94,6 @@ public class Client implements Runnable {
         } catch (IOException ex) {
             //probably already quit...
         }
+        
     }
 }

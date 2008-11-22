@@ -19,7 +19,7 @@ public class Game {
     public Client client;
     
     public Game(GameStarted g, Client c) {
-        h = new HeightMap(g.gi.mapSize);
+       h = new HeightMap(g.gi.mapSize);
        client = c;
         
        new GameFrame(h, client);

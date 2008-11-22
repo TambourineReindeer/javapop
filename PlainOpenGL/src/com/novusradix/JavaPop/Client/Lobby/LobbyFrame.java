@@ -16,7 +16,6 @@ import java.awt.event.WindowListener;
 public class LobbyFrame extends javax.swing.JFrame implements WindowListener {
 
     public Lobby lobby;
-    AnnounceListener a;
    // public PlayerState player;
     
     /** Creates new form LobbyFrame */
@@ -26,7 +25,6 @@ public class LobbyFrame extends javax.swing.JFrame implements WindowListener {
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
         lobby = l;
-        a = new AnnounceListener(serverPanel1);
         serverPanel1.setLobby(lobby);
         gamesPanel1.setLobby(lobby);
         gamePanel1.setLobby(lobby);
@@ -95,7 +93,6 @@ public class LobbyFrame extends javax.swing.JFrame implements WindowListener {
         }
 
     public void windowClosing(WindowEvent e) {
-        a.kill();
         lobby.quit();
     }
 

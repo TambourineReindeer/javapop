@@ -1,5 +1,6 @@
 package com.novusradix.JavaPop.Server;
 
+import com.novusradix.JavaPop.Messaging.GameList;
 import com.novusradix.JavaPop.Messaging.Message;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -45,6 +46,7 @@ public class Player implements Runnable {
             oos.flush();
             ois = new ObjectInputStream(socket.getInputStream());
             (new Thread(this, "Server Player")).start();
+            sendMessage(new GameList(s.getGames()));
         } catch (IOException ioe) {
             Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ioe);
         }
