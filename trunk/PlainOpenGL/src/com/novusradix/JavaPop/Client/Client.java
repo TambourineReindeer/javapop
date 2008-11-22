@@ -87,7 +87,7 @@ public class Client implements Runnable {
         
     }
 
-    void quit() {
+    public void quit() {
         sendMessage(new Bye());
         try {
             socket.close();
