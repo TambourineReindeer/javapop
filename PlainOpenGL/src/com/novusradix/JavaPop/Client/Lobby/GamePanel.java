@@ -13,10 +13,9 @@ import javax.swing.DefaultListModel;
  *
  * @author  mom
  */
-public class GamePanel extends javax.swing.JPanel {
+public class GamePanel extends javax.swing.JPanel implements GameListener {
 
     public Lobby lobby;
-    public GameInfo game;
 
     /** Creates new form GamePanel */
     public GamePanel() {
@@ -25,9 +24,7 @@ public class GamePanel extends javax.swing.JPanel {
 
     void setLobby(Lobby lobby) {
         this.lobby = lobby;
-        if (lobby.currentGame != null) {
-            lstPlayers.setModel(lobby.currentGame.getPlayerList());
-        }
+
     }
 
     /** This method is called from within the constructor to
@@ -118,4 +115,11 @@ private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JList lstPlayers;
     // End of variables declaration//GEN-END:variables
+    public void setGame(Game g) {
+        if (g != null) {
+            lstPlayers.setModel(g.getPlayerList());
+        } else {
+            lstPlayers.setModel(new DefaultListModel());
+        }
+    }
 }
