@@ -84,6 +84,8 @@ public class Lobby {
 
     void newClient(String s) {
         client = new Client(s, this);
+        if (!client.isConnected())
+            client = null;
     }
 
     void quit() {

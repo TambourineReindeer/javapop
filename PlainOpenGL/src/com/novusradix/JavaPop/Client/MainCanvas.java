@@ -4,7 +4,6 @@
  */
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Messaging.UpDown;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -24,7 +23,6 @@ import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
-import com.sun.opengl.util.Animator;
 import java.awt.event.MouseWheelListener;
 import java.util.Vector;
 
@@ -56,8 +54,8 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         ring.add(new Point(-1, 1));
         ring.add(new Point(0, 1));
         ring.add(new Point(1, 1));
-        
-        
+
+
         this.client = c;
         mvpInverse = new Matrix4f();
         heightMap = h;
@@ -346,12 +344,15 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             } else {
                 return;
             }
-            client.sendMessage(new UpDown(selected.x, selected.y, primary));
+
+            if (primary) {
+                client.tool.PrimaryAction(selected.x, selected.y);
+            } else {
+                client.tool.SecondaryAction(selected.x, selected.y);
+            }
         } else {
             mouseMoved(e);
-
         }
-
     }
 
     public void mouseWheelMoved(MouseWheelEvent e) {

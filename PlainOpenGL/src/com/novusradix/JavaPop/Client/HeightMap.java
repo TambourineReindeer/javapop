@@ -410,15 +410,15 @@ public class HeightMap {
     }
 
     public boolean isFlat(int x, int y) {
-        int a = 0, b = 0, c = 0, d = 0;
+        int ha = 0, hb = 0, hc = 0, hd = 0;
         if (x < 0 || y < 0 || x + 1 >= width || y + 1 >= breadth) {
             return false;
         }
-        a = getHeight(x, y);
-        b = getHeight(x, y + 1);
-        c = getHeight(x + 1, y);
-        d = getHeight(x + 1, y + 1);
-        return (a == b && b == c && c == d);
+        ha = getHeight(x, y);
+        hb = getHeight(x, y + 1);
+        hc = getHeight(x + 1, y);
+        hd = getHeight(x + 1, y + 1);
+        return (ha == hb && hb == hc && hc == hd);
     }
 
     public void display(GL gl) {
