@@ -5,8 +5,6 @@
 
 package com.novusradix.JavaPop.Client.Tools;
 
-import com.novusradix.JavaPop.Client.*;
-import com.novusradix.JavaPop.Client.Tools.Tool;
 import com.novusradix.JavaPop.Messaging.UpDown;
 
 /**
@@ -15,10 +13,18 @@ import com.novusradix.JavaPop.Messaging.UpDown;
  */
 public class RaiseLowerTool extends Tool {
 
-    Client client;
-    public RaiseLowerTool(Client c)
+    private static RaiseLowerTool t;
+    
+    private RaiseLowerTool()
     {
-        client = c;
+        
+    }
+    
+    public static Tool getTool()
+    {
+        if(t==null)
+            t = new RaiseLowerTool();
+        return t;                 
     }
     
     @Override

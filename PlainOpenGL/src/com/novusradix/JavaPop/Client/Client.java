@@ -37,7 +37,8 @@ public class Client implements Runnable {
     public Client(String host, Lobby l) {
         lobby = l;
         connected = false;
-        tool = new RaiseLowerTool(this);
+        Tool.Initialise(this);
+        tool = RaiseLowerTool.getTool();
         try {
 
             socket = new Socket(host, 13579);
