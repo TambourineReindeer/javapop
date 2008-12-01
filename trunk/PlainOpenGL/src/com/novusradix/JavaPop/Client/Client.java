@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Client.Tools.Tool;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.novusradix.JavaPop.Client.Lobby.Lobby;
+import com.novusradix.JavaPop.Client.Tools.RaiseLowerTool;
 import com.novusradix.JavaPop.Messaging.Bye;
 import com.novusradix.JavaPop.Messaging.GameStarted;
 import com.novusradix.JavaPop.Messaging.Message;
@@ -27,31 +28,39 @@ public class Client implements Runnable {
     private Socket socket;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
-    public Player player;
+    private boolean connected;
     public Lobby lobby;
     public Game game;
+    Tool tool;
+    
     
     public Client(String host, Lobby l) {
-        lobby =l;
-       
+        lobby = l;
+        connected = false;
+        tool = new RaiseLowerTool(this);
         try {
 
             socket = new Socket(host, 13579);
             socket.setTcpNoDelay(true);
         } catch (UnknownHostException ex) {
-            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
+            return;
         } catch (IOException ex) {
-            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
+            return;
         }
         try {
             oos = new ObjectOutputStream(socket.getOutputStream());
             oos.flush();
             ois = new ObjectInputStream(socket.getInputStream());
+            connected = true;
             (new Thread(this, "Client Player")).start();
         } catch (IOException ioe) {
-            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ioe);
-           }
-        
+            return;
+        }
+
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 
     public void run() {
@@ -59,15 +68,15 @@ public class Client implements Runnable {
         try {
             while (socket.isConnected()) {
                 message = (Message) ois.readObject();
-                message.client=this;
-                
+                message.client = this;
+
                 message.execute();
             }
         } catch (IOException ioe) {
         } catch (ClassNotFoundException cnfe) {
         }
-        //disconnected
-        
+    //disconnected
+
     }
 
     public synchronized void sendMessage(Message m) {
@@ -76,15 +85,15 @@ public class Client implements Runnable {
             oos.flush();
             System.out.println("Client sending " + m.getClass().getSimpleName());
         } catch (IOException ex) {
-            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public void newGame(GameStarted g){
+
+    public void newGame(GameStarted g) {
         lobby.hide();
         game = new Game(g, this);
-        
-        
+
+
     }
 
     public void quit() {
@@ -94,6 +103,6 @@ public class Client implements Runnable {
         } catch (IOException ex) {
             //probably already quit...
         }
-        
+
     }
 }

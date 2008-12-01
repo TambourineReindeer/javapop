@@ -36,6 +36,7 @@ public class Server implements Runnable {
         form = new ServerForm(this);
         new Thread(this, "Server").start();
         a = new Announcer(13579);
+        form.setBounds(500,500,150, 150);
         form.setVisible(true);
     }
 
