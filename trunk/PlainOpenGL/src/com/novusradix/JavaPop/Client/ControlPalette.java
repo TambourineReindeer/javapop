@@ -12,9 +12,15 @@ package com.novusradix.JavaPop.Client;
  */
 public class ControlPalette extends javax.swing.JPanel {
 
+    private Client client;
     /** Creates new form ControlPalette */
     public ControlPalette() {
         initComponents();
+    }
+    
+    public void setClient(Client c)
+    {
+        client = c;
     }
 
     /** This method is called from within the constructor to
