@@ -24,20 +24,21 @@ public class Lobby {
     private DefaultListModel serverList;
     private LobbyFrame f;
     AnnounceListener a;
-
+    GameListener gl;
+    
     public Lobby() {
         gameList = new DefaultListModel();
         serverList = new DefaultListModel();
 
         f = new LobbyFrame(this);
         a = new AnnounceListener(this);
-
+        gl = f.getGamePanel();
         f.setVisible(true);
     }
 
     public void newGame(GameInfo gi) {
         currentGame = new Game(gi);
-        f.getGamePanel().setLobby(this);
+        gl.setGame(currentGame);
     }
 
     public ListModel getGameList() {
@@ -46,6 +47,11 @@ public class Lobby {
 
     public ListModel getServerList() {
         return serverList;
+    }
+    
+    public void setGame(Game g)
+    {
+        gl.setGame(g);
     }
 
     public void setGames(Vector<GameInfo> gs) {
@@ -63,6 +69,7 @@ public class Lobby {
     public void hide() {
         f.setVisible(false);
         this.currentGame = null;
+        gl.setGame(currentGame);
     }
 
     public void show() {
