@@ -26,6 +26,7 @@ import javax.vecmath.Vector4f;
 
 import com.sun.opengl.util.Animator;
 import java.awt.event.MouseWheelListener;
+import java.util.Vector;
 
 public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener, MouseMotionListener, MouseListener, MouseWheelListener {
 
@@ -42,10 +43,21 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Point selected;
     private Matrix4f mvpInverse;
     private Client client;
+    Vector<Point> ring;
 
     public MainCanvas(HeightMap h, GLCapabilities caps, Client c) {
         super(caps);
-
+        ring = new Vector<Point>();
+        ring.add(new Point(-1, -1));
+        ring.add(new Point(0, -1));
+        ring.add(new Point(1, -1));
+        ring.add(new Point(-1, 0));
+        ring.add(new Point(1, 0));
+        ring.add(new Point(-1, 1));
+        ring.add(new Point(0, 1));
+        ring.add(new Point(1, 1));
+        
+        
         this.client = c;
         mvpInverse = new Matrix4f();
         heightMap = h;
@@ -257,31 +269,44 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         mvpInverse.transform(z0);
         mvpInverse.transform(z1);
-        Vector3f v0, v1, p;
+        Vector3f v0, v1;
         v0 = new Vector3f(z0.x, z0.y, z0.z);
         v1 = new Vector3f(z1.x, z1.y, z1.z);
+
         z1.sub(z0);
         l = -z0.z / z1.z;
         s = new Vector4f();
         s.scaleAdd(l, z1, z0);
-        selected.x = Math.max(Math.min((int)Math.round(s.x), heightMap.getWidth()-1),0);
-        selected.y = Math.max(Math.min((int)Math.round(s.y), heightMap.getBreadth()-1),0);
+        selected.x = Math.max(Math.min((int) Math.round(s.x), heightMap.getWidth() - 1), 0);
+        selected.y = Math.max(Math.min((int) Math.round(s.y), heightMap.getBreadth() - 1), 0);
 
+
+        selected = iterateSelection(selected, v0, v1);
+
+
+    }
+
+    private Point iterateSelection(Point current, Vector3f v0, Vector3f v1) {
+        Vector3f p;
         float d, oldD;
-        p = new Vector3f(selected.x, selected.y, heightMap.getHeight(selected.x, selected.y));
+        p = new Vector3f(current.x, current.y, heightMap.getHeight(current.x, current.y));
         d = Helpers.PointLineDistance(v0, v1, p);
-        oldD = 1000;
-        for (int x = 0; x < 128; x++) {
-            for (int y = 0; y < 128; y++) {
+        oldD = d;
+
+        int x, y;
+        for (Point offset : ring) {
+            x = current.x + offset.x;
+            y = current.y + offset.y;
+
+            if (x > 0 && y > 0 && x < heightMap.getWidth() && y < heightMap.getBreadth()) {
                 p = new Vector3f(x, y, heightMap.getHeight(x, y));
                 d = Helpers.PointLineDistance(v0, v1, p);
                 if (d < oldD) {
-                    selected.x = x;
-                    selected.y = y;
-                    oldD = d;
+                    return iterateSelection(new Point(x, y), v0, v1);
                 }
             }
         }
+        return current;
     }
 
     public void mouseClicked(MouseEvent e) {
