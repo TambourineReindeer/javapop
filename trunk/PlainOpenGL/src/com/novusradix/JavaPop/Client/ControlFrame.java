@@ -16,10 +16,7 @@ public class ControlFrame extends javax.swing.JFrame {
     public ControlFrame() {
         initComponents();
     }
-    public void setClient(Client c)
-    {
-        controlPalette1.setClient(c);
-    }
+   
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -30,14 +27,13 @@ public class ControlFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         controlPalette1 = new com.novusradix.JavaPop.Client.ControlPalette();
-        controlPalette2 = new com.novusradix.JavaPop.Client.ControlPalette();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("JavaPop"); // NOI18N
         setFocusableWindowState(false);
         setResizable(false);
         getContentPane().setLayout(new java.awt.GridLayout(1, 0));
-        getContentPane().add(controlPalette2);
+        getContentPane().add(controlPalette1);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -45,7 +41,6 @@ public class ControlFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private com.novusradix.JavaPop.Client.ControlPalette controlPalette1;
-    private com.novusradix.JavaPop.Client.ControlPalette controlPalette2;
     // End of variables declaration//GEN-END:variables
 
 }

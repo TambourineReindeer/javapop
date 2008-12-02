@@ -4,7 +4,6 @@
  */
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Client.Tools.Tool;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.novusradix.JavaPop.Client.Lobby.Lobby;
-import com.novusradix.JavaPop.Client.Tools.RaiseLowerTool;
+import com.novusradix.JavaPop.Client.Tools.BaseTool;
 import com.novusradix.JavaPop.Messaging.Bye;
 import com.novusradix.JavaPop.Messaging.GameStarted;
 import com.novusradix.JavaPop.Messaging.Message;
@@ -31,14 +30,12 @@ public class Client implements Runnable {
     private boolean connected;
     public Lobby lobby;
     public Game game;
-    Tool tool;
-    
     
     public Client(String host, Lobby l) {
         lobby = l;
         connected = false;
-        Tool.Initialise(this);
-        tool = RaiseLowerTool.getTool();
+        BaseTool.Initialise(this);
+        
         try {
 
             socket = new Socket(host, 13579);
