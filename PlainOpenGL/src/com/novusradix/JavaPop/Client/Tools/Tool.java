@@ -4,19 +4,14 @@
  */
 package com.novusradix.JavaPop.Client.Tools;
 
-import com.novusradix.JavaPop.Client.Client;
-
 /**
  *
  * @author mom
  */
-public abstract class Tool {
-    static Client client;
+public interface Tool {
+    enum ToolType {RaiseLower, Lightning};
     
-    public abstract void PrimaryAction(int x, int y);
-    public abstract void SecondaryAction(int x, int y);
-    public static void Initialise(Client c)
-    {
-        client = c;
-    }
+    public void PrimaryAction(int x, int y);
+    public void SecondaryAction(int x, int y);
+  
 }

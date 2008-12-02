@@ -34,7 +34,6 @@ public class GameFrame extends JFrame implements WindowListener {
         addWindowListener(this);
         setVisible(true);
         cf = new ControlFrame();
-        cf.setClient(c);
         cf.setBounds(1024, 0, cf.getWidth(), cf.getHeight());
         cf.setVisible(true);
 

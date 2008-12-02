@@ -4,8 +4,6 @@
  */
 package com.novusradix.JavaPop.Client;
 
-import javax.media.opengl.GLCapabilities;
-import javax.swing.JFrame;
 
 import com.novusradix.JavaPop.Messaging.GameStarted;
 
