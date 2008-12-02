@@ -73,11 +73,11 @@ public class ControlPalette extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
 private void UpDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpDownButtonActionPerformed
-    BaseTool.setTool(ToolType.RaiseLower);
+    BaseTool.setTool(ToolType.RaiseLower, false);
 }//GEN-LAST:event_UpDownButtonActionPerformed
 
 private void LightningButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LightningButtonActionPerformed
-    BaseTool.setTool(ToolType.Lightning);
+    BaseTool.setTool(ToolType.Lightning, false);
 }//GEN-LAST:event_LightningButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton LightningButton;

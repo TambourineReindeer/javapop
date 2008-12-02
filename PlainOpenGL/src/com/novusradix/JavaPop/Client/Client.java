@@ -81,7 +81,7 @@ public class Client implements Runnable {
         try {
             oos.writeObject(m);
             oos.flush();
-            System.out.println("Client sending " + m.getClass().getSimpleName());
+            //System.out.println("Client sending " + m.getClass().getSimpleName());
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
