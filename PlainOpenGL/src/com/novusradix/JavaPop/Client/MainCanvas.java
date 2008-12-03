@@ -5,6 +5,8 @@
 package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Client.Tools.BaseTool;
+import com.novusradix.JavaPop.Math.Matrix4;
+import com.novusradix.JavaPop.Math.Vector3;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -20,9 +22,7 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
-import javax.vecmath.Vector4f;
+
 
 import java.awt.event.MouseWheelListener;
 import java.util.Vector;
@@ -40,7 +40,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private int height,  width;
     private Point dragOrigin;
     private Point selected;
-    private Matrix4f mvpInverse;
+    private Matrix4 mvpInverse;
     private Client client;
     Vector<Point> ring;
 
@@ -58,7 +58,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
 
         this.client = c;
-        mvpInverse = new Matrix4f();
+        mvpInverse = new Matrix4();
         heightMap = h;
         Peon.init(h);
         House.init(h);
@@ -103,15 +103,17 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         float[] buf = new float[16];
         gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, buf, 0);
 
-        Matrix4f m_mv, m_p;
-        m_mv = new Matrix4f();
-        m_p = new Matrix4f();
-        m_mv.set(buf);
-        m_mv.transpose();
+        Matrix4 m_mvn, m_pn;
+        m_mvn = new Matrix4();
+        m_pn = new Matrix4();
+        gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, buf, 0);
+
+        m_mvn.set(buf);
+        m_mvn.transpose();
         gl.glGetFloatv(GL.GL_PROJECTION_MATRIX, buf, 0);
-        m_p.set(buf);
-        m_p.transpose();
-        mvpInverse.mul(m_p, m_mv);
+        m_pn.set(buf);
+        m_pn.transpose();
+        mvpInverse.mul(m_pn, m_mvn);
         mvpInverse.invert();
 
         gl.glEnable(GL.GL_BLEND);
@@ -258,37 +260,43 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     public void mouseMoved(MouseEvent e) {
         // TODO Auto-generated method stub
         float xMouse, yMouse;
-        xMouse = (2.0f * e.getX() / width - 1.0f);
-        yMouse = (-2.0f * e.getY() / height + 1.0f);
+        if (width > 0 && height > 0) {
+            xMouse = (2.0f * e.getX() / width - 1.0f);
+            yMouse = (-2.0f * e.getY() / height + 1.0f);
 
-        float l;
-        Vector4f z0, z1, s;
-        z0 = new Vector4f(xMouse, yMouse, 10, 1);
-        z1 = new Vector4f(xMouse, yMouse, 11, 1);
+            float l;
 
-        mvpInverse.transform(z0);
-        mvpInverse.transform(z1);
-        Vector3f v0, v1;
-        v0 = new Vector3f(z0.x, z0.y, z0.z);
-        v1 = new Vector3f(z1.x, z1.y, z1.z);
+            Vector3 z0, z1, s;
+            z0 = new Vector3(xMouse, yMouse, 10);
+            z1 = new Vector3(xMouse, yMouse, 11);
 
-        z1.sub(z0);
-        l = -z0.z / z1.z;
-        s = new Vector4f();
-        s.scaleAdd(l, z1, z0);
-        selected.x = Math.max(Math.min((int) Math.round(s.x), heightMap.getWidth() - 1), 0);
-        selected.y = Math.max(Math.min((int) Math.round(s.y), heightMap.getBreadth() - 1), 0);
+            mvpInverse.transform(z0);
+            mvpInverse.transform(z1);
 
+            Vector3 v0n, v1n;
+            v0n = new Vector3(z0);
+            v1n = new Vector3(z1);
 
-        selected = iterateSelection(selected, v0, v1);
+            z1.sub(z0);
+            l = -z0.z / z1.z;
+            s = new Vector3();
+            s.scaleAdd(l, z1, z0);
 
 
+            selected.x = Math.max(Math.min((int) Math.round(s.x), heightMap.getWidth() - 1), 0);
+            selected.y = Math.max(Math.min((int) Math.round(s.y), heightMap.getBreadth() - 1), 0);
+
+
+            selected = iterateSelection(selected, v0n, v1n);
+
+        }
     }
 
-    private Point iterateSelection(Point current, Vector3f v0, Vector3f v1) {
-        Vector3f p;
+    private Point iterateSelection(Point current, Vector3 v0, Vector3 v1) {
+        Vector3 p;
+
         float d, oldD;
-        p = new Vector3f(current.x, current.y, heightMap.getHeight(current.x, current.y));
+        p = new Vector3(current.x, current.y, heightMap.getHeight(current.x, current.y));
         d = Helpers.PointLineDistance(v0, v1, p);
         oldD = d;
 
@@ -298,7 +306,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             y = current.y + offset.y;
 
             if (x > 0 && y > 0 && x < heightMap.getWidth() && y < heightMap.getBreadth()) {
-                p = new Vector3f(x, y, heightMap.getHeight(x, y));
+                p = new Vector3(x, y, heightMap.getHeight(x, y));
                 d = Helpers.PointLineDistance(v0, v1, p);
                 if (d < oldD) {
                     return iterateSelection(new Point(x, y), v0, v1);

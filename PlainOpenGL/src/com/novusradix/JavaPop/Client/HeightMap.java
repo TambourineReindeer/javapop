@@ -1,5 +1,7 @@
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Math.Vector2;
+import com.novusradix.JavaPop.Math.Vector3;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.net.URL;
@@ -8,8 +10,6 @@ import java.nio.FloatBuffer;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLException;
-import javax.vecmath.Point2f;
-import javax.vecmath.Vector3f;
 
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.sun.opengl.util.BufferUtil;
@@ -72,7 +72,7 @@ public class HeightMap {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(1);
+                b.put(31.0f);
                 b.put(0);
                 // 2
                 b.put(x + 0.5f);
@@ -81,8 +81,8 @@ public class HeightMap {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(0.5f);
-                b.put(0.5f);
+                b.put(15.5f);
+                b.put(15.5f);
                 // 3
                 b.put((float) x + 1);
                 b.put(y);
@@ -90,7 +90,7 @@ public class HeightMap {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(1);
+                b.put(31.0f);
                 b.put(0);
                 // 4
                 b.put((float) x + 1);
@@ -99,8 +99,8 @@ public class HeightMap {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(1);
-                b.put(1);
+                b.put(31.0f);
+                b.put(31.0f);
                 // 5
                 b.put(x + 0.5f);
                 b.put(y + 0.5f);
@@ -108,8 +108,8 @@ public class HeightMap {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(0.5f);
-                b.put(0.5f);
+                b.put(15.5f);
+                b.put(15.5f);
                 // 6
                 b.put((float) x + 1);
                 b.put((float) y + 1);
@@ -117,8 +117,8 @@ public class HeightMap {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(1);
-                b.put(1);
+                b.put(31.0f);
+                b.put(31.0f);
                 // 7
                 b.put(x);
                 b.put((float) y + 1);
@@ -127,7 +127,7 @@ public class HeightMap {
                 b.put(0);
                 b.put(1);
                 b.put(0);
-                b.put(1);
+                b.put(31.0f);
                 // 8
                 b.put(x + 0.5f);
                 b.put(y + 0.5f);
@@ -135,8 +135,8 @@ public class HeightMap {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(0.5f);
-                b.put(0.5f);
+                b.put(15.5f);
+                b.put(15.5f);
                 // 9
                 b.put(x);
                 b.put((float) y + 1);
@@ -145,7 +145,7 @@ public class HeightMap {
                 b.put(0);
                 b.put(1);
                 b.put(0);
-                b.put(1);
+                b.put(31.0f);
                 // 10
                 b.put(x);
                 b.put(y);
@@ -162,8 +162,8 @@ public class HeightMap {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(0.5f);
-                b.put(0.5f);
+                b.put(15.5f);
+                b.put(15.5f);
             }
         }
         b.flip();
@@ -254,7 +254,7 @@ public class HeightMap {
         }
     }
 
-    public Point2f getSlope(float x, float y) {
+    public Vector2 getSlope(float x, float y) {
         int x1, x2, y1, y2;
         float a, b, c, d, m;
         x1 = (int) Math.floor(x);
@@ -271,7 +271,7 @@ public class HeightMap {
         d = getHeight(x2, y2);
 
         if (a == b && b == c && c == d) {
-            return new Point2f(0, 0);
+            return new Vector2(0, 0);
         }
         m = a;
         if (b > a || c > a || d > a) {
@@ -283,18 +283,18 @@ public class HeightMap {
         if (y > x) {
             if (y > 1 - x) {
                 // BMD
-                return new Point2f(d - b, 2.0f * ((d + b) / 2.0f - m));
+                return new Vector2(d - b, 2.0f * ((d + b) / 2.0f - m));
             } else {
                 // AMB
-                return new Point2f(2.0f * (m - (a + b) / 2.0f), b - a);
+                return new Vector2(2.0f * (m - (a + b) / 2.0f), b - a);
             }
         } else {
             if (y > 1 - x) {
                 // CMD
-                return new Point2f(2.0f * ((c + d) / 2.0f - m), d - c);
+                return new Vector2(2.0f * ((c + d) / 2.0f - m), d - c);
             } else {
                 // AMC
-                return new Point2f(c - a, 2.0f * (m - (a + c) / 2.0f));
+                return new Vector2(c - a, 2.0f * (m - (a + c) / 2.0f));
             }
         }
     }
@@ -350,18 +350,23 @@ public class HeightMap {
     }
 
     public void setTexture(int x, int y, int t) {
-        b.put(bufPos(x, y, 0, TX), t);
-        b.put(bufPos(x, y, 1, TX), t + 1);
-        b.put(bufPos(x, y, 2, TX), t + 0.5f);
-        b.put(bufPos(x, y, 3, TX), t + 1);
-        b.put(bufPos(x, y, 4, TX), t + 1);
-        b.put(bufPos(x, y, 5, TX), t + 0.5f);
-        b.put(bufPos(x, y, 6, TX), t + 1);
-        b.put(bufPos(x, y, 7, TX), t);
-        b.put(bufPos(x, y, 8, TX), t + 0.5f);
-        b.put(bufPos(x, y, 9, TX), t);
-        b.put(bufPos(x, y, 10, TX), t);
-        b.put(bufPos(x, y, 11, TX), t + 0.5f);
+        float left, mid, right;
+        left = t*32.0f;
+        right = left + 31.0f;
+        mid = (left+right)/2.0f;
+        
+        b.put(bufPos(x, y, 0, TX), left);
+        b.put(bufPos(x, y, 1, TX), right);
+        b.put(bufPos(x, y, 2, TX), mid);
+        b.put(bufPos(x, y, 3, TX), right);
+        b.put(bufPos(x, y, 4, TX), right);
+        b.put(bufPos(x, y, 5, TX), mid);
+        b.put(bufPos(x, y, 6, TX), right);
+        b.put(bufPos(x, y, 7, TX), left);
+        b.put(bufPos(x, y, 8, TX), mid);
+        b.put(bufPos(x, y, 9, TX), left);
+        b.put(bufPos(x, y, 10, TX), left);
+        b.put(bufPos(x, y, 11, TX), mid);
 
     }
 
@@ -373,10 +378,10 @@ public class HeightMap {
     }
 
     private void setNormals(int x, int y, int vertA, int vertB, int vertC) {
-        Vector3f va, vb, vc, vn;
-        va = new Vector3f();
-        vb = new Vector3f();
-        vc = new Vector3f();
+        Vector3 va, vb, vc, vn;
+        va = new Vector3();
+        vb = new Vector3();
+        vc = new Vector3();
 
         try {
             va.x = b.get(bufPos(x, y, vertA, VX));
@@ -391,7 +396,7 @@ public class HeightMap {
             vc.y = b.get(bufPos(x, y, vertC, VY));
             vc.z = b.get(bufPos(x, y, vertC, VZ));
 
-            vn = calcNormal(vc, va, vb);
+            vn = Helpers.calcNormal(vc, va, vb);
 
             b.put(bufPos(x, y, vertA, NX), vn.x);
             b.put(bufPos(x, y, vertA, NY), vn.y);
@@ -423,7 +428,7 @@ public class HeightMap {
 
     public void display(GL gl) {
 
-        Vector3f l = new Vector3f(new float[]{-9, -5, 10});
+        Vector3 l = new Vector3(-9, -5, 10);
         l.normalize();
 
         gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 0.0f}));
@@ -435,25 +440,14 @@ public class HeightMap {
          */
         tex.enable();
         tex.bind();
+        
         synchronized (this) {
             gl.glDrawArrays(GL.GL_TRIANGLES, 0, (width - 1) * (breadth - 1) * 4 * 3);
         }
         tex.disable();
     }
 
-    private Vector3f calcNormal(final Vector3f a, final Vector3f b, final Vector3f c) {
-        Vector3f ab, ac, n;
-        ab = (Vector3f) b.clone();
-        ab.sub(a);
-        ac = (Vector3f) c.clone();
-        ac.sub(a);
-
-        n = new Vector3f();
-        n.cross(ab, ac);
-        n.normalize();
-
-        return n;
-    }
+    
 
     public void init(final GLAutoDrawable glDrawable) {
         final GL gl = glDrawable.getGL();
@@ -470,7 +464,7 @@ public class HeightMap {
 
         gl.glMatrixMode(GL.GL_TEXTURE);
         gl.glLoadIdentity();
-        gl.glScalef(32.0f / 256.0f, 32.0f / 256.0f, 1.0f);
+        gl.glScalef(1.0f / 255.0f, 1.0f / 255.0f, 1.0f);
 
         try {
             URL u = getClass().getResource("/com/novusradix/JavaPop/textures/tex.png");

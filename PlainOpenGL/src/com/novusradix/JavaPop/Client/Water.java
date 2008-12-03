@@ -1,25 +1,25 @@
 package com.novusradix.JavaPop.Client;
+import com.novusradix.JavaPop.Math.Vector2;
+import com.novusradix.JavaPop.Math.Vector3;
+import com.novusradix.JavaPop.Math.Vector4;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
 
 import javax.media.opengl.GL;
-import javax.vecmath.Point2f;
-import javax.vecmath.Point4f;
-import javax.vecmath.Vector3f;
 
 public class Water {
 
 	private HeightMap h;
 	private float[][] w, w2;
 	private float[][] mx, my;
-	private Vector<Point2f> springs;
+	private Vector<Vector2> springs;
 
 	private int n = 0;
 
-	private Vector<Point4f> drops;
+	private Vector<Vector4> drops;
 
-	// private Vector<Point2f> momentum;
+	// private Vector<Vector2> momentum;
 
 	public Water(HeightMap h) {
 		this.h = h;
@@ -28,17 +28,17 @@ public class Water {
 		mx = new float[h.getWidth()][h.getBreadth()];
 		my = new float[h.getWidth()][h.getBreadth()];
 
-		drops = new Vector<Point4f>();
-		springs = new Vector<Point2f>();
+		drops = new Vector<Vector4>();
+		springs = new Vector<Vector2>();
 
-		// momentum = new Vector<Point2f>();
+		// momentum = new Vector<Vector2>();
 	}
 
 	public void drop(float x, float y) {
 		if (x > 0 && x < h.getWidth() && y > 0 && y < h.getBreadth()) {
-			Point4f p;
+			Vector4 p;
 
-			p = new Point4f(x, y, 0, 0);
+			p = new Vector4(x, y, 0, 0);
 
 			drops.add(p);
 		}
@@ -62,7 +62,7 @@ public class Water {
 		float[][] neww = new float[h.getWidth()][h.getBreadth()];
 		float[][] neww2 = new float[h.getWidth() - 1][h.getBreadth() - 1];
 
-		for (Point2f s : springs) {
+		for (Vector2 s : springs) {
 			for (int m = 0; m < 2; m++) {
 				w[(int) s.x][(int) s.y] += 0.01f;
 			}
@@ -101,7 +101,7 @@ public class Water {
 	public void step() {
 		Random r = new Random();
 
-		for (Point2f s : springs) {
+		for (Vector2 s : springs) {
 			for (int m = 0; m < 2; m++) {
 				if (r.nextInt(10) > 7)
 					drop(s.x + r.nextFloat(), s.y + r.nextFloat());
@@ -113,10 +113,10 @@ public class Water {
 		float[][] newmx = new float[h.getWidth()][h.getBreadth()];
 		float[][] newmy = new float[h.getWidth()][h.getBreadth()];
 
-		Point2f s;
-		Point4f d;
+		Vector2 s;
+		Vector4 d;
 
-		for (Iterator<Point4f> i = drops.iterator(); i.hasNext();) {
+		for (Iterator<Vector4> i = drops.iterator(); i.hasNext();) {
 
 			d = i.next();
 			s = h.getSlope(d.x, d.y);
@@ -174,8 +174,8 @@ public class Water {
 		gl.glDepthMask(false);
 		gl.glDisable(GL.GL_DEPTH_TEST);
 		gl.glBegin(GL.GL_TRIANGLES);
-		Point4f d;
-		for (Iterator<Point4f> i = drops.iterator(); i.hasNext();) {
+		Vector4 d;
+		for (Iterator<Vector4> i = drops.iterator(); i.hasNext();) {
 			m++;
 			d = i.next();
 			r1 = 0.1f + 0.1f * (float) Math.sin(n * 0.01f + d.z);
@@ -221,12 +221,12 @@ public class Water {
 
 	public void display2(GL gl) {
 		int x, y;
-		Vector3f a, b, c, d, e;
+		Vector3 a, b, c, d, e;
 		float midHeight;
 		for (y = 0; y < h.getBreadth(); y++) {
 			for (x = 0; x < h.getWidth(); x++) {
 
-				b = new Vector3f(x, y, h.getHeight(x, y) + w[x][y]);
+				b = new Vector3(x, y, h.getHeight(x, y) + w[x][y]);
 
 				if (y < h.getBreadth() - 1 && x < h.getWidth() - 1) {
 					midHeight = h.getHeight2(x, y);
@@ -236,11 +236,11 @@ public class Water {
 					gl.glShadeModel(GL.GL_SMOOTH);
 					gl.glBegin(GL.GL_TRIANGLES);
 
-					a = new Vector3f(x + 0.5f, y + 0.5f, midHeight + w2[x][y]);
+					a = new Vector3(x + 0.5f, y + 0.5f, midHeight + w2[x][y]);
 					// b already set
-					c = new Vector3f(x + 1, y, h.getHeight(x + 1, y) + w[x + 1][y]);
-					d = new Vector3f(x + 1, y + 1, h.getHeight(x + 1, y + 1) + w[x + 1][y + 1]);
-					e = new Vector3f(x, y + 1, h.getHeight(x, y + 1) + w[x][y + 1]);
+					c = new Vector3(x + 1, y, h.getHeight(x + 1, y) + w[x + 1][y]);
+					d = new Vector3(x + 1, y + 1, h.getHeight(x + 1, y + 1) + w[x + 1][y + 1]);
+					e = new Vector3(x, y + 1, h.getHeight(x, y + 1) + w[x][y + 1]);
 
 					gl.glColor4f(0.0f, 0.3f, 0.8f, 0.1f + Math.min(0.9f, w2[x][y]));
 					gl.glVertex3f(a.x, a.y, a.z);
@@ -284,6 +284,6 @@ public class Water {
 
 	public void addSpring(int x, int y) {
 		// TODO Auto-generated method stub
-		springs.add(new Point2f(x, y));
+		springs.add(new Vector2(x, y));
 	}
 }
