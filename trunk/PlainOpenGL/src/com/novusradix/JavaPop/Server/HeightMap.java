@@ -4,11 +4,9 @@
  */
 package com.novusradix.JavaPop.Server;
 
+import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import java.util.Random;
-
-import javax.vecmath.Point2f;
-
 import com.sun.opengl.util.BufferUtil;
 import java.awt.Rectangle;
 import java.nio.IntBuffer;
@@ -141,7 +139,7 @@ public class HeightMap {
         }
     }
 
-    public Point2f getSlope(float x, float y) {
+    public Vector2 getSlope(float x, float y) {
         int x1, x2, y1, y2;
         float ha, hb, hc, hd, hm;
         x1 = (int) Math.floor(x);
@@ -158,7 +156,7 @@ public class HeightMap {
         hd = getHeight(x2, y2);
 
         if (ha == hb && hb == hc && hc == hd) {
-            return new Point2f(0, 0);
+            return new Vector2(0, 0);
         }
         hm = ha;
         if (hb > ha || hc > ha || hd > ha) {
@@ -170,18 +168,18 @@ public class HeightMap {
         if (y > x) {
             if (y > 1 - x) {
                 // BMD
-                return new Point2f(hd - hb, 2.0f * ((hd + hb) / 2.0f - hm));
+                return new Vector2(hd - hb, 2.0f * ((hd + hb) / 2.0f - hm));
             } else {
                 // AMB
-                return new Point2f(2.0f * (hm - (ha + hb) / 2.0f), hb - ha);
+                return new Vector2(2.0f * (hm - (ha + hb) / 2.0f), hb - ha);
             }
         } else {
             if (y > 1 - x) {
                 // CMD
-                return new Point2f(2.0f * ((hc + hd) / 2.0f - hm), hd - hc);
+                return new Vector2(2.0f * ((hc + hd) / 2.0f - hm), hd - hc);
             } else {
                 // AMC
-                return new Point2f(hc - ha, 2.0f * (hm - (ha + hc) / 2.0f));
+                return new Vector2(hc - ha, 2.0f * (hm - (ha + hc) / 2.0f));
             }
         }
     }

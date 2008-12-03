@@ -1,16 +1,36 @@
 package com.novusradix.JavaPop.Client;
-import javax.vecmath.Vector3f;
+
+import com.novusradix.JavaPop.Math.Vector3;
+
 
 public class Helpers {
 
-	public static float PointLineDistance(Vector3f line1, Vector3f line2, Vector3f point) {
-		Vector3f a, b;
-		a = new Vector3f();
-		b = new Vector3f();
-		a.sub(line2, line1);
-		b.sub(line1, point);
+    public static float PointLineDistance(Vector3 line1, Vector3 line2, Vector3 point) {
+        Vector3 a, b;
 
-		b.cross(a, b);
-		return b.length() / a.length();
-	}
+        a = new Vector3();
+        b = new Vector3();
+        a.sub(line2, line1);
+        b.sub(line1, point);
+
+        b.cross(a, b);
+
+        return b.length() / a.length();
+    }
+
+    
+
+    public static Vector3 calcNormal(final Vector3 a, final Vector3 b, final Vector3 c) {
+        Vector3 ab,ac ,n ;
+        ab = new Vector3(b);
+        ab.sub(a);
+        ac = new Vector3(c);
+        ac.sub(a);
+
+        n = new Vector3();
+        n.cross(ab, ac);
+        n.normalize();
+
+        return n;
+    }
 }
