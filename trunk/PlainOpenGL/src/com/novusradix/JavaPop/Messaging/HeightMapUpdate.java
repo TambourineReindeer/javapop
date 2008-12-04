@@ -33,6 +33,6 @@ public class HeightMapUpdate extends Message implements Serializable {
     
     public void execute()
     {
-        client.game.h.applyUpdate(this);
+        client.game.heightMap.applyUpdate(this);
     }
 }
