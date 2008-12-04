@@ -18,18 +18,18 @@ import javax.swing.JFrame;
 public class GameFrame extends JFrame implements WindowListener {
 
     ControlFrame cf;
-    Client client;
+    Game game;
     private Animator a;
 
-    GameFrame(HeightMap h, Client c) {
-        client = c;
+    GameFrame(Game g) {
+        game = g;
         GLCapabilities caps = new GLCapabilities();
         caps.setSampleBuffers(true);
         caps.setNumSamples(8);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(1024, 768);
         setTitle("JavaPop");
-        MainCanvas mc = new MainCanvas(h, caps, client);
+        MainCanvas mc = new MainCanvas(caps, game);
         add(mc);
         addWindowListener(this);
         setVisible(true);
@@ -50,8 +50,8 @@ public class GameFrame extends JFrame implements WindowListener {
         a.stop();
         this.dispose();
         cf.dispose();
-        client.sendMessage(new LeaveGame());
-        client.lobby.show();
+        game.client.sendMessage(new LeaveGame());
+        game.client.lobby.show();
     }
 
     public void windowClosed(WindowEvent e) {

@@ -25,7 +25,6 @@ import javax.media.opengl.GLEventListener;
 
 
 import java.awt.event.MouseWheelListener;
-import java.util.Vector;
 
 public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener, MouseMotionListener, MouseListener, MouseWheelListener {
 
@@ -34,36 +33,22 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
      */
     private static final long serialVersionUID = 1L;
     private static final float fHeightScale = 0.4082f;
-    private HeightMap heightMap;
+    //private HeightMap heightMap;
     private Water water;
     private float xPos,  yPos,  xOrig,  yOrig;
     private int height,  width;
     private Point dragOrigin;
     private Point selected;
     private Matrix4 mvpInverse;
-    private Client client;
-    Vector<Point> ring;
-
-    public MainCanvas(HeightMap h, GLCapabilities caps, Client c) {
+    private Game game;
+ 
+    public MainCanvas(GLCapabilities caps, Game g) {
         super(caps);
-        ring = new Vector<Point>();
-        ring.add(new Point(-1, -1));
-        ring.add(new Point(0, -1));
-        ring.add(new Point(1, -1));
-        ring.add(new Point(-1, 0));
-        ring.add(new Point(1, 0));
-        ring.add(new Point(-1, 1));
-        ring.add(new Point(0, 1));
-        ring.add(new Point(1, 1));
+        
+      
 
-
-        this.client = c;
+        this.game = g;
         mvpInverse = new Matrix4();
-        heightMap = h;
-        Peon.init(h);
-        House.init(h);
-
-        water = new Water(heightMap);
 
         selected = new Point();
 
@@ -119,13 +104,13 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glEnable(GL.GL_BLEND);
         gl.glEnable(GL.GL_MULTISAMPLE);
 
-        heightMap.display(gl);
+        game.heightMap.display(gl);
 
-        Peon.stepall();
-        House.stepAll();
+        game.peons.step();
+        game.houses.step();
 
-        Peon.displayall(gl);
-        House.display(gl);
+        game.peons.display(gl);
+        game.houses.display(gl);
 
         displayCursor(gl);
 
@@ -143,7 +128,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glDisable(GL.GL_DEPTH_TEST);
 
         gl.glPushMatrix();
-        gl.glTranslatef(selected.x, selected.y, heightMap.getHeight(selected.x, selected.y));
+        gl.glTranslatef(selected.x, selected.y, game.heightMap.getHeight(selected.x, selected.y));
         gl.glBegin(GL.GL_TRIANGLES);
 
         gl.glColor4f(1.0f, 1, 1, 1);
@@ -202,7 +187,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
-        heightMap.init(glDrawable);
+        game.heightMap.init(glDrawable);
     }
 
     public void reshape(final GLAutoDrawable glDrawable, final int x, final int y, final int w, int h) {
@@ -226,7 +211,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         // TODO Auto-generated method stub
 
         if (e.getKeyCode() == KeyEvent.VK_N) {
-            Peon.addPeon(selected.x, selected.y);
+            game.peons.addPeon(selected.x, selected.y, 100);
         }
 
         if (e.getKeyCode() == KeyEvent.VK_S) {
@@ -283,8 +268,8 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             s.scaleAdd(l, z1, z0);
 
 
-            selected.x = Math.max(Math.min((int) Math.round(s.x), heightMap.getWidth() - 1), 0);
-            selected.y = Math.max(Math.min((int) Math.round(s.y), heightMap.getBreadth() - 1), 0);
+            selected.x = Math.max(Math.min((int) Math.round(s.x), game.heightMap.getWidth() - 1), 0);
+            selected.y = Math.max(Math.min((int) Math.round(s.y), game.heightMap.getBreadth() - 1), 0);
 
 
             selected = iterateSelection(selected, v0n, v1n);
@@ -296,17 +281,17 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         Vector3 p;
 
         float d, oldD;
-        p = new Vector3(current.x, current.y, heightMap.getHeight(current.x, current.y));
+        p = new Vector3(current.x, current.y, game.heightMap.getHeight(current.x, current.y));
         d = Helpers.PointLineDistance(v0, v1, p);
         oldD = d;
 
         int x, y;
-        for (Point offset : ring) {
+        for (Point offset : Helpers.rings[1]) {
             x = current.x + offset.x;
             y = current.y + offset.y;
 
-            if (x > 0 && y > 0 && x < heightMap.getWidth() && y < heightMap.getBreadth()) {
-                p = new Vector3(x, y, heightMap.getHeight(x, y));
+            if (x > 0 && y > 0 && x < game.heightMap.getWidth() && y < game.heightMap.getBreadth()) {
+                p = new Vector3(x, y, game.heightMap.getHeight(x, y));
                 d = Helpers.PointLineDistance(v0, v1, p);
                 if (d < oldD) {
                     return iterateSelection(new Point(x, y), v0, v1);

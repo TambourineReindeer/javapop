@@ -13,14 +13,18 @@ import com.novusradix.JavaPop.Messaging.GameStarted;
  */
 public class Game {
 
-    public HeightMap h;
+    public HeightMap heightMap;
     public Client client;
+    public Peons peons;
+    public Houses houses;
     
     public Game(GameStarted g, Client c) {
-       h = new HeightMap(g.gi.mapSize);
+       heightMap = new HeightMap(g.gi.mapSize);
        client = c;
+       peons = new Peons(this);
+       houses = new Houses(this);
         
-       new GameFrame(h, client);
+       new GameFrame(this);
         
         
     }

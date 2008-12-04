@@ -1,10 +1,31 @@
 package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Math.Vector3;
+import java.awt.Point;
 
 
 public class Helpers {
 
+    public static Point[][] rings;
+    
+    static {
+        rings = new Point[10][];
+        rings[0] = new Point[1];
+        rings[0][0] = new Point(0,0);
+        for(int i=1;i<10;i++)
+        {
+            rings[i] = new Point[8*i];
+            for(int n=0;n<i*2;n++)
+            {
+                rings[i][n]     = new Point(n-i,i);
+                rings[i][n+2*i] = new Point(i,i-n);
+                rings[i][n+4*i] = new Point(i-n,-i);
+                rings[i][n+6*i] = new Point(-i,n-i);
+                
+            }
+        }
+    }
+    
     public static float PointLineDistance(Vector3 line1, Vector3 line2, Vector3 point) {
         Vector3 a, b;
 
