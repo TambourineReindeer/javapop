@@ -21,9 +21,13 @@ public class Game extends TimerTask {
     public Vector<Player> players;
     private Player owner;
     private Server server;
-    public HeightMap h;
     private Timer timer;
+    private float seconds;
     
+    public HeightMap heightMap;
+    public Peons peons;
+    public Houses houses;
+
     public Game(Player owner) {
         this.owner = owner;
         server = owner.s;
@@ -63,24 +67,31 @@ public class Game extends TimerTask {
 
     public void startGame() {
         id = nextId++;
-        h = new HeightMap(128, 128);
-        h.randomize(1);
+        heightMap = new HeightMap(128, 128);
+        heightMap.randomize(1);
+        peons =new Peons(this);
+        houses = new Houses(this);
         GameStarted go = new GameStarted(this);
         server.sendAllPlayers(go);
-        h.sendUpdates(players);
-        
-        timer = new Timer("Game " + id);
-        timer.scheduleAtFixedRate(this, 0, 1000/20);
-    }
+        heightMap.sendUpdates(players);
 
+        timer = new Timer("Game " + id);
+        seconds = 1.0f/20.0f;
+        timer.scheduleAtFixedRate(this, 0, (int)(seconds * 1000.0f));
+    }
 
     public void run() {
         //start a clock,
         //move people.
-        h.sendUpdates(players);
         
-        if(players.isEmpty())
+        if (players.isEmpty()) {
             timer.cancel();
+        }
         
+        
+        peons.step(seconds);
+        houses.step(seconds);
+        heightMap.sendUpdates(players);
+
     }
 }

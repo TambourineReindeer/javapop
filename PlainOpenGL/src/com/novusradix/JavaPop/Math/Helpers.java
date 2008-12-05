@@ -1,6 +1,5 @@
-package com.novusradix.JavaPop.Client;
+package com.novusradix.JavaPop.Math;
 
-import com.novusradix.JavaPop.Math.Vector3;
 import java.awt.Point;
 
 

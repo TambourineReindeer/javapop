@@ -8,9 +8,13 @@ import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import java.util.Random;
 import com.sun.opengl.util.BufferUtil;
+import com.sun.tools.javac.util.Pair;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.nio.IntBuffer;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -24,11 +28,13 @@ public class HeightMap {
     private static int VZ = 0;
     private Rectangle dirty;
     private Rectangle bounds;
+      private   Map<Point,Integer> texture;
 
     public HeightMap(int width, int breadth) {
 
         b = BufferUtil.newIntBuffer(width * breadth);
-
+        texture = new HashMap<Point, Integer>();
+        
         this.breadth = breadth;
         this.width = width;
         rowstride = width;
@@ -225,6 +231,10 @@ public class HeightMap {
         }
     }
 
+    void setTexture(Point p, int i) {
+        texture.put(p, i);
+    }
+
     private void setHeight(int x, int y, int height) {
         if (x >= 0 && x < width && y >= 0 && y < breadth) {
             b.put(bufPos(x, y), height);
@@ -304,13 +314,14 @@ public class HeightMap {
     public void sendUpdates(Collection<Player> players) {
         synchronized (this) {
             if (dirty != null) {
-                HeightMapUpdate m = new HeightMapUpdate(dirty, b, width);
+                HeightMapUpdate m = new HeightMapUpdate(dirty, b, width, texture);
 
                 for (Player p : players) {
                     p.sendMessage(m);
                 }
             }
             dirty = null;
+            texture.clear();
         }
     }
 }

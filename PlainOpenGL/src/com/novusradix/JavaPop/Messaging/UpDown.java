@@ -26,9 +26,9 @@ public class UpDown extends Message {
     @Override
     public void execute() {
         if (primaryAction) {
-            serverGame.h.up(x, y);
+            serverGame.heightMap.up(x, y);
         } else {
-            serverGame.h.down(x, y);
+            serverGame.heightMap.down(x, y);
         }
     }
 }

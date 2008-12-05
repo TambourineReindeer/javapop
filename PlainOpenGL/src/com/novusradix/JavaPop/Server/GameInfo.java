@@ -24,8 +24,8 @@ public class GameInfo implements Serializable {
 
     public GameInfo(Game g) {
         id = g.getId();
-        if (g.h != null) {
-            mapSize = new Dimension(g.h.getWidth(), g.h.getBreadth());
+        if (g.heightMap != null) {
+            mapSize = new Dimension(g.heightMap.getWidth(), g.heightMap.getBreadth());
         }
         players = new Vector<String>();
         for (Player p : g.players) {
