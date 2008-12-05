@@ -1,5 +1,6 @@
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Math.Vector3;
 import java.awt.Dimension;
@@ -14,6 +15,8 @@ import javax.media.opengl.GLException;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.TextureIO;
+import java.awt.Point;
+import java.util.Map.Entry;
 
 public class HeightMap {
 
@@ -184,10 +187,14 @@ public class HeightMap {
         return y * rowstride + x * tilestride + vertex * vertexstride + index;
     }
 
+    private static int bufPos(Point p, int vertex, int index) {
+        return p.y * rowstride + p.x * tilestride + vertex * vertexstride + index;
+    }
+
     public int getHeight(int x, int y) {
         try {
             if (x == width - 1 && y == breadth - 1) {
-                return (int) b.get(bufPos(x - 1, y-1, 4, VZ));
+                return (int) b.get(bufPos(x - 1, y - 1, 4, VZ));
             }
             if (x == width - 1) {
                 return (int) b.get(bufPos(x - 1, y, 3, VZ));
@@ -214,8 +221,8 @@ public class HeightMap {
     }
 
     public float getHeight(float x, float y) {
-        int x1, x2, y1, y2;
-        float ha, hb, hc, hd, hm;
+        int x1,  x2,  y1, y2;
+        float ha,  hb,  hc,  hd, hm;
         x1 = (int) Math.floor(x);
         x2 = (int) Math.ceil(x);
         y1 = (int) Math.floor(y);
@@ -255,8 +262,8 @@ public class HeightMap {
     }
 
     public Vector2 getSlope(float x, float y) {
-        int x1, x2, y1, y2;
-        float a, b, c, d, m;
+        int x1,  x2,  y1, y2;
+        float a,  b,  c,  d,  m;
         x1 = (int) Math.floor(x);
         x2 = (int) Math.ceil(x);
         y1 = (int) Math.floor(y);
@@ -342,31 +349,31 @@ public class HeightMap {
         setNormals(x, y);
 
         if (getHeight(x, y) == 0 && getHeight(x, y + 1) == 0 && getHeight(x + 1, y) == 0 && getHeight(x + 1, y + 1) == 0) {
-            setTexture(x, y, 0);
+            setTexture(new Point(x, y), 0);
         } else {
-            setTexture(x, y, 1);
+            setTexture(new Point(x, y), 1);
         }
 
     }
 
-    public void setTexture(int x, int y, int t) {
-        float left, mid, right;
-        left = t*32.0f;
+    public void setTexture(Point p, int t) {
+        float left,  mid, right;
+        left = t * 32.0f;
         right = left + 31.0f;
-        mid = (left+right)/2.0f;
-        
-        b.put(bufPos(x, y, 0, TX), left);
-        b.put(bufPos(x, y, 1, TX), right);
-        b.put(bufPos(x, y, 2, TX), mid);
-        b.put(bufPos(x, y, 3, TX), right);
-        b.put(bufPos(x, y, 4, TX), right);
-        b.put(bufPos(x, y, 5, TX), mid);
-        b.put(bufPos(x, y, 6, TX), right);
-        b.put(bufPos(x, y, 7, TX), left);
-        b.put(bufPos(x, y, 8, TX), mid);
-        b.put(bufPos(x, y, 9, TX), left);
-        b.put(bufPos(x, y, 10, TX), left);
-        b.put(bufPos(x, y, 11, TX), mid);
+        mid = (left + right) / 2.0f;
+
+        b.put(bufPos(p, 0, TX), left);
+        b.put(bufPos(p, 1, TX), right);
+        b.put(bufPos(p, 2, TX), mid);
+        b.put(bufPos(p, 3, TX), right);
+        b.put(bufPos(p, 4, TX), right);
+        b.put(bufPos(p, 5, TX), mid);
+        b.put(bufPos(p, 6, TX), right);
+        b.put(bufPos(p, 7, TX), left);
+        b.put(bufPos(p, 8, TX), mid);
+        b.put(bufPos(p, 9, TX), left);
+        b.put(bufPos(p, 10, TX), left);
+        b.put(bufPos(p, 11, TX), mid);
 
     }
 
@@ -378,7 +385,7 @@ public class HeightMap {
     }
 
     private void setNormals(int x, int y, int vertA, int vertB, int vertC) {
-        Vector3 va, vb, vc, vn;
+        Vector3 va,vb ,vc , vn;
         va = new Vector3();
         vb = new Vector3();
         vc = new Vector3();
@@ -410,12 +417,12 @@ public class HeightMap {
             b.put(bufPos(x, y, vertC, NY), vn.y);
             b.put(bufPos(x, y, vertC, NZ), vn.z);
         } catch (IndexOutOfBoundsException e) {
-           System.out.println("Array out of bounds in Client SetNormal:" + x + ", " + y);
+            System.out.println("Array out of bounds in Client SetNormal:" + x + ", " + y);
         }
     }
 
     public boolean isFlat(int x, int y) {
-        int ha = 0, hb = 0, hc = 0, hd = 0;
+        int ha = 0,  hb = 0, hc = 0, hd = 0;
         if (x < 0 || y < 0 || x + 1 >= width || y + 1 >= breadth) {
             return false;
         }
@@ -440,14 +447,12 @@ public class HeightMap {
          */
         tex.enable();
         tex.bind();
-        
+
         synchronized (this) {
             gl.glDrawArrays(GL.GL_TRIANGLES, 0, (width - 1) * (breadth - 1) * 4 * 3);
         }
         tex.disable();
     }
-
-    
 
     public void init(final GLAutoDrawable glDrawable) {
         final GL gl = glDrawable.getGL();
@@ -483,7 +488,7 @@ public class HeightMap {
 
     public void applyUpdate(HeightMapUpdate u) {
         synchronized (this) {
-            int x, y;
+            int x,  y;
             for (y = 0; y < u.dirtyRegion.height; y++) {
                 for (x = 0; x < u.dirtyRegion.width; x++) {
                     setHeight(u.dirtyRegion.x + x, u.dirtyRegion.y + y, u.heightData[x + y * u.dirtyRegion.width]);
@@ -495,6 +500,9 @@ public class HeightMap {
                 }
             }
 
+            for (Entry<Point, Integer> e : u.texture.entrySet()) {
+                setTexture(e.getKey(), e.getValue());
+            }
         }
     }
 }

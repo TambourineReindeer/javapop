@@ -4,6 +4,7 @@
  */
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Client.Tools.BaseTool;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
@@ -44,22 +45,17 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
  
     public MainCanvas(GLCapabilities caps, Game g) {
         super(caps);
-        
-      
-
+       
         this.game = g;
         mvpInverse = new Matrix4();
 
         selected = new Point();
 
         addGLEventListener(this);
-
         addMouseListener(this);
         addMouseMotionListener(this);
         addKeyListener(this);
         addMouseWheelListener(this);
-
-        getBounds();
 
         requestFocus();
         xPos = 0;
@@ -105,10 +101,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glEnable(GL.GL_MULTISAMPLE);
 
         game.heightMap.display(gl);
-
-        game.peons.step();
-        game.houses.step();
-
         game.peons.display(gl);
         game.houses.display(gl);
 
@@ -210,20 +202,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     public void keyPressed(final KeyEvent e) {
         // TODO Auto-generated method stub
 
-        if (e.getKeyCode() == KeyEvent.VK_N) {
-            game.peons.addPeon(selected.x, selected.y, 100);
-        }
-
-        if (e.getKeyCode() == KeyEvent.VK_S) {
-            water.addSpring(selected.x, selected.y);
-        }
-
-        if (e.getKeyCode() == KeyEvent.VK_W) {
-            for (int n = 0; n < 10; n++) {
-                Random r = new Random();
-                water.drop(selected.x + r.nextFloat(), selected.y + r.nextFloat());
-            }
-        }
     }
 
     public void keyReleased(final KeyEvent e) {

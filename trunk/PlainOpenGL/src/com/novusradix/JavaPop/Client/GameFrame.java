@@ -26,16 +26,19 @@ public class GameFrame extends JFrame implements WindowListener {
         GLCapabilities caps = new GLCapabilities();
         caps.setSampleBuffers(true);
         caps.setNumSamples(8);
+        
+        cf = new ControlFrame();
+        cf.setBounds(1024, 0, cf.getWidth(), cf.getHeight());
+        cf.setVisible(true);
+
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(1024, 768);
         setTitle("JavaPop");
+
         MainCanvas mc = new MainCanvas(caps, game);
         add(mc);
         addWindowListener(this);
         setVisible(true);
-        cf = new ControlFrame();
-        cf.setBounds(1024, 0, cf.getWidth(), cf.getHeight());
-        cf.setVisible(true);
 
         a = new Animator(mc);
 
