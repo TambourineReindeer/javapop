@@ -87,6 +87,7 @@ public class Player implements Runnable {
         try {
             oos.writeObject(m);
             oos.flush();
+            oos.reset();
             //System.out.println("Server sending " + name + " " + m.getClass().getSimpleName());
         } catch (IOException ex) {
             Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);

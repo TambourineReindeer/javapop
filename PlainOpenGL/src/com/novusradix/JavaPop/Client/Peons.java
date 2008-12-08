@@ -1,10 +1,11 @@
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Math.Vector2;
+import com.novusradix.JavaPop.Messaging.PeonUpdate.Detail;
+import com.novusradix.JavaPop.Server.Peons.State;
 import java.awt.Point;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.media.opengl.GL;
@@ -12,41 +13,70 @@ import javax.media.opengl.GL;
 public class Peons {
 
     public Game game;
-    public static final int ALIVE = 0;
-    public static final int DEAD = 1;
-    public static final int SETTLED = 3;
-    private static Vector<Peon> peons;
+    private static Map<Integer, Peon> peons;
 
     public Peons(Game g) {
         game = g;
-        peons = new Vector<Peon>();
+        peons = new HashMap<Integer, Peon>();
     }
 
-    public void addPeon(float x, float y, float strength) {
-        peons.add(new Peon(x, y, strength));
+    public void Update(Detail d) {
+        synchronized (peons) {
+            if (peons.containsKey(d.id)) {
+                if (d.state == State.DEAD || d.state == State.SETTLED) {
+                    peons.remove(d.id);
+                } else {
+                    peons.get(d.id).Update(d);
+                }
+            } else {
+                peons.put(d.id, new Peon(d));
+            }
+        }
     }
 
     public void display(GL gl) {
-        for (Peon p : peons) {
-            gl.glPushMatrix();
-            gl.glTranslatef(p.pos.x, p.pos.y, game.heightMap.getHeight(p.pos.x, p.pos.y));
-            p.display(gl);
-            gl.glPopMatrix();
+        synchronized (peons) {
+            for (Peon p : peons.values()) {
+                gl.glPushMatrix();
+                gl.glTranslatef(p.pos.x, p.pos.y, game.heightMap.getHeight(p.pos.x, p.pos.y));
+                p.display(gl);
+                gl.glPopMatrix();
+            }
         }
     }
 
-   
+    void step(float seconds) {
+        synchronized (peons) {
+            for (Peon p : peons.values()) {
+
+                p.step(seconds);
+            }
+        }
+    }
+
     private class Peon {
 
-        public Vector2 pos;
-        public float strength;
-        private Point dest; // destination to walk to.
+        private Vector2 pos;
+        private Point dest;
+        private float dx,  dy;
+        private State state;
 
-        public Peon(float x, float y, float strength) {
-            pos = new Vector2(x, y);
-            this.strength = strength;
+        public Peon(Detail d) {
+            pos = d.pos;
+            dest = d.dest;
+            dx = d.dx;
+            dy = d.dy;
+            state = d.state;
         }
-      
+
+        public void Update(Detail d) {
+            pos = d.pos;
+            dest = d.dest;
+            dx = d.dx;
+            dy = d.dy;
+            state = d.state;
+        }
+
         private void display(GL gl) {
             gl.glBegin(GL.GL_TRIANGLES);
             gl.glColor3f(0, 0, 1);
@@ -57,6 +87,16 @@ public class Peons {
 
             gl.glEnd();
 
+        }
+
+        public void step(float seconds) {
+            switch (state) {
+                case WALKING:
+                    pos.x += seconds * dx;
+                    pos.y += seconds * dy;
+                    break;
+
+            }
         }
     }
 }

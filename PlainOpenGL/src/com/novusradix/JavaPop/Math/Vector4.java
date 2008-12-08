@@ -4,11 +4,13 @@
  */
 package com.novusradix.JavaPop.Math;
 
+import java.io.Serializable;
+
 /**
  *
  * @author mom
  */
-public class Vector4 {
+public class Vector4 implements Serializable {
 
     public float x,  y,  z,  w;
 

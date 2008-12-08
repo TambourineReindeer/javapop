@@ -1,7 +1,10 @@
 package com.novusradix.JavaPop.Client;
 
 import java.awt.Point;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import javax.media.opengl.GL;
@@ -10,7 +13,7 @@ public class Houses {
 
     private Game game;
     private int[][] map;
-    private Vector<House> houses;
+    private Map<Point, House> houses;
     private static final int TEAMS = 4;
     private static final int EMPTY = 0;
     private static final int FARM = EMPTY + 1;
@@ -20,12 +23,20 @@ public class Houses {
     public Houses(Game g) {
         game = g;
         map = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
-        houses = new Vector<House>();
+        houses = new HashMap<Point, House>();
     }
 
-    public void addHouse(int x, int y, int team, float strength) {
-        if (canBuild(x, y)) {
-            houses.add(new House(x, y, team, strength));
+    public void updateHouse(Point pos, int team, int level) {
+        synchronized(houses){
+        if (level < 1) {
+            //remove
+            if (houses.containsKey(pos)) {
+                houses.remove(pos);
+            }
+        } else {
+
+            houses.put(pos, new House(pos, team, level));
+        }
         }
     }
 
@@ -36,13 +47,10 @@ public class Houses {
         return (map[x][y] == EMPTY && game.heightMap.getHeight(x, y) > 0 && game.heightMap.isFlat(x, y));
     }
 
-    
-    
-
-
     public void display(GL gl) {
+        synchronized(houses){
         if (houses != null) {
-            for (House h : houses) {
+            for (House h : houses.values()) {
                 gl.glPushMatrix();
                 gl.glTranslatef(h.pos.x, h.pos.y, game.heightMap.getHeight(h.pos.x, h.pos.y));
 
@@ -78,24 +86,19 @@ public class Houses {
             }
         }
     }
+    }
 
     public class House {
 
         private Point pos;
         private int level;
         private int team;
-        private float strength;
 
-        public House(int x, int y, int team, float strength) {
-            map[x][y] = HOUSE + team;
-            pos = new Point(x, y);
-            level = 0;
+        public House(Point p, int team, int level) {
+            map[p.x][p.y] = HOUSE + team;
+            pos = (Point) p.clone();
+            this.level = level;
             this.team = team;
-            this.strength = strength;
         }
-
-       
-
-      
     }
 }

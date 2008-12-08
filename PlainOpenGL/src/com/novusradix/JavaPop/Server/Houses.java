@@ -1,5 +1,6 @@
 package com.novusradix.JavaPop.Server;
 
+import com.novusradix.JavaPop.Messaging.HouseUpdate;
 import java.awt.Point;
 import java.util.Iterator;
 import java.util.Vector;
@@ -10,7 +11,9 @@ public class Houses {
 
     private Game game;
     private int[][] map;
+    private int[][] newmap;
     private Vector<House> houses;
+    private Vector<HouseUpdate.Detail> hds;
     private static final int TEAMS = 4;
     private static final int EMPTY = 0;
     private static final int FARM = EMPTY + 1;
@@ -20,7 +23,9 @@ public class Houses {
     public Houses(Game g) {
         game = g;
         map = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
+        newmap = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
         houses = new Vector<House>();
+        hds = new Vector<HouseUpdate.Detail>();
     }
 
     public void addHouse(int x, int y, int team, float strength) {
@@ -37,8 +42,11 @@ public class Houses {
     }
 
     public void step(float seconds) {
-        int[][] newmap;
-        newmap = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
+        for (int y = 0; y < game.heightMap.getBreadth(); y++) {
+            for (int x = 0; x < game.heightMap.getWidth(); x++) {
+                newmap[y][x] = 0;
+            }
+        }
         Iterator<House> i = houses.iterator();
         House h;
         for (; i.hasNext();) {
@@ -50,21 +58,30 @@ public class Houses {
             } else {
                 i.remove();
                 game.peons.addPeon(h.pos.x, h.pos.y, h.strength);
+                hds.add(new HouseUpdate.Detail(h.pos, 0, 0));
             }
         }
 
         synchronized (game.heightMap) {
             unpaint();
-
+            int[][] t;
+            t = map;
             map = newmap;
+            newmap = t;
             paint();
+        }
+        if (!hds.isEmpty()) {
+            game.sendAllPlayers(new HouseUpdate(hds));
+            hds.clear();
         }
     }
 
     private void paint() {
 
 
-        int x,  y;
+
+
+        int x, y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (map[x][y] != EMPTY) {
@@ -77,7 +94,9 @@ public class Houses {
     private void unpaint() {
 
 
-        int x,  y;
+
+
+        int x, y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (map[x][y] != EMPTY) {
@@ -90,7 +109,9 @@ public class Houses {
     public int countFlatLand(Point pos) {
 
 
-        int x,  y;
+
+
+        int x, y;
         int flat = 0;
         int h = game.heightMap.getHeight(pos.x, pos.y);
         for (int radius = 1; radius <= 3; radius++) {
@@ -171,8 +192,10 @@ public class Houses {
         private int level;
         private int team;
         private float strength;
+        private boolean changed;
 
         public House(int x, int y, int team, float strength) {
+            changed = true;
             map[x][y] = HOUSE + team;
             pos = new Point(x, y);
             level = 0;
@@ -195,7 +218,9 @@ public class Houses {
             }
 
 
-            int x,  y;
+
+
+            int x, y;
 
             int h = game.heightMap.getHeight(pos.x, pos.y);
             for (int radius = 1; radius <= radiuslimit; radius++) {
@@ -228,7 +253,11 @@ public class Houses {
         }
 
         private void setLevel() {
+            int oldLevel = level;
             level = calcLevel();
+            if (level != oldLevel) {
+                changed = true;
+            }
         }
 
         private int calcLevel() {
@@ -242,12 +271,17 @@ public class Houses {
             float rate = (level + 1);
 
             strength += rate * seconds;
-            if (strength > rate * 100) {
-                float sprogStrength = Math.min(500.0f, strength / 2.0f);
-                strength -= sprogStrength;
-                game.peons.addPeon(pos.x, pos.y, sprogStrength);
-
+            if (strength > rate * 100.0f) {
+                float houseStrength = rate*100.0f - Math.min(500.0f, rate*100.0f / 2.0f);
+                game.peons.addPeon(pos.x, pos.y, strength - houseStrength);
+                strength = houseStrength;
             }
+
+            if (changed) {
+                changed = false;
+                hds.add(new HouseUpdate.Detail(pos, team, level));
+            }
+
         }
     }
 }

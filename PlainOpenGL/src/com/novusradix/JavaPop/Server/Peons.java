@@ -2,6 +2,7 @@ package com.novusradix.JavaPop.Server;
 
 import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Math.Vector2;
+import com.novusradix.JavaPop.Messaging.PeonUpdate;
 import java.awt.Point;
 import java.util.Iterator;
 import java.util.Random;
@@ -12,10 +13,13 @@ import javax.media.opengl.GL;
 public class Peons {
 
     public Game game;
-    public static final int ALIVE = 0;
-    public static final int DEAD = 1;
-    public static final int SETTLED = 3;
-    private static Vector<Peon> peons;
+
+    public enum State {
+
+        ALIVE, DEAD, SETTLED, WALKING, DROWNING
+    };
+    private Vector<Peon> peons;
+    private int nextId = 0;
 
     public Peons(Game g) {
         game = g;
@@ -28,22 +32,30 @@ public class Peons {
 
     public void step(float seconds) {
         if (peons != null) {
-            int status;
             Peon p;
+            Vector<PeonUpdate.Detail> pds = new Vector<PeonUpdate.Detail>();
+            PeonUpdate.Detail pd;
             for (Iterator<Peon> i = peons.iterator(); i.hasNext();) {
 
                 p = i.next();
-                status = p.step(seconds);
-                if (status == DEAD) {
-                    i.remove();
-                }
 
-                if (status == SETTLED) {
-                    if (game.houses.canBuild((int) p.pos.x, (int) p.pos.y)) {
+                pd = p.step(seconds);
+                if (pd != null) {
+                    pds.add(pd);
+                }
+                switch (p.state) {
+                    case DEAD:
+                        i.remove();
+                        break;
+                    case SETTLED:
                         i.remove();
                         game.houses.addHouse((int) p.pos.x, (int) p.pos.y, 1, p.strength);
-                    }
+                        break;
                 }
+            }
+            if (pds.size() > 0) {
+                game.sendAllPlayers(new PeonUpdate(pds));
+                pds.clear();
             }
         }
     }
@@ -82,18 +94,21 @@ public class Peons {
 
     private class Peon {
 
+        public int id;
         public Vector2 pos;
         public float strength;
         private Point dest; // destination to walk to.
+        private State state;
+        private float dx,  dy;
 
         public Peon(float x, float y, float strength) {
+            id = nextId++;
             pos = new Vector2(x, y);
             this.strength = strength;
+            state = State.ALIVE;
         }
 
-        private int step(float seconds) {
-            // returns a peon status, e.g. DEAD
-
+        private PeonUpdate.Detail step(float seconds) {
             // what can a peon do?
             // drown, die of exhaustion, settle down?
 
@@ -103,36 +118,57 @@ public class Peons {
             x1 = (int) Math.floor(pos.x);
             y1 = (int) Math.floor(pos.y);
 
+
             strength -= seconds;
             if (strength < 1) {
-                return DEAD;
+                state = State.DEAD;
+                return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
             }
-            if (game.heightMap.isFlat(x1, y1)) {
-                if (game.heightMap.getHeight(x1, y1) == 0) {
-                    // you're drowning
-                    // increment a drowning clock and PREPARE TO DIE
-                    return DEAD;
-                } else {
-                    // we're on flat ground
-                    if (game.houses.canBuild(x1, y1)) {
-                        return SETTLED;
+
+            switch (state) {
+                case WALKING:
+                    if (game.heightMap.isFlat(x1, y1)) {
+                        if (game.heightMap.getHeight(x1, y1) == 0) {
+                            // you're drowning
+                            // increment a drowning clock and PREPARE TO DIE
+                            state = State.DROWNING;
+                            return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                        }
                     }
-                }
+                    if (x1 == dest.x && y1 == dest.y) {
+                        //Yay we're here
+                        state = State.ALIVE;
+                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                    }
+
+                    pos.x += seconds * dx;
+                    pos.y += seconds * dy;
+                    return null;
+
+                case ALIVE:
+                    if (game.houses.canBuild(x1, y1)) {
+                        state = State.SETTLED;
+                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                    }
+
+                    dest = findFlatLand(pos);
+
+                    dx = dest.x + 0.5f - pos.x;
+                    dy = dest.y + 0.5f - pos.y;
+                    float dist = (float) Math.sqrt(dx * dx + dy * dy);
+                    dx = dx / dist;
+                    dy = dy / dist;
+                    state = State.WALKING;
+                    return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                case DROWNING:
+                    if (!(game.heightMap.getHeight(x1, y1) == 0 && game.heightMap.isFlat(x1, y1))) {
+                        state = State.ALIVE;
+                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                    }
+                    strength -= 10.0f * seconds;
+                    return null;
             }
-            // We're on a hill or farm of some sort. Find a flat place to live.
-            dest = findFlatLand(pos);
-
-            float fdx = dest.x + 0.5f - pos.x;
-            float fdy = dest.y + 0.5f - pos.y;
-            float dist = (float) Math.sqrt(fdx * fdx + fdy * fdy);
-
-            fdx = seconds * fdx / dist;
-            fdy = seconds * fdy / dist;
-
-            pos.x += fdx;
-            pos.y += fdy;
-
-            return ALIVE;
+            return null;
         }
 
         private void display(GL gl) {

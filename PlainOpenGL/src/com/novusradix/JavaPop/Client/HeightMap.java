@@ -20,7 +20,7 @@ import java.util.Map.Entry;
 
 public class HeightMap {
 
-    private int width,  breadth;
+    private final int width,  breadth;
     private FloatBuffer b;
     private static int rowstride,  tilestride,  vertexstride;
     private static final int VX = 0,  VY = 1,  VZ = 2,  NX = 3,  NY = 4,  NZ = 5,  TX = 6,  TY = 7;
@@ -221,8 +221,8 @@ public class HeightMap {
     }
 
     public float getHeight(float x, float y) {
-        int x1,  x2,  y1, y2;
-        float ha,  hb,  hc,  hd, hm;
+        int x1, x2, y1, y2;
+        float ha, hb, hc, hd, hm;
         x1 = (int) Math.floor(x);
         x2 = (int) Math.ceil(x);
         y1 = (int) Math.floor(y);
@@ -262,8 +262,8 @@ public class HeightMap {
     }
 
     public Vector2 getSlope(float x, float y) {
-        int x1,  x2,  y1, y2;
-        float a,  b,  c,  d,  m;
+        int x1, x2, y1, y2;
+        float a, b, c, d, m;
         x1 = (int) Math.floor(x);
         x2 = (int) Math.ceil(x);
         y1 = (int) Math.floor(y);
@@ -357,7 +357,7 @@ public class HeightMap {
     }
 
     public void setTexture(Point p, int t) {
-        float left,  mid, right;
+        float left, mid, right;
         left = t * 32.0f;
         right = left + 31.0f;
         mid = (left + right) / 2.0f;
@@ -385,7 +385,7 @@ public class HeightMap {
     }
 
     private void setNormals(int x, int y, int vertA, int vertB, int vertC) {
-        Vector3 va,vb ,vc , vn;
+        Vector3 va, vb, vc, vn;
         va = new Vector3();
         vb = new Vector3();
         vc = new Vector3();
@@ -422,7 +422,7 @@ public class HeightMap {
     }
 
     public boolean isFlat(int x, int y) {
-        int ha = 0,  hb = 0, hc = 0, hd = 0;
+        int ha = 0, hb = 0, hc = 0, hd = 0;
         if (x < 0 || y < 0 || x + 1 >= width || y + 1 >= breadth) {
             return false;
         }
@@ -488,18 +488,20 @@ public class HeightMap {
 
     public void applyUpdate(HeightMapUpdate u) {
         synchronized (this) {
-            int x,  y;
-            for (y = 0; y < u.dirtyRegion.height; y++) {
-                for (x = 0; x < u.dirtyRegion.width; x++) {
-                    setHeight(u.dirtyRegion.x + x, u.dirtyRegion.y + y, u.heightData[x + y * u.dirtyRegion.width]);
-                }
-            }
-            for (y = -1; y < u.dirtyRegion.height + 1; y++) {
-                for (x = -1; x < u.dirtyRegion.width + 1; x++) {
-                    setMidTile(u.dirtyRegion.x + x, u.dirtyRegion.y + y);
-                }
-            }
+            if (u.dirtyRegion != null) {
+                int x, y;
 
+                for (y = 0; y < u.dirtyRegion.height; y++) {
+                    for (x = 0; x < u.dirtyRegion.width; x++) {
+                        setHeight(u.dirtyRegion.x + x, u.dirtyRegion.y + y, u.heightData[x + y * u.dirtyRegion.width]);
+                    }
+                }
+                for (y = -1; y < u.dirtyRegion.height + 1; y++) {
+                    for (x = -1; x < u.dirtyRegion.width + 1; x++) {
+                        setMidTile(u.dirtyRegion.x + x, u.dirtyRegion.y + y);
+                    }
+                }
+            }
             for (Entry<Point, Integer> e : u.texture.entrySet()) {
                 setTexture(e.getKey(), e.getValue());
             }

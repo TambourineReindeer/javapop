@@ -24,16 +24,17 @@ public class HeightMapUpdate extends Message implements Serializable {
     public Rectangle dirtyRegion;
     public int[] heightData;
     public Map<Point, Integer> texture;
-    
+
     public HeightMapUpdate(Rectangle dirty, IntBuffer b, int stride, Map<Point, Integer> texture) {
         dirtyRegion = dirty;
-        heightData = new int[dirty.width * dirty.height];
+        if (dirtyRegion != null) {
+            heightData = new int[dirty.width * dirty.height];
 
-        for (int n = 0; n < dirty.height; n++) {
-            b.position(dirty.x + (dirty.y + n) * stride);
-            b.get(heightData, n * dirty.width, dirty.width);
+            for (int n = 0; n < dirty.height; n++) {
+                b.position(dirty.x + (dirty.y + n) * stride);
+                b.get(heightData, n * dirty.width, dirty.width);
+            }
         }
-
         this.texture = new HashMap<Point, Integer>(texture);
     }
 
