@@ -6,6 +6,7 @@ package com.novusradix.JavaPop.Server;
 
 import com.novusradix.JavaPop.Messaging.GameStarted;
 import com.novusradix.JavaPop.Messaging.JoinedGame;
+import com.novusradix.JavaPop.Messaging.Message;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -23,7 +24,6 @@ public class Game extends TimerTask {
     private Server server;
     private Timer timer;
     private float seconds;
-    
     public HeightMap heightMap;
     public Peons peons;
     public Houses houses;
@@ -69,29 +69,39 @@ public class Game extends TimerTask {
         id = nextId++;
         heightMap = new HeightMap(128, 128);
         heightMap.randomize(1);
-        peons =new Peons(this);
+        peons = new Peons(this);
         houses = new Houses(this);
+
+        peons.addPeon(2.5f, 2.5f, 200);
+        peons.addPeon(10, 12, 200);
+
         GameStarted go = new GameStarted(this);
         server.sendAllPlayers(go);
         heightMap.sendUpdates(players);
 
         timer = new Timer("Game " + id);
-        seconds = 1.0f/20.0f;
-        timer.scheduleAtFixedRate(this, 0, (int)(seconds * 1000.0f));
+        seconds = 1.0f / 20.0f;
+        timer.scheduleAtFixedRate(this, 0, (int) (seconds * 1000.0f));
     }
 
     public void run() {
         //start a clock,
         //move people.
-        
+
         if (players.isEmpty()) {
             timer.cancel();
         }
-        
-        
+
+
         peons.step(seconds);
         houses.step(seconds);
         heightMap.sendUpdates(players);
 
+    }
+
+    public void sendAllPlayers(Message m) {
+        for (Player pl : players) {
+            pl.sendMessage(m);
+        }
     }
 }

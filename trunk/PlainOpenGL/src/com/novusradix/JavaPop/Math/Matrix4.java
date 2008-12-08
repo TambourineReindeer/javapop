@@ -4,11 +4,13 @@
  */
 package com.novusradix.JavaPop.Math;
 
+import java.io.Serializable;
+
 /**
  *
  * @author mom
  */
-public class Matrix4 {
+public class Matrix4 implements Serializable {
 
     private float[] m;
 

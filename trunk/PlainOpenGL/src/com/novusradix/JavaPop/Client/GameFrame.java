@@ -50,6 +50,7 @@ public class GameFrame extends JFrame implements WindowListener {
     }
 
     public void windowClosing(WindowEvent e) {
+        game.kill();
         a.stop();
         this.dispose();
         cf.dispose();
