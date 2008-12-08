@@ -27,16 +27,16 @@ public class Houses {
     }
 
     public void updateHouse(Point pos, int team, int level) {
-        synchronized(houses){
-        if (level < 1) {
-            //remove
-            if (houses.containsKey(pos)) {
-                houses.remove(pos);
-            }
-        } else {
+        synchronized (houses) {
+            if (level < 1) {
+                //remove
+                if (houses.containsKey(pos)) {
+                    houses.remove(pos);
+                }
+            } else {
 
-            houses.put(pos, new House(pos, team, level));
-        }
+                houses.put(pos, new House(pos, team, level));
+            }
         }
     }
 
@@ -48,44 +48,49 @@ public class Houses {
     }
 
     public void display(GL gl) {
-        synchronized(houses){
-        if (houses != null) {
-            for (House h : houses.values()) {
-                gl.glPushMatrix();
-                gl.glTranslatef(h.pos.x, h.pos.y, game.heightMap.getHeight(h.pos.x, h.pos.y));
+        synchronized (houses) {
+            if (houses != null) {
+                for (House h : houses.values()) {
+                    gl.glPushMatrix();
+                    gl.glTranslatef(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos.x, h.pos.y));
+                    if (h.level > 9) {
+                        gl.glScalef(3.0f, 3.0f, 1.0f);
+                    }
+                    if (h.level == 48) {
+                        gl.glScalef(1.0f, 1.0f, 2.0f);
+                    }
+                    gl.glEnable(GL.GL_LIGHTING);
+                    gl.glBegin(GL.GL_QUADS);
+                    gl.glColor3f(1, 1, 1);
+                    gl.glNormal3f(-1, 0, 0);
+                    gl.glVertex3f(-0.3f, -0.3f, 0.0f);
+                    gl.glVertex3f(-0.3f, 0.3f, 0.0f);
+                    gl.glVertex3f(-0.3f, 0.3f, 1.3f);
+                    gl.glVertex3f(-0.3f, -0.3f, 1.3f);
 
-                gl.glEnable(GL.GL_LIGHTING);
-                gl.glBegin(GL.GL_QUADS);
-                gl.glColor3f(1, 1, 1);
-                gl.glNormal3f(-1, 0, 0);
-                gl.glVertex3f(0.2f, 0.2f, 0.0f);
-                gl.glVertex3f(0.2f, 0.8f, 0.0f);
-                gl.glVertex3f(0.2f, 0.8f, 0.8f);
-                gl.glVertex3f(0.2f, 0.2f, 0.8f);
+                    gl.glNormal3f(1, 0, 0);
+                    gl.glVertex3f(0.3f, -0.3f, 0.0f);
+                    gl.glVertex3f(0.3f, 0.3f, 0.0f);
+                    gl.glVertex3f(0.3f, 0.3f, 1.3f);
+                    gl.glVertex3f(0.3f, -0.3f, 1.3f);
 
-                gl.glNormal3f(1, 0, 0);
-                gl.glVertex3f(0.8f, 0.2f, 0.0f);
-                gl.glVertex3f(0.8f, 0.8f, 0.0f);
-                gl.glVertex3f(0.8f, 0.8f, 0.8f);
-                gl.glVertex3f(0.8f, 0.2f, 0.8f);
+                    gl.glNormal3f(0, -1, 0);
+                    gl.glVertex3f(-0.3f, -0.3f, 0.0f);
+                    gl.glVertex3f(0.3f, -0.3f, 0.0f);
+                    gl.glVertex3f(0.3f, -0.3f, 1.3f);
+                    gl.glVertex3f(-0.3f, -0.3f, 1.3f);
 
-                gl.glNormal3f(0, -1, 0);
-                gl.glVertex3f(0.2f, 0.2f, 0.0f);
-                gl.glVertex3f(0.8f, 0.2f, 0.0f);
-                gl.glVertex3f(0.8f, 0.2f, 0.8f);
-                gl.glVertex3f(0.2f, 0.2f, 0.8f);
+                    gl.glNormal3f(0, 1, 0);
+                    gl.glVertex3f(-0.3f, 0.3f, 0.0f);
+                    gl.glVertex3f(0.3f, 0.3f, 0.0f);
+                    gl.glVertex3f(0.3f, 0.3f, 1.3f);
+                    gl.glVertex3f(-0.3f, 0.3f, 1.3f);
 
-                gl.glNormal3f(0, 1, 0);
-                gl.glVertex3f(0.2f, 0.8f, 0.0f);
-                gl.glVertex3f(0.8f, 0.8f, 0.0f);
-                gl.glVertex3f(0.8f, 0.8f, 0.8f);
-                gl.glVertex3f(0.2f, 0.8f, 0.8f);
-
-                gl.glEnd();
-                gl.glPopMatrix();
+                    gl.glEnd();
+                    gl.glPopMatrix();
+                }
             }
         }
-    }
     }
 
     public class House {
