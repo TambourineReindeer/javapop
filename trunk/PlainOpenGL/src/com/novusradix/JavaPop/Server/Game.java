@@ -5,6 +5,7 @@
 package com.novusradix.JavaPop.Server;
 
 import com.novusradix.JavaPop.Messaging.GameStarted;
+import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.novusradix.JavaPop.Messaging.JoinedGame;
 import com.novusradix.JavaPop.Messaging.Message;
 import java.util.Timer;
@@ -77,8 +78,10 @@ public class Game extends TimerTask {
 
         GameStarted go = new GameStarted(this);
         server.sendAllPlayers(go);
-        heightMap.sendUpdates(players);
-
+        HeightMapUpdate m = heightMap.GetUpdate();
+        if (m != null) {
+            sendAllPlayers(m);
+        }
         timer = new Timer("Game " + id);
         seconds = 1.0f / 20.0f;
         timer.scheduleAtFixedRate(this, 0, (int) (seconds * 1000.0f));
@@ -95,8 +98,10 @@ public class Game extends TimerTask {
 
         peons.step(seconds);
         houses.step(seconds);
-        heightMap.sendUpdates(players);
-
+        HeightMapUpdate m = heightMap.GetUpdate();
+        if (m != null) {
+            sendAllPlayers(m);
+        }
     }
 
     public void sendAllPlayers(Message m) {
