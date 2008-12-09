@@ -10,8 +10,8 @@ import java.util.Random;
 import com.sun.opengl.util.BufferUtil;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +22,8 @@ import java.util.Map;
 public class HeightMap {
 
     private int width,  breadth;
-    private IntBuffer b;
+    private ByteBuffer b;
+//    private IntBuffer b;
     private static int rowstride;
     private static int VZ = 0;
     private Rectangle dirty;
@@ -31,7 +32,7 @@ public class HeightMap {
 
     public HeightMap(int width, int breadth) {
 
-        b = BufferUtil.newIntBuffer(width * breadth);
+        b = BufferUtil.newByteBuffer(width * breadth);
         texture = new HashMap<Point, Integer>();
 
         this.breadth = breadth;
@@ -44,20 +45,20 @@ public class HeightMap {
             for (x = 0; x < width; x++) {
 
 
-                b.put(0);
+                b.put((byte)0);
 
             }
         }
         b.flip();
     }
 
-    public int[] getData() {
-        int[] buf = new int[width * breadth];
+    public byte[] getData() {
+        byte[] buf = new byte[width * breadth];
         getData(buf);
         return buf;
     }
 
-    public void getData(int[] buf) {
+    public void getData(byte[] buf) {
         b.position(0);
         b.get(buf);
     }
@@ -78,9 +79,9 @@ public class HeightMap {
         return y * rowstride + x;
     }
 
-    public int getHeight(int x, int y) {
+    public byte getHeight(int x, int y) {
         try {
-            return (int) b.get(bufPos(x, y, 0, VZ));
+            return b.get(bufPos(x, y, 0, VZ));
         } catch (Exception e) {
             System.out.println("Array out of bounds in Server getHeight:" + x + ", " + y);
         }
@@ -218,14 +219,14 @@ public class HeightMap {
 
     public void up(int x, int y) {
         synchronized (this) {
-            setHeight(x, y, getHeight(x, y) + 1);
+            setHeight(x, y,(byte)( getHeight(x, y) + 1));
             conform(x, y);
         }
     }
 
     public void down(int x, int y) {
         synchronized (this) {
-            setHeight(x, y, Math.max(getHeight(x, y) - 1, 0));
+            setHeight(x, y, (byte)(Math.max(getHeight(x, y) - 1, 0)));
             conform(x, y);
         }
     }
@@ -236,37 +237,37 @@ public class HeightMap {
         }
     }
 
-    private void setHeight(int x, int y, int height) {
+    private void setHeight(int x, int y, byte height) {
         if (x >= 0 && x < width && y >= 0 && y < breadth) {
             b.put(bufPos(x, y), height);
         }
     }
 
     private void conform(int x, int y) {
-        conform(x, y, 1);
+        conform(x, y, (byte)1);
     }
 
-    private void conform(int x, int y, int radius) {
+    private void conform(int x, int y, byte r) {
         int ex, wy;
-        int height = getHeight(x, y);
+        byte height = getHeight(x, y);
         boolean bChanged = false;
-        for (ex = x - radius; ex <= x + radius; ex++) {
-            for (wy = y - radius; wy <= y + radius; wy++) {
+        for (ex = x - r; ex <= x + r; ex++) {
+            for (wy = y - r; wy <= y + r; wy++) {
                 if (ex >= 0 && ex <= width && wy >= 0 && wy <= breadth) {
-                    if (getHeight(ex, wy) - height > radius) {
+                    if (getHeight(ex, wy) - height > r) {
                         bChanged = true;
-                        setHeight(ex, wy, height + radius);
-                    } else if (height - getHeight(ex, wy) > radius) {
+                        setHeight(ex, wy, (byte)(height + r));
+                    } else if (height - getHeight(ex, wy) > r) {
                         bChanged = true;
-                        setHeight(ex, wy, height - radius);
+                        setHeight(ex, wy, (byte)(height - r));
                     }
                 }
             }
         }
         if (bChanged) {
-            conform(x, y, radius + 1);
+            conform(x, y, (byte)(r + 1));
         } else {
-            markDirty(new Rectangle(x - radius, y - radius, radius * 2 + 1, radius * 2 + 1));
+            markDirty(new Rectangle(x - r, y - r, r * 2 + 1, r * 2 + 1));
         }
     }
 
@@ -312,17 +313,15 @@ public class HeightMap {
         dirty = dirty.intersection(bounds);
     }
 
-    public void sendUpdates(Collection<Player> players) {
+    public HeightMapUpdate GetUpdate() {
+        HeightMapUpdate m = null;
         synchronized (this) {
-            if (dirty != null || texture.size()>0) {
-                HeightMapUpdate m = new HeightMapUpdate(dirty, b, width, texture);
-
-                for (Player p : players) {
-                    p.sendMessage(m);
-                }
+            if (dirty != null || texture.size() > 0) {
+                m = new HeightMapUpdate(dirty, b, width, texture);
             }
             dirty = null;
             texture.clear();
         }
+        return m;
     }
 }

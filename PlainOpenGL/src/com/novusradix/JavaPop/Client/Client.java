@@ -37,7 +37,6 @@ public class Client implements Runnable {
         BaseTool.Initialise(this);
         
         try {
-
             socket = new Socket(host, 13579);
             socket.setTcpNoDelay(true);
         } catch (UnknownHostException ex) {
@@ -66,7 +65,7 @@ public class Client implements Runnable {
         try {
             while (socket.isConnected()) {
                 message = (Message) ois.readObject();
-                message.client = this;
+                message.setClient(this);
 
                 message.execute();
             }
