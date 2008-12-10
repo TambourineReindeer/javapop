@@ -11,7 +11,6 @@ import com.sun.opengl.util.BufferUtil;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +20,7 @@ import java.util.Map;
  */
 public class HeightMap {
 
-    private int width,  breadth;
+    private final int width,  breadth;
     private ByteBuffer b;
 //    private IntBuffer b;
     private static int rowstride;
@@ -31,22 +30,17 @@ public class HeightMap {
     private Map<Point, Integer> texture;
 
     public HeightMap(int width, int breadth) {
-
+        this.breadth = breadth;
+        this.width = width;
         b = BufferUtil.newByteBuffer(width * breadth);
         texture = new HashMap<Point, Integer>();
 
-        this.breadth = breadth;
-        this.width = width;
         rowstride = width;
         bounds = new Rectangle(0, 0, width, breadth);
-
         int x, y;
         for (y = 0; y < breadth; y++) {
             for (x = 0; x < width; x++) {
-
-
-                b.put((byte)0);
-
+                b.put((byte) 0);
             }
         }
         b.flip();
@@ -79,11 +73,13 @@ public class HeightMap {
         return y * rowstride + x;
     }
 
+    public boolean inBounds(int x, int y) {
+        return (x >= 0 && y >= 0 && x < width && y < breadth);
+    }
+
     public byte getHeight(int x, int y) {
-        try {
+        if (inBounds(x, y)) {
             return b.get(bufPos(x, y, 0, VZ));
-        } catch (Exception e) {
-            System.out.println("Array out of bounds in Server getHeight:" + x + ", " + y);
         }
         return 0;
     }
@@ -192,8 +188,6 @@ public class HeightMap {
 
     void randomize(int seed) {
         synchronized (this) {
-
-
             int n, m;
             int x, y;
             Random r = new Random(seed);
@@ -219,14 +213,14 @@ public class HeightMap {
 
     public void up(int x, int y) {
         synchronized (this) {
-            setHeight(x, y,(byte)( getHeight(x, y) + 1));
+            setHeight(x, y, (byte) (getHeight(x, y) + 1));
             conform(x, y);
         }
     }
 
     public void down(int x, int y) {
         synchronized (this) {
-            setHeight(x, y, (byte)(Math.max(getHeight(x, y) - 1, 0)));
+            setHeight(x, y, (byte) (Math.max(getHeight(x, y) - 1, 0)));
             conform(x, y);
         }
     }
@@ -244,7 +238,7 @@ public class HeightMap {
     }
 
     private void conform(int x, int y) {
-        conform(x, y, (byte)1);
+        conform(x, y, (byte) 1);
     }
 
     private void conform(int x, int y, byte r) {
@@ -256,16 +250,16 @@ public class HeightMap {
                 if (ex >= 0 && ex <= width && wy >= 0 && wy <= breadth) {
                     if (getHeight(ex, wy) - height > r) {
                         bChanged = true;
-                        setHeight(ex, wy, (byte)(height + r));
+                        setHeight(ex, wy, (byte) (height + r));
                     } else if (height - getHeight(ex, wy) > r) {
                         bChanged = true;
-                        setHeight(ex, wy, (byte)(height - r));
+                        setHeight(ex, wy, (byte) (height - r));
                     }
                 }
             }
         }
         if (bChanged) {
-            conform(x, y, (byte)(r + 1));
+            conform(x, y, (byte) (r + 1));
         } else {
             markDirty(new Rectangle(x - r, y - r, r * 2 + 1, r * 2 + 1));
         }
