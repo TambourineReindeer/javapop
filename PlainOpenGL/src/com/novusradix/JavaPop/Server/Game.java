@@ -74,7 +74,6 @@ public class Game extends TimerTask {
         houses = new Houses(this);
 
         peons.addPeon(2.5f, 2.5f, 200);
-        peons.addPeon(10, 12, 200);
 
         GameStarted go = new GameStarted(this);
         server.sendAllPlayers(go);

@@ -29,8 +29,10 @@ public class Houses {
     }
 
     public void addHouse(int x, int y, int team, float strength) {
-        if (canBuild(x, y)) {
-            houses.add(new House(x, y, team, strength));
+        synchronized (houses) {
+            if (canBuild(x, y)) {
+                houses.add(new House(x, y, team, strength));
+            }
         }
     }
 
@@ -47,21 +49,22 @@ public class Houses {
                 newmap[y][x] = 0;
             }
         }
-        Iterator<House> i = houses.iterator();
-        House h;
-        for (; i.hasNext();) {
-            h = i.next();
-            if (game.heightMap.isFlat(h.pos.x, h.pos.y) && newmap[h.pos.x][h.pos.y] == 0) {
-                h.setLevel();
-                h.paintmap(newmap);
-                h.step(seconds);
-            } else {
-                i.remove();
-                game.peons.addPeon(h.pos.x, h.pos.y, h.strength);
-                hds.add(new HouseUpdate.Detail(h.pos, 0, 0));
+        synchronized (houses) {
+            Iterator<House> i = houses.iterator();
+            House h;
+            for (; i.hasNext();) {
+                h = i.next();
+                if (game.heightMap.isFlat(h.pos.x, h.pos.y) && newmap[h.pos.x][h.pos.y] == 0) {
+                    h.setLevel();
+                    h.paintmap(newmap);
+                    h.step(seconds);
+                } else {
+                    i.remove();
+                    game.peons.addPeon(h.pos.x, h.pos.y, h.strength);
+                    hds.add(new HouseUpdate.Detail(h.pos, 0, -1));
+                }
             }
         }
-
         synchronized (game.heightMap) {
             unpaint();
             int[][] t;
@@ -77,10 +80,6 @@ public class Houses {
     }
 
     private void paint() {
-
-
-
-
         int x, y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
@@ -92,10 +91,6 @@ public class Houses {
     }
 
     private void unpaint() {
-
-
-
-
         int x, y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
@@ -107,10 +102,6 @@ public class Houses {
     }
 
     public int countFlatLand(Point pos) {
-
-
-
-
         int x, y;
         int flat = 0;
         int h = game.heightMap.getHeight(pos.x, pos.y);
@@ -143,7 +134,6 @@ public class Houses {
                 break;
             }
         }
-
         return flat;
     }
 
@@ -198,13 +188,12 @@ public class Houses {
             changed = true;
             map[x][y] = HOUSE + team;
             pos = new Point(x, y);
-            level = 0;
+            level = 1;
             this.team = team;
             this.strength = strength;
         }
 
         private void paintmap(int[][] newmap) {
-            // TODO Auto-generated method stub
             newmap[pos.x][pos.y] = HOUSE + team;
             int radiuslimit = 0;
             if (level > 0) {
@@ -216,10 +205,6 @@ public class Houses {
             if (level == 48) {
                 radiuslimit = 3;
             }
-
-
-
-
             int x, y;
 
             int h = game.heightMap.getHeight(pos.x, pos.y);
@@ -249,7 +234,6 @@ public class Houses {
                     }
                 }
             }
-
         }
 
         private void setLevel() {
@@ -267,12 +251,11 @@ public class Houses {
         }
 
         private void step(float seconds) {
-
             float rate = (level + 1);
 
             strength += rate * seconds;
             if (strength > rate * 100.0f) {
-                float houseStrength = rate*100.0f - Math.min(500.0f, rate*100.0f / 2.0f);
+                float houseStrength = rate * 100.0f - Math.min(500.0f, rate * 100.0f / 2.0f);
                 game.peons.addPeon(pos.x, pos.y, strength - houseStrength);
                 strength = houseStrength;
             }
@@ -281,7 +264,6 @@ public class Houses {
                 changed = false;
                 hds.add(new HouseUpdate.Detail(pos, team, level));
             }
-
         }
     }
 }
