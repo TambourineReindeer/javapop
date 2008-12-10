@@ -2,10 +2,7 @@ package com.novusradix.JavaPop.Client;
 
 import java.awt.Point;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.Vector;
 
 import javax.media.opengl.GL;
 
@@ -28,13 +25,12 @@ public class Houses {
 
     public void updateHouse(Point pos, int team, int level) {
         synchronized (houses) {
-            if (level < 1) {
+            if (level < 0) {
                 //remove
                 if (houses.containsKey(pos)) {
                     houses.remove(pos);
                 }
             } else {
-
                 houses.put(pos, new House(pos, team, level));
             }
         }

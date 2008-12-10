@@ -6,7 +6,6 @@ import com.novusradix.JavaPop.Server.Peons.State;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.media.opengl.GL;
 
@@ -29,7 +28,9 @@ public class Peons {
                     peons.get(d.id).Update(d);
                 }
             } else {
+                if (!(d.state == State.DEAD || d.state == State.SETTLED)) {
                 peons.put(d.id, new Peon(d));
+                }
             }
         }
     }

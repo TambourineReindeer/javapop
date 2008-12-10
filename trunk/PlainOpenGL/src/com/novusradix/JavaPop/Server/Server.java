@@ -29,13 +29,16 @@ public class Server implements Runnable {
     ServerForm form;
     ServerSocket s;
 
+    public void main(){
+        new Server(13579);
+    }
     public Server(int port) {
         games = new HashMap<Integer, Game>();
         players = new Vector<Player>();
         this.port = port;
         form = new ServerForm(this);
         new Thread(this, "Server").start();
-        a = new Announcer(13579);
+        a = new Announcer(port);
         form.setBounds(500,500,150, 150);
         form.setVisible(true);
     }
