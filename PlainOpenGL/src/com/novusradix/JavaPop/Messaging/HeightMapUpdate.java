@@ -40,6 +40,9 @@ public class HeightMapUpdate extends Message implements Externalizable {
                 b.position(dirty.x + (dirty.y + n) * stride);
                 b.get(heightData, n * dirty.width, dirty.width);
             }
+
+        } else {
+            dirtyRegion = new Rectangle();
         }
         this.texture = new HashMap<Point, Integer>(texture);
     }
@@ -53,8 +56,12 @@ public class HeightMapUpdate extends Message implements Externalizable {
         o.writeInt(dirtyRegion.y);
         o.writeInt(dirtyRegion.width);
         o.writeInt(dirtyRegion.height);
-        o.writeInt(heightData.length);
-        o.write(heightData);
+        if (heightData != null) {
+            o.writeInt(heightData.length);
+            o.write(heightData, 0, heightData.length);
+        } else {
+            o.writeInt(0);
+        }
         o.writeInt(texture.size());
         for (Entry<Point, Integer> e : texture.entrySet()) {
             o.writeInt(e.getKey().x);
@@ -71,19 +78,23 @@ public class HeightMapUpdate extends Message implements Externalizable {
         dirtyRegion.width = i.readInt();
         dirtyRegion.height = i.readInt();
 
+        int heightBytes = i.readInt();
+int readBytes=0;
+        heightData = new byte[heightBytes];
+        do {
+            readBytes += i.read(heightData, readBytes, heightBytes);
+            heightBytes -=readBytes;
+        } while (heightBytes > 0);
 
-        heightData = new byte[i.readInt()];
-        i.read(heightData, 0, heightData.length);
         int texcount = i.readInt();
         texture = new HashMap<Point, Integer>();
-        
-        int x,y,n;
-        for(;texcount>0;texcount--)
-        {
+
+        int x, y, n;
+        for (; texcount > 0; texcount--) {
             x = i.readInt();
-            y=i.readInt();
+            y = i.readInt();
             n = i.readInt();
-            texture.put(new Point(x,y), n);
+            texture.put(new Point(x, y), n);
         }
 
     }

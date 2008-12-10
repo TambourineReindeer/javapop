@@ -488,7 +488,7 @@ public class HeightMap {
 
     public void applyUpdate(HeightMapUpdate u) {
         synchronized (this) {
-            if (u.dirtyRegion != null) {
+            if (!u.dirtyRegion.isEmpty()) {
                 int x, y;
 
                 for (y = 0; y < u.dirtyRegion.height; y++) {
