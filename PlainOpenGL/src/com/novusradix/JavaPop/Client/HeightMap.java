@@ -170,9 +170,10 @@ public class HeightMap {
             }
         }
         b.flip();
+    }
 
-
-
+    public boolean inBounds(int x, int y) {
+        return (x >= 0 && y >= 0 && x < width && y < breadth);
     }
 
     public int getWidth() {
@@ -192,20 +193,18 @@ public class HeightMap {
     }
 
     public int getHeight(int x, int y) {
-        try {
-            if (x == width - 1 && y == breadth - 1) {
-                return (int) b.get(bufPos(x - 1, y - 1, 4, VZ));
-            }
-            if (x == width - 1) {
-                return (int) b.get(bufPos(x - 1, y, 3, VZ));
-            }
-            if (y == breadth - 1) {
-                return (int) b.get(bufPos(x, y - 1, 7, VZ));
-            }
-            return (int) b.get(bufPos(x, y, 0, VZ));
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println("Array out of bounds in Client getHeight:" + x + ", " + y);
 
+        if (x == width - 1 && y == breadth - 1) {
+            return (int) b.get(bufPos(x - 1, y - 1, 4, VZ));
+        }
+        if (x == width - 1) {
+            return (int) b.get(bufPos(x - 1, y, 3, VZ));
+        }
+        if (y == breadth - 1) {
+            return (int) b.get(bufPos(x, y - 1, 7, VZ));
+        }
+        if (inBounds(x, y)) {
+            return (int) b.get(bufPos(x, y, 0, VZ));
         }
         return 0;
     }
