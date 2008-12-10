@@ -79,11 +79,11 @@ public class HeightMapUpdate extends Message implements Externalizable {
         dirtyRegion.height = i.readInt();
 
         int heightBytes = i.readInt();
-int readBytes=0;
+        int readBytes = 0;
         heightData = new byte[heightBytes];
         do {
             readBytes += i.read(heightData, readBytes, heightBytes);
-            heightBytes -=readBytes;
+            heightBytes = heightData.length - readBytes;
         } while (heightBytes > 0);
 
         int texcount = i.readInt();
