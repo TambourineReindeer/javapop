@@ -66,12 +66,12 @@ public class Houses {
             }
         }
         synchronized (game.heightMap) {
-            repaint();
+            unpaint();
             int[][] t;
             t = map;
             map = newmap;
             newmap = t;
-            
+            paint();
         }
         if (!hds.isEmpty()) {
             game.sendAllPlayers(new HouseUpdate(hds));

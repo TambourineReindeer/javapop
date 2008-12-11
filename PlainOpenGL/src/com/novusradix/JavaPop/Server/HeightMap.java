@@ -29,15 +29,17 @@ public class HeightMap {
     private Rectangle bounds;
     private Map<Point, Integer> texture;
     private int[][] tex;
+    private int[][] oldTex;
 
     public HeightMap(int width, int breadth) {
         this.breadth = breadth;
         this.width = width;
         b = BufferUtil.newByteBuffer(width * breadth);
         texture = new HashMap<Point, Integer>();
-        tex = new int[width][breadth];
         rowstride = width;
         bounds = new Rectangle(0, 0, width, breadth);
+        tex = new int[width][breadth];
+        oldTex = new int[width][breadth];
         int x, y;
         for (y = 0; y < breadth; y++) {
             for (x = 0; x < width; x++) {
@@ -227,26 +229,50 @@ public class HeightMap {
     }
 
     public void setTexture(Point p, int i) {
+        tex[p.x][p.y] = i;
+
         synchronized (this) {
-            if (tex[p.x][p.y] != i) {
-                texture.put(p, i);
-                tex[p.x][p.y] = i;
+            texture.put(p, i);
+        }
+    }
+
+    private void difTex() {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < breadth; y++) {
+                if (tex[x][y] != oldTex[x][y]) {
+                    texture.put(new Point(x, y), tex[x][y]);
+                    oldTex[x][y] = tex[x][y];
+                }
+            }
+        }
+    }
+
+    private void retexture(int x, int y, int r) {
+        for (int ex = x - r; ex < x + r; ex++) {
+            for (int wy = y - r; wy < y + r; wy++) {
+                if (ex >= 0 && wy >= 0 && ex + 1 < width && wy + 1 < breadth) {
+                    if (getHeight(ex, wy) == 0 && getHeight(ex + 1, wy) == 0 && getHeight(ex, wy + 1) == 0 && getHeight(ex + 1, wy + 1) == 0) {
+                        setTexture(new Point(ex, wy), 0);
+                    } else {
+                        setTexture(new Point(ex, wy), 1);
+                    }
+                }
             }
         }
     }
 
     private void setHeight(int x, int y, byte height) {
-        if (x >= 0 && x < width && y >= 0 && y < breadth) {
+        if (inBounds(x, y)) {
             b.put(bufPos(x, y), height);
         }
     }
 
     private void conform(int x, int y) {
-        conform(x, y, (byte) 1);
+        conform(x, y, 1);
     }
 
-    private void conform(int x, int y, byte r) {
-        int ex,  wy;
+    private void conform(int x, int y, int r) {
+        int ex, wy;
         byte height = getHeight(x, y);
         boolean bChanged = false;
         for (ex = x - r; ex <= x + r; ex++) {
@@ -265,12 +291,13 @@ public class HeightMap {
         if (bChanged) {
             conform(x, y, (byte) (r + 1));
         } else {
-            markDirty(new Rectangle(x - r, y - r, r * 2 + 1, r * 2 + 1));
+            markDirty(new Rectangle(x - r + 1, y - r + 1, r * 2 - 1, r * 2 - 1));
+            retexture(x, y, r);
         }
     }
 
     public boolean isFlat(int x, int y) {
-        int ha = 0,  hb = 0,  hc = 0,  hd = 0;
+        int ha = 0, hb = 0, hc = 0, hd = 0;
         if (x < 0 || y < 0 || x + 1 >= width || y + 1 >= breadth) {
             return false;
         }
@@ -313,6 +340,7 @@ public class HeightMap {
 
     public HeightMapUpdate GetUpdate() {
         HeightMapUpdate m = null;
+        difTex();
         synchronized (this) {
             if (dirty != null || texture.size() > 0) {
                 m = new HeightMapUpdate(dirty, b, width, texture);

@@ -6,7 +6,6 @@
 package com.novusradix.JavaPop.Client.Lobby;
 
 import com.novusradix.JavaPop.Messaging.Ready;
-import com.novusradix.JavaPop.Server.GameInfo;
 import javax.swing.DefaultListModel;
 
 /**
