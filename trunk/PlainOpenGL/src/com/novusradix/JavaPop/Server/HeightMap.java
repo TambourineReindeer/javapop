@@ -28,13 +28,14 @@ public class HeightMap {
     private Rectangle dirty;
     private Rectangle bounds;
     private Map<Point, Integer> texture;
+    private int[][] tex;
 
     public HeightMap(int width, int breadth) {
         this.breadth = breadth;
         this.width = width;
         b = BufferUtil.newByteBuffer(width * breadth);
         texture = new HashMap<Point, Integer>();
-
+        tex = new int[width][breadth];
         rowstride = width;
         bounds = new Rectangle(0, 0, width, breadth);
         int x, y;
@@ -227,7 +228,10 @@ public class HeightMap {
 
     public void setTexture(Point p, int i) {
         synchronized (this) {
-            texture.put(p, i);
+            if (tex[p.x][p.y] != i) {
+                texture.put(p, i);
+                tex[p.x][p.y] = i;
+            }
         }
     }
 
@@ -242,7 +246,7 @@ public class HeightMap {
     }
 
     private void conform(int x, int y, byte r) {
-        int ex, wy;
+        int ex,  wy;
         byte height = getHeight(x, y);
         boolean bChanged = false;
         for (ex = x - r; ex <= x + r; ex++) {
@@ -266,7 +270,7 @@ public class HeightMap {
     }
 
     public boolean isFlat(int x, int y) {
-        int ha = 0, hb = 0, hc = 0, hd = 0;
+        int ha = 0,  hb = 0,  hc = 0,  hd = 0;
         if (x < 0 || y < 0 || x + 1 >= width || y + 1 >= breadth) {
             return false;
         }
