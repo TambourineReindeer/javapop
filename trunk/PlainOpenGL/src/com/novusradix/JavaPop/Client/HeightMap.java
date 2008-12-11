@@ -346,13 +346,6 @@ public class HeightMap {
             System.out.println("Array out of bounds in Client setMidTile:" + x + ", " + y);
         }
         setNormals(x, y);
-
-        if (getHeight(x, y) == 0 && getHeight(x, y + 1) == 0 && getHeight(x + 1, y) == 0 && getHeight(x + 1, y + 1) == 0) {
-            setTexture(new Point(x, y), 0);
-        } else {
-            setTexture(new Point(x, y), 1);
-        }
-
     }
 
     public void setTexture(Point p, int t) {
