@@ -93,11 +93,12 @@ public class Game extends TimerTask {
         if (players.isEmpty()) {
             timer.cancel();
         }
-
-
-        peons.step(seconds);
-        houses.step(seconds);
-        HeightMapUpdate m = heightMap.GetUpdate();
+        HeightMapUpdate m;
+        synchronized (heightMap) {
+            peons.step(seconds);
+            houses.step(seconds);
+            m = heightMap.GetUpdate();
+        }
         if (m != null) {
             sendAllPlayers(m);
         }

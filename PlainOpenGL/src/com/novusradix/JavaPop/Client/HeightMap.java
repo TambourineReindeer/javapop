@@ -433,12 +433,9 @@ public class HeightMap {
     }
 
     public void display(GL gl) {
-
         Vector3 l = new Vector3(-9, -5, 10);
         l.normalize();
-
         gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 0.0f}));
-
         gl.glColor3f(1, 1, 1);
 
         /*gl.glBindTexture(GL.GL_TEXTURE_2D, texture[0]);

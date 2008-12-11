@@ -66,12 +66,12 @@ public class Houses {
             }
         }
         synchronized (game.heightMap) {
-            unpaint();
+            repaint();
             int[][] t;
             t = map;
             map = newmap;
             newmap = t;
-            paint();
+            
         }
         if (!hds.isEmpty()) {
             game.sendAllPlayers(new HouseUpdate(hds));
@@ -79,8 +79,25 @@ public class Houses {
         }
     }
 
-    private void paint() {
+    private void repaint() {
         int x, y;
+        for (y = 0; y < game.heightMap.getBreadth(); y++) {
+            for (x = 0; x < game.heightMap.getWidth(); x++) {
+                if (newmap[x][y] != map[x][y]) {
+                    switch (newmap[x][y]) {
+                        case EMPTY:
+                            game.heightMap.setTexture(new Point(x, y), 1);
+                            break;
+                        default:
+                            game.heightMap.setTexture(new Point(x, y), 2);
+                    }
+                }
+            }
+        }
+    }
+
+    private void paint() {
+        int x,  y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (map[x][y] != EMPTY) {
@@ -91,7 +108,7 @@ public class Houses {
     }
 
     private void unpaint() {
-        int x, y;
+        int x,  y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (map[x][y] != EMPTY) {
@@ -102,7 +119,7 @@ public class Houses {
     }
 
     public int countFlatLand(Point pos) {
-        int x, y;
+        int x,  y;
         int flat = 0;
         int h = game.heightMap.getHeight(pos.x, pos.y);
         for (int radius = 1; radius <= 3; radius++) {
@@ -186,7 +203,6 @@ public class Houses {
 
         public House(int x, int y, int team, float strength) {
             changed = true;
-            map[x][y] = HOUSE + team;
             pos = new Point(x, y);
             level = 1;
             this.team = team;
@@ -205,7 +221,7 @@ public class Houses {
             if (level == 48) {
                 radiuslimit = 3;
             }
-            int x, y;
+            int x,  y;
 
             int h = game.heightMap.getHeight(pos.x, pos.y);
             for (int radius = 1; radius <= radiuslimit; radius++) {
