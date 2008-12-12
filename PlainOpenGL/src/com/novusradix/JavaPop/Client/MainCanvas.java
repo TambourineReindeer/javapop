@@ -33,8 +33,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
      */
     private static final long serialVersionUID = 1L;
     private static final float fHeightScale = 0.4082f;
-    //private HeightMap heightMap;
-    private Water water;
     private float xPos,  yPos,  xOrig,  yOrig;
     private int height,  width;
     private Point dragOrigin;
@@ -317,9 +315,9 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             }
 
             if (primary) {
-                BaseTool.getCurrentTool().PrimaryAction(selected.x, selected.y);
+                BaseTool.getCurrentTool().PrimaryAction(selected);
             } else {
-                BaseTool.getCurrentTool().SecondaryAction(selected.x, selected.y);
+                BaseTool.getCurrentTool().SecondaryAction(selected);
             }
         } else {
             mouseMoved(e);

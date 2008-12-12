@@ -4,6 +4,7 @@
  */
 package com.novusradix.JavaPop.Server;
 
+import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import java.util.Random;
@@ -22,11 +23,9 @@ public class HeightMap {
 
     private final int width,  breadth;
     private ByteBuffer b;
-//    private IntBuffer b;
     private static int rowstride;
-    private static int VZ = 0;
     private Rectangle dirty;
-    private Rectangle bounds;
+    public final Rectangle bounds;
     private Map<Point, Integer> texture;
     private int[][] tex;
     private int[][] oldTex;
@@ -68,37 +67,17 @@ public class HeightMap {
         return breadth;
     }
 
-    private static int bufPos(int x, int y, int vertex, int index) {
-        return y * rowstride + x;
+    private static int bufPos(Point p) {
+        return p.y * rowstride + p.x;
     }
 
-    private static int bufPos(int x, int y) {
-        return y * rowstride + x;
+    public boolean inBounds(Point p) {
+        return (p.x >= 0 && p.y >= 0 && p.x < width && p.y < breadth);
     }
 
-    public boolean inBounds(int x, int y) {
-        return (x >= 0 && y >= 0 && x < width && y < breadth);
-    }
-
-    public byte getHeight(int x, int y) {
-        if (inBounds(x, y)) {
-            return b.get(bufPos(x, y, 0, VZ));
-        }
-        return 0;
-    }
-
-    public float getHeight2(int x, int y) {
-        try {
-            int ha, hb, hc, hd;
-            ha = getHeight(x, y);
-            hb = getHeight(x, y);
-            hc = getHeight(x, y);
-            hd = getHeight(x, y);
-
-            return (Math.max(Math.max(ha, hb), Math.max(hb, hc)) + Math.min(Math.min(ha, hb), Math.min(hc, hd))) / 2.0f;
-        } catch (Exception e) {
-            System.out.println("Array out of bounds in getHeight2:" + x + ", " + y);
-
+    public byte getHeight(Point p) {
+        if (inBounds(p)) {
+            return b.get(bufPos(p));
         }
         return 0;
     }
@@ -114,10 +93,10 @@ public class HeightMap {
         x = x - x1;
         y = y - y1;
 
-        ha = getHeight(x1, y1);
-        hb = getHeight(x1, y2);
-        hc = getHeight(x2, y1);
-        hd = getHeight(x2, y2);
+        ha = getHeight(new Point(x1, y1));
+        hb = getHeight(new Point(x1, y2));
+        hc = getHeight(new Point(x2, y1));
+        hd = getHeight(new Point(x2, y2));
         hm = ha;
         if (hb > ha || hc > ha || hd > ha) {
             hm = ha + 0.5f;
@@ -144,51 +123,50 @@ public class HeightMap {
         }
     }
 
-    public Vector2 getSlope(float x, float y) {
-        int x1, x2, y1, y2;
-        float ha, hb, hc, hd, hm;
-        x1 = (int) Math.floor(x);
-        x2 = (int) Math.ceil(x);
-        y1 = (int) Math.floor(y);
-        y2 = (int) Math.ceil(y);
-
-        x = x - x1;
-        y = y - y1;
-
-        ha = getHeight(x1, y1);
-        hb = getHeight(x1, y2);
-        hc = getHeight(x2, y1);
-        hd = getHeight(x2, y2);
-
-        if (ha == hb && hb == hc && hc == hd) {
-            return new Vector2(0, 0);
-        }
-        hm = ha;
-        if (hb > ha || hc > ha || hd > ha) {
-            hm = ha + 0.5f;
-        }
-        if (hb < ha || hc < ha || hd < ha) {
-            hm = ha - 0.5f;
-        }
-        if (y > x) {
-            if (y > 1 - x) {
-                // BMD
-                return new Vector2(hd - hb, 2.0f * ((hd + hb) / 2.0f - hm));
-            } else {
-                // AMB
-                return new Vector2(2.0f * (hm - (ha + hb) / 2.0f), hb - ha);
-            }
-        } else {
-            if (y > 1 - x) {
-                // CMD
-                return new Vector2(2.0f * ((hc + hd) / 2.0f - hm), hd - hc);
-            } else {
-                // AMC
-                return new Vector2(hc - ha, 2.0f * (hm - (ha + hc) / 2.0f));
-            }
-        }
+    /*public Vector2 getSlope(float x, float y) {
+    int x1, x2, y1, y2;
+    float ha, hb, hc, hd, hm;
+    x1 = (int) Math.floor(x);
+    x2 = (int) Math.ceil(x);
+    y1 = (int) Math.floor(y);
+    y2 = (int) Math.ceil(y);
+    
+    x = x - x1;
+    y = y - y1;
+    
+    ha = getHeight(x1, y1);
+    hb = getHeight(x1, y2);
+    hc = getHeight(x2, y1);
+    hd = getHeight(x2, y2);
+    
+    if (ha == hb && hb == hc && hc == hd) {
+    return new Vector2(0, 0);
     }
-
+    hm = ha;
+    if (hb > ha || hc > ha || hd > ha) {
+    hm = ha + 0.5f;
+    }
+    if (hb < ha || hc < ha || hd < ha) {
+    hm = ha - 0.5f;
+    }
+    if (y > x) {
+    if (y > 1 - x) {
+    // BMD
+    return new Vector2(hd - hb, 2.0f * ((hd + hb) / 2.0f - hm));
+    } else {
+    // AMB
+    return new Vector2(2.0f * (hm - (ha + hb) / 2.0f), hb - ha);
+    }
+    } else {
+    if (y > 1 - x) {
+    // CMD
+    return new Vector2(2.0f * ((hc + hd) / 2.0f - hm), hd - hc);
+    } else {
+    // AMC
+    return new Vector2(hc - ha, 2.0f * (hm - (ha + hc) / 2.0f));
+    }
+    }
+    }*/
     void randomize(int seed) {
         synchronized (this) {
             int n, m;
@@ -199,41 +177,39 @@ public class HeightMap {
                 x = r.nextInt(width);
                 y = r.nextInt(breadth);
                 for (m = 0; m < r.nextInt(8); m++) {
-                    up(x, y);
+                    up(new Point(x, y));
                 }
                 for (m = 0; m < r.nextInt(8); m++) {
-                    up(x - 5 + r.nextInt(10), y - 5 + r.nextInt(10));
+                    up(new Point(x - 5 + r.nextInt(10), y - 5 + r.nextInt(10)));
                 }
                 for (m = 0; m < r.nextInt(2); m++) {
-                    down(x - 5 + r.nextInt(10), -5 + r.nextInt(10));
+                    down(new Point(x - 5 + r.nextInt(10), -5 + r.nextInt(10)));
                 }
                 for (m = 0; m < r.nextInt(2); m++) {
-                    down(x, y);
+                    down(new Point(x, y));
                 }
             }
         }
     }
 
-    public void up(int x, int y) {
+    public void up(Point p) {
         synchronized (this) {
-            setHeight(x, y, (byte) (getHeight(x, y) + 1));
-            conform(x, y);
+            setHeight(p, (byte) (getHeight(p) + 1));
+            conform(p);
         }
     }
 
-    public void down(int x, int y) {
+    public void down(Point p) {
         synchronized (this) {
-            setHeight(x, y, (byte) (Math.max(getHeight(x, y) - 1, 0)));
-            conform(x, y);
+            setHeight(p, (byte) (Math.max(getHeight(p) - 1, 0)));
+            conform(p);
         }
     }
 
     public void setTexture(Point p, int i) {
         tex[p.x][p.y] = i;
 
-        synchronized (this) {
-            texture.put(p, i);
-        }
+
     }
 
     private void difTex() {
@@ -247,84 +223,94 @@ public class HeightMap {
         }
     }
 
-    private void retexture(int x, int y, int r) {
-        for (int ex = x - r; ex < x + r; ex++) {
-            for (int wy = y - r; wy < y + r; wy++) {
+    private void retexture(Point p, int r) {
+        for (int ex = p.x - r; ex < p.x + r; ex++) {
+            for (int wy = p.y - r; wy < p.y + r; wy++) {
                 if (ex >= 0 && wy >= 0 && ex + 1 < width && wy + 1 < breadth) {
-                    if (getHeight(ex, wy) == 0 && getHeight(ex + 1, wy) == 0 && getHeight(ex, wy + 1) == 0 && getHeight(ex + 1, wy + 1) == 0) {
-                        setTexture(new Point(ex, wy), 0);
+                    Point p2 = new Point(ex, wy);
+                    if (isSea(p2)) {
+                        setTexture(p2, 0);
                     } else {
-                        setTexture(new Point(ex, wy), 1);
+                        setTexture(p2, 1);
                     }
                 }
             }
         }
     }
 
-    private void setHeight(int x, int y, byte height) {
-        if (inBounds(x, y)) {
-            b.put(bufPos(x, y), height);
+    private void setHeight(Point p, byte height) {
+        if (inBounds(p)) {
+            b.put(bufPos(p), height);
         }
     }
 
-    private void conform(int x, int y) {
-        conform(x, y, 1);
-    }
-
-    private void conform(int x, int y, int r) {
-        int ex, wy;
-        byte height = getHeight(x, y);
+    private void conform(Point p) {
+        byte height = getHeight(p);
         boolean bChanged = false;
-        for (ex = x - r; ex <= x + r; ex++) {
-            for (wy = y - r; wy <= y + r; wy++) {
-                if (ex >= 0 && ex <= width && wy >= 0 && wy <= breadth) {
-                    if (getHeight(ex, wy) - height > r) {
+        Point p1;
+        int r;
+        for (r = 1; r < 64; r++) {
+            bChanged = false;
+            for (Point offset : Helpers.rings[r]) {
+                p1 = new Point(p.x + offset.x, p.y + offset.y);
+                if (bounds.contains(p1)) {
+                    if (getHeight(p1) - height > r) {
                         bChanged = true;
-                        setHeight(ex, wy, (byte) (height + r));
-                    } else if (height - getHeight(ex, wy) > r) {
+                        setHeight(p1, (byte) (height + r));
+                    } else if (height - getHeight(p1) > r) {
                         bChanged = true;
-                        setHeight(ex, wy, (byte) (height - r));
+                        setHeight(p1, (byte) (height - r));
                     }
                 }
             }
-        }
-        if (bChanged) {
-            conform(x, y, (byte) (r + 1));
-        } else {
-            markDirty(new Rectangle(x - r + 1, y - r + 1, r * 2 - 1, r * 2 - 1));
-            retexture(x, y, r);
+
+            if (!bChanged) {
+                markDirty(new Rectangle(p.x - r + 1, p.y - r + 1, r * 2 - 1, r * 2 - 1));
+                retexture(p, r);
+                return;
+            }
         }
     }
 
-    public boolean isFlat(int x, int y) {
-        int ha = 0, hb = 0, hc = 0, hd = 0;
-        if (x < 0 || y < 0 || x + 1 >= width || y + 1 >= breadth) {
+    public boolean isSea(Point p) {
+        if (p.x < 0 || p.y < 0 || p.x + 1 >= width || p.y + 1 >= breadth) {
             return false;
         }
-        ha = getHeight(x, y);
-        hb = getHeight(x, y + 1);
-        hc = getHeight(x + 1, y);
-        hd = getHeight(x + 1, y + 1);
+        return (0 == getHeight(p) &&
+                0 == getHeight(new Point(p.x, p.y + 1)) &&
+                0 == getHeight(new Point(p.x + 1, p.y)) &&
+                0 == getHeight(new Point(p.x + 1, p.y + 1)));
+    }
+
+    public boolean isFlat(Point p) {
+        int ha = 0,  hb = 0,  hc = 0, hd = 0;
+        if (p.x < 0 || p.y < 0 || p.x + 1 >= width || p.y + 1 >= breadth) {
+            return false;
+        }
+        ha = getHeight(p);
+        hb = getHeight(new Point(p.x, p.y + 1));
+        hc = getHeight(new Point(p.x + 1, p.y));
+        hd = getHeight(new Point(p.x + 1, p.y + 1));
         return (ha == hb && hb == hc && hc == hd);
     }
 
-    private void markDirty(int x, int y) {
+    private void markDirty(Point p) {
         if (dirty == null) {
-            dirty = new Rectangle(x, y);
+            dirty = new Rectangle(p);
         }
-        if (x < dirty.x) {
-            dirty.width += dirty.x - x;
-            dirty.x = x;
+        if (p.x < dirty.x) {
+            dirty.width += dirty.x - p.x;
+            dirty.x = p.x;
         }
-        if (x > dirty.x + dirty.width) {
-            dirty.width = x - dirty.x;
+        if (p.x > dirty.x + dirty.width) {
+            dirty.width = p.x - dirty.x;
         }
-        if (y < dirty.y) {
-            dirty.height += dirty.y - y;
-            dirty.y = y;
+        if (p.y < dirty.y) {
+            dirty.height += dirty.y - p.y;
+            dirty.y = p.y;
         }
-        if (y > dirty.height) {
-            dirty.height = y - dirty.y;
+        if (p.y > dirty.height) {
+            dirty.height = p.y - dirty.y;
         }
         dirty = dirty.intersection(bounds);
     }

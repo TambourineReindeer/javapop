@@ -262,7 +262,7 @@ public class HeightMap {
 
     public Vector2 getSlope(float x, float y) {
         int x1, x2, y1, y2;
-        float a, b, c, d, m;
+        float ha, hb, hc, hd, hm;
         x1 = (int) Math.floor(x);
         x2 = (int) Math.ceil(x);
         y1 = (int) Math.floor(y);
@@ -271,36 +271,36 @@ public class HeightMap {
         x = x - x1;
         y = y - y1;
 
-        a = getHeight(x1, y1);
-        b = getHeight(x1, y2);
-        c = getHeight(x2, y1);
-        d = getHeight(x2, y2);
+        ha = getHeight(x1, y1);
+        hb = getHeight(x1, y2);
+        hc = getHeight(x2, y1);
+        hd = getHeight(x2, y2);
 
-        if (a == b && b == c && c == d) {
+        if (ha == hb && hb == hc && hc == hd) {
             return new Vector2(0, 0);
         }
-        m = a;
-        if (b > a || c > a || d > a) {
-            m = a + 0.5f;
+        hm = ha;
+        if (hb > ha || hc > ha || hd > ha) {
+            hm = ha + 0.5f;
         }
-        if (b < a || c < a || d < a) {
-            m = a - 0.5f;
+        if (hb < ha || hc < ha || hd < ha) {
+            hm = ha - 0.5f;
         }
         if (y > x) {
             if (y > 1 - x) {
                 // BMD
-                return new Vector2(d - b, 2.0f * ((d + b) / 2.0f - m));
+                return new Vector2(hd - hb, 2.0f * ((hd + hb) / 2.0f - hm));
             } else {
                 // AMB
-                return new Vector2(2.0f * (m - (a + b) / 2.0f), b - a);
+                return new Vector2(2.0f * (hm - (ha + hb) / 2.0f), hb - ha);
             }
         } else {
             if (y > 1 - x) {
                 // CMD
-                return new Vector2(2.0f * ((c + d) / 2.0f - m), d - c);
+                return new Vector2(2.0f * ((hc + hd) / 2.0f - hm), hd - hc);
             } else {
                 // AMC
-                return new Vector2(c - a, 2.0f * (m - (a + c) / 2.0f));
+                return new Vector2(hc - ha, 2.0f * (hm - (ha + hc) / 2.0f));
             }
         }
     }

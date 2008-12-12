@@ -4,6 +4,8 @@
  */
 package com.novusradix.JavaPop.Messaging;
 
+import java.awt.Point;
+
 /**
  *
  * @author erinhowie
@@ -14,21 +16,20 @@ public class UpDown extends Message {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public int x,  y;
+	public Point p;
     public boolean primaryAction;
     
-    public UpDown(int x, int y, boolean primary) {
-        this.x = x;
-        this.y = y;
+    public UpDown(Point p, boolean primary) {
+        this.p = p;
         primaryAction = primary;
     }
 
     @Override
     public void execute() {
         if (primaryAction) {
-            serverGame.heightMap.up(x, y);
+            serverGame.heightMap.up(p);
         } else {
-            serverGame.heightMap.down(x, y);
+            serverGame.heightMap.down(p);
         }
     }
 }

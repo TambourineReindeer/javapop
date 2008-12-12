@@ -4,19 +4,19 @@
  */
 package com.novusradix.JavaPop.Client.Tools;
 
+import java.awt.Point;
+
 /**
  *
  * @author mom
  */
 public class LightningTool extends BaseTool {
-
-
-    public void PrimaryAction(int x, int y) {
+    
+    public void PrimaryAction(Point p) {
     }
 
-  
-    public void SecondaryAction(int x, int y) {
-        setTool(ToolType.RaiseLower);
+    public void SecondaryAction(Point p) {
+         setTool(ToolType.RaiseLower);
     }
  
 }

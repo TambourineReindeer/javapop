@@ -1,7 +1,9 @@
 package com.novusradix.JavaPop.Server;
 
+import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Messaging.HouseUpdate;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -28,19 +30,20 @@ public class Houses {
         hds = new Vector<HouseUpdate.Detail>();
     }
 
-    public void addHouse(int x, int y, int team, float strength) {
+    public void addHouse(Point p, int team, float strength) {
         synchronized (houses) {
-            if (canBuild(x, y)) {
-                houses.add(new House(x, y, team, strength));
+            if (canBuild(p)) {
+                houses.add(new House(p, team, strength));
             }
         }
     }
 
-    public boolean canBuild(int x, int y) {
-        if (x < 0 || y < 0 || x >= game.heightMap.getWidth() || y >= game.heightMap.getBreadth()) {
-            return false;
+    public boolean canBuild(Point p) {
+        if (game.heightMap.inBounds(p)) {
+            return (map[p.x][p.y] == EMPTY && game.heightMap.getHeight(p) > 0 && game.heightMap.isFlat(p));
+
         }
-        return (map[x][y] == EMPTY && game.heightMap.getHeight(x, y) > 0 && game.heightMap.isFlat(x, y));
+        return false;
     }
 
     public void step(float seconds) {
@@ -54,13 +57,13 @@ public class Houses {
             House h;
             for (; i.hasNext();) {
                 h = i.next();
-                if (game.heightMap.isFlat(h.pos.x, h.pos.y) && newmap[h.pos.x][h.pos.y] == 0) {
+                if (game.heightMap.isFlat(h.pos) && newmap[h.pos.x][h.pos.y] == 0) {
                     h.setLevel();
                     h.paintmap(newmap);
                     h.step(seconds);
                 } else {
                     i.remove();
-                    game.peons.addPeon(h.pos.x, h.pos.y, h.strength);
+                    game.peons.addPeon(h.pos.x + 0.5f, h.pos.y + 0.5f, h.strength);
                     hds.add(new HouseUpdate.Detail(h.pos, 0, -1));
                 }
             }
@@ -79,25 +82,8 @@ public class Houses {
         }
     }
 
-    private void repaint() {
-        int x, y;
-        for (y = 0; y < game.heightMap.getBreadth(); y++) {
-            for (x = 0; x < game.heightMap.getWidth(); x++) {
-                if (newmap[x][y] != map[x][y]) {
-                    switch (newmap[x][y]) {
-                        case EMPTY:
-                            game.heightMap.setTexture(new Point(x, y), 1);
-                            break;
-                        default:
-                            game.heightMap.setTexture(new Point(x, y), 2);
-                    }
-                }
-            }
-        }
-    }
-
     private void paint() {
-        int x,  y;
+        int x, y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (map[x][y] != EMPTY) {
@@ -108,7 +94,7 @@ public class Houses {
     }
 
     private void unpaint() {
-        int x,  y;
+        int x, y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (map[x][y] != EMPTY) {
@@ -119,37 +105,20 @@ public class Houses {
     }
 
     public int countFlatLand(Point pos) {
-        int x,  y;
         int flat = 0;
-        int h = game.heightMap.getHeight(pos.x, pos.y);
+        int h = game.heightMap.getHeight(pos);
         for (int radius = 1; radius <= 3; radius++) {
-            y = -radius;
-            for (x = -radius; x < radius; x++) {
-                if (game.heightMap.getHeight(pos.x + x, pos.y + y) == h && game.heightMap.isFlat(pos.x + x, pos.y + y)) {
+            for (Point offset : Helpers.rings[radius]) {
+                Point p = new Point(pos.x + offset.x, pos.y + offset.y);
+
+                if (game.heightMap.getHeight(p) == h && game.heightMap.isFlat(p)) {
                     flat++;
                 }
             }
-            x = radius;
-            for (y = -radius; y < radius; y++) {
-                if (game.heightMap.getHeight(pos.x + x, pos.y + y) == h && game.heightMap.isFlat(pos.x + x, pos.y + y)) {
-                    flat++;
+                if (flat < (2 * radius + 1) * (2 * radius + 1) - 1) {
+                    break;
                 }
-            }
-            y = radius;
-            for (x = radius; x > -radius; x--) {
-                if (game.heightMap.getHeight(pos.x + x, pos.y + y) == h && game.heightMap.isFlat(pos.x + x, pos.y + y)) {
-                    flat++;
-                }
-            }
-            x = -radius;
-            for (y = radius; y > -radius; y--) {
-                if (game.heightMap.getHeight(pos.x + x, pos.y + y) == h && game.heightMap.isFlat(pos.x + x, pos.y + y)) {
-                    flat++;
-                }
-            }
-            if (flat < (2 * radius + 1) * (2 * radius + 1) - 1) {
-                break;
-            }
+            
         }
         return flat;
     }
@@ -158,7 +127,7 @@ public class Houses {
         if (houses != null) {
             for (House h : houses) {
                 gl.glPushMatrix();
-                gl.glTranslatef(h.pos.x, h.pos.y, game.heightMap.getHeight(h.pos.x, h.pos.y));
+                gl.glTranslatef(h.pos.x, h.pos.y, game.heightMap.getHeight(h.pos));
 
                 gl.glEnable(GL.GL_LIGHTING);
                 gl.glBegin(GL.GL_QUADS);
@@ -201,9 +170,9 @@ public class Houses {
         private float strength;
         private boolean changed;
 
-        public House(int x, int y, int team, float strength) {
+        public House(Point p, int team, float strength) {
             changed = true;
-            pos = new Point(x, y);
+            pos = p;
             level = 1;
             this.team = team;
             this.strength = strength;
@@ -221,34 +190,16 @@ public class Houses {
             if (level == 48) {
                 radiuslimit = 3;
             }
-            int x,  y;
 
-            int h = game.heightMap.getHeight(pos.x, pos.y);
+            int h = game.heightMap.getHeight(pos);
             for (int radius = 1; radius <= radiuslimit; radius++) {
-                y = -radius;
-                for (x = -radius; x < radius; x++) {
-                    if (game.heightMap.getHeight(pos.x + x, pos.y + y) == h && game.heightMap.isFlat(pos.x + x, pos.y + y)) {
-                        newmap[pos.x + x][pos.y + y] = FARM + team;
+                for (Point offset : Helpers.rings[radius]) {
+                    Point p = new Point(pos.x + offset.x, pos.y + offset.y);
+                    if (game.heightMap.getHeight(p) == h && game.heightMap.isFlat(p)) {
+                        newmap[p.x][p.y] = FARM + team;
                     }
                 }
-                x = radius;
-                for (y = -radius; y < radius; y++) {
-                    if (game.heightMap.getHeight(pos.x + x, pos.y + y) == h && game.heightMap.isFlat(pos.x + x, pos.y + y)) {
-                        newmap[pos.x + x][pos.y + y] = FARM + team;
-                    }
-                }
-                y = radius;
-                for (x = radius; x > -radius; x--) {
-                    if (game.heightMap.getHeight(pos.x + x, pos.y + y) == h && game.heightMap.isFlat(pos.x + x, pos.y + y)) {
-                        newmap[pos.x + x][pos.y + y] = FARM + team;
-                    }
-                }
-                x = -radius;
-                for (y = radius; y > -radius; y--) {
-                    if (game.heightMap.getHeight(pos.x + x, pos.y + y) == h && game.heightMap.isFlat(pos.x + x, pos.y + y)) {
-                        newmap[pos.x + x][pos.y + y] = FARM + team;
-                    }
-                }
+
             }
         }
 
@@ -262,7 +213,6 @@ public class Houses {
 
         private int calcLevel() {
             int l = countFlatLand(pos);
-
             return l;
         }
 

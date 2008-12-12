@@ -1,6 +1,7 @@
 package com.novusradix.JavaPop.Server;
 
 import com.novusradix.JavaPop.Math.Helpers;
+import com.novusradix.JavaPop.Math.MultiMap;
 import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.PeonUpdate;
 import java.awt.Point;
@@ -8,33 +9,36 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
 
-import javax.media.opengl.GL;
-
 public class Peons {
 
     public Game game;
 
     public enum State {
-
-        ALIVE, DEAD, SETTLED, WALKING, DROWNING
+        ALIVE, DEAD, SETTLED, WALKING, DROWNING, MERGING
     };
     private Vector<Peon> peons;
+    private MultiMap<Point, Peon> map;
     private int nextId = 0;
 
     public Peons(Game g) {
         game = g;
         peons = new Vector<Peon>();
+        map = new MultiMap<Point, Peon>();
     }
 
     public void addPeon(float x, float y, float strength) {
-        peons.add(new Peon(x, y, strength));
+        Peon p = new Peon(x, y, strength);
+        peons.add(p);
+        map.put(p.getPoint(), p);
     }
 
     public void step(float seconds) {
         if (peons != null) {
             Peon p;
+
             Vector<PeonUpdate.Detail> pds = new Vector<PeonUpdate.Detail>();
             PeonUpdate.Detail pd;
+
             for (Iterator<Peon> i = peons.iterator(); i.hasNext();) {
 
                 p = i.next();
@@ -44,12 +48,10 @@ public class Peons {
                     pds.add(pd);
                 }
                 switch (p.state) {
-                    case DEAD:
+                    case DEAD:   
+                    case SETTLED:                      
                         i.remove();
-                        break;
-                    case SETTLED:
-                        i.remove();
-                        game.houses.addHouse((int) p.pos.x, (int) p.pos.y, 1, p.strength);
+                        map.remove(p.getPoint(), p);
                         break;
                 }
             }
@@ -58,38 +60,6 @@ public class Peons {
                 pds.clear();
             }
         }
-    }
-
-    public void display(GL gl) {
-        for (Peon p : peons) {
-            gl.glPushMatrix();
-            gl.glTranslatef(p.pos.x, p.pos.y, game.heightMap.getHeight(p.pos.x, p.pos.y));
-            p.display(gl);
-            gl.glPopMatrix();
-        }
-    }
-
-    private Point findFlatLand(Vector2 start) {
-        // TODO Auto-generated method stub
-        Random r = new Random();
-        Point dest = new Point();
-        dest.x = r.nextInt(game.heightMap.getWidth());
-        dest.y = r.nextInt(game.heightMap.getBreadth());
-        int x, y;
-        for (Point[] ring : Helpers.rings) {
-            for (Point offset : ring) {
-                x = (int) start.x + offset.x;
-                y = (int) start.y + offset.y;
-                if (x >= 0 && x < game.heightMap.getWidth() && y >= 0 && y < game.heightMap.getBreadth()) {
-                    if (game.houses.canBuild(x, y)) {
-                        dest.x = (int) start.x + offset.x;
-                        dest.y = (int) start.y + offset.y;
-                        return dest;
-                    }
-                }
-            }
-        }
-        return dest;
     }
 
     private class Peon {
@@ -101,6 +71,10 @@ public class Peons {
         private State state;
         private float dx,  dy;
 
+        public Point getPoint() {
+            return new Point((int) Math.floor(pos.x), (int) Math.floor(pos.y));
+        }
+
         public Peon(float x, float y, float strength) {
             id = nextId++;
             pos = new Vector2(x, y);
@@ -109,16 +83,8 @@ public class Peons {
         }
 
         private PeonUpdate.Detail step(float seconds) {
-            // what can a peon do?
-            // drown, die of exhaustion, settle down?
 
-            // drown?
-            int x1, y1;
-
-            x1 = (int) Math.floor(pos.x);
-            y1 = (int) Math.floor(pos.y);
-
-
+            Point oldPos = getPoint();
             strength -= seconds;
             if (strength < 1) {
                 state = State.DEAD;
@@ -127,15 +93,16 @@ public class Peons {
 
             switch (state) {
                 case WALKING:
-                    if (game.heightMap.isFlat(x1, y1)) {
-                        if (game.heightMap.getHeight(x1, y1) == 0) {
-                            // you're drowning
-                            // increment a drowning clock and PREPARE TO DIE
-                            state = State.DROWNING;
-                            return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
-                        }
+                    if (game.heightMap.isSea(oldPos)) {
+                        state = State.DROWNING;
+                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);    
                     }
-                    if (x1 == dest.x && y1 == dest.y) {
+                    if (map.size(oldPos) > 1) {
+                        state = State.MERGING;
+                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                    }
+                    if (oldPos.equals(dest)) {
+
                         //Yay we're here
                         state = State.ALIVE;
                         return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
@@ -143,16 +110,21 @@ public class Peons {
 
                     pos.x += seconds * dx;
                     pos.y += seconds * dy;
+                    Point newPos = new Point((int) Math.floor(pos.x), (int) Math.floor(pos.y));
+                    if (!oldPos.equals(newPos)) {
+                        map.remove(oldPos, this);
+                        map.put(newPos, this);
+                    }
                     return null;
 
                 case ALIVE:
-                    if (game.houses.canBuild(x1, y1)) {
+                    if (game.houses.canBuild(oldPos)) {
                         state = State.SETTLED;
+                        game.houses.addHouse(oldPos, 1, strength);
                         return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
                     }
 
-                    dest = findFlatLand(pos);
-
+                    dest = findFlatLand(oldPos);
                     dx = dest.x + 0.5f - pos.x;
                     dy = dest.y + 0.5f - pos.y;
                     float dist = (float) Math.sqrt(dx * dx + dy * dy);
@@ -160,27 +132,48 @@ public class Peons {
                     dy = dy / dist;
                     state = State.WALKING;
                     return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                    
                 case DROWNING:
-                    if (!(game.heightMap.getHeight(x1, y1) == 0 && game.heightMap.isFlat(x1, y1))) {
+                    if (!(game.heightMap.getHeight(oldPos) == 0 && game.heightMap.isFlat(oldPos))) {
                         state = State.ALIVE;
                         return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
                     }
                     strength -= 10.0f * seconds;
                     return null;
+                    
+                case MERGING:
+                    if (map.size(oldPos) == 1) {
+                        state = State.ALIVE;
+                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                    }
+                    map.remove(oldPos, this);
+                    Peon other =
+                            map.get(oldPos).get(0);
+                    other.strength += strength;
+                    state = state.DEAD;
+                    return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
             }
             return null;
         }
 
-        private void display(GL gl) {
-            gl.glBegin(GL.GL_TRIANGLES);
-            gl.glColor3f(0, 0, 1);
-
-            gl.glVertex3f(0, 0, 0.3f);
-            gl.glVertex3f(0.1f, -0.1f, 0);
-            gl.glVertex3f(-0.1f, +0.1f, 0);
-
-            gl.glEnd();
-
+        private Point findFlatLand(Point start) {
+            // TODO Auto-generated method stub
+            Point p;
+            for (Point[] ring : Helpers.rings) {
+                for (Point offset : ring) {
+                    p = new Point(start.x + offset.x, start.y + offset.y);
+                    if (game.heightMap.inBounds(p)) {
+                        if (game.houses.canBuild(p)) {
+                            return p;
+                        }
+                    }
+                }
+            }
+            Random r = new Random();
+            p = new Point();
+            p.x = start.x + r.nextInt(5) - 2;
+            p.y = start.y + r.nextInt(5) - 2;
+            return p;
         }
     }
 }
