@@ -16,7 +16,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.nio.FloatBuffer;
-import java.util.Random;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
@@ -268,7 +267,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             x = current.x + offset.x;
             y = current.y + offset.y;
 
-            if (x > 0 && y > 0 && x < game.heightMap.getWidth() && y < game.heightMap.getBreadth()) {
+            if (x >= 0 && y >= 0 && x < game.heightMap.getWidth() && y < game.heightMap.getBreadth()) {
                 p = new Vector3(x, y, game.heightMap.getHeight(x, y));
                 d = Helpers.PointLineDistance(v0, v1, p);
                 if (d < oldD) {
