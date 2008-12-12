@@ -6,23 +6,22 @@
 package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Messaging.UpDown;
+import java.awt.Point;
 
 /**
  *
  * @author mom
  */
 public class RaiseLowerTool extends BaseTool {
-
-    private static RaiseLowerTool t;
     
 
-    public void PrimaryAction(int x, int y) {
-        client.sendMessage(new UpDown(x, y, true));
+    public void PrimaryAction(Point p) {
+        client.sendMessage(new UpDown(p, true));
     }
 
 
-    public void SecondaryAction(int x, int y) {
-        client.sendMessage(new UpDown(x, y, false));
+    public void SecondaryAction(Point p) {
+        client.sendMessage(new UpDown(p, false));
     }
 
 }

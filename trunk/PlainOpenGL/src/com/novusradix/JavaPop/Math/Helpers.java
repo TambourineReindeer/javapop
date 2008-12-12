@@ -8,10 +8,10 @@ public class Helpers {
     public static Point[][] rings;
     
     static {
-        rings = new Point[10][];
+        rings = new Point[64][];
         rings[0] = new Point[1];
         rings[0][0] = new Point(0,0);
-        for(int i=1;i<10;i++)
+        for(int i=1;i<64;i++)
         {
             rings[i] = new Point[8*i];
             for(int n=0;n<i*2;n++)

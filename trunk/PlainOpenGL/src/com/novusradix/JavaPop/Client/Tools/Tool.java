@@ -4,6 +4,8 @@
  */
 package com.novusradix.JavaPop.Client.Tools;
 
+import java.awt.Point;
+
 /**
  *
  * @author mom
@@ -11,7 +13,7 @@ package com.novusradix.JavaPop.Client.Tools;
 public interface Tool {
     enum ToolType {RaiseLower, Lightning};
     
-    public void PrimaryAction(int x, int y);
-    public void SecondaryAction(int x, int y);
+    public void PrimaryAction(Point p);
+    public void SecondaryAction(Point p);
   
 }
