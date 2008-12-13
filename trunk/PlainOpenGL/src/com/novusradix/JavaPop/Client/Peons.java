@@ -4,6 +4,8 @@ import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.PeonUpdate.Detail;
 import com.novusradix.JavaPop.Server.Peons.State;
 import java.awt.Point;
+import java.sql.Time;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,15 +81,25 @@ public class Peons {
         }
 
         private void display(GL gl) {
-            gl.glBegin(GL.GL_TRIANGLES);
+            gl.glPushMatrix();
+            Date d = new Date();
+            long t = (this.hashCode() + d.getTime()) % 1000;
+            float f = t/100.0f;
+            switch(state)
+            {
+                case DROWNING:
+                gl.glTranslatef(0.0f, 0.0f,(float) Math.sin(f)/2.0f+0.1f);
+                default:
+          
+            }
+              gl.glBegin(GL.GL_TRIANGLES);
             gl.glColor3f(0, 0, 1);
 
             gl.glVertex3f(0, 0, 0.3f);
             gl.glVertex3f(0.1f, -0.1f, 0);
             gl.glVertex3f(-0.1f, +0.1f, 0);
 
-            gl.glEnd();
-
+            gl.glEnd();gl.glPopMatrix();
         }
 
         public void step(float seconds) {
