@@ -18,6 +18,7 @@ public class PeonUpdate extends Message {
 
     Vector<Detail> details;
 
+    @SuppressWarnings("unchecked")
     public PeonUpdate(Vector<Detail> pds) {
         details = (Vector<Detail>) pds.clone();
     }
@@ -36,14 +37,16 @@ public class PeonUpdate extends Message {
         public float dx,  dy;
         public Point dest;
         public Vector2 pos;
+        public int playerId;
 
-        public Detail(int id, Peons.State state, Vector2 pos, Point dest, float dx, float dy) {
+        public Detail(int id, Peons.State state, Vector2 pos, Point dest, float dx, float dy, int playerId) {
             this.id = id;
             this.state = state;
             this.dx = dx;
             this.dy = dy;
             this.dest = dest;
             this.pos = pos;
+            this.playerId = playerId;
         }
 
         @Override

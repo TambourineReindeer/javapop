@@ -5,7 +5,6 @@
 package com.novusradix.JavaPop.Server;
 
 import com.novusradix.JavaPop.Math.Helpers;
-import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import java.util.Random;
 import com.sun.opengl.util.BufferUtil;
@@ -15,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.Math.*;
 /**
  *
  * @author mom
@@ -201,7 +201,7 @@ public class HeightMap {
 
     public void down(Point p) {
         synchronized (this) {
-            setHeight(p, (byte) (Math.max(getHeight(p) - 1, 0)));
+            setHeight(p, (byte) (max(getHeight(p) - 1, 0)));
             conform(p);
         }
     }

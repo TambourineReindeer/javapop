@@ -5,11 +5,9 @@
 package com.novusradix.JavaPop.Math;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,12 +16,13 @@ import java.util.Set;
  */
 public class MultiMap<K, V> {
 
-    private HashMap<K, Set<V>> m;
+    private HashMap<K, HashSet<V>> m;
 
     public MultiMap() {
-        m = new HashMap<K, Set<V>>();
+        m = new HashMap<K, HashSet<V>>();
     }
 
+    @SuppressWarnings("unchecked")
     public void put(K key, V value) {
         if (m.containsKey(key)) {
             if(!m.get(key).add(value))

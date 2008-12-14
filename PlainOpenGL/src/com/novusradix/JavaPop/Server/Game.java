@@ -73,8 +73,10 @@ public class Game extends TimerTask {
         peons = new Peons(this);
         houses = new Houses(this);
 
-        peons.addPeon(2.5f, 2.5f, 200);
-
+        for(Player p:players)
+        {
+            peons.addPeon(2.5f, 2.5f, 200,players.get(0));
+        }
         GameStarted go = new GameStarted(this);
         server.sendAllPlayers(go);
         HeightMapUpdate m = heightMap.GetUpdate();

@@ -9,11 +9,14 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
 
+import static java.lang.Math.*;
+
 public class Peons {
 
     public Game game;
 
     public enum State {
+
         ALIVE, DEAD, SETTLED, WALKING, DROWNING, MERGING
     };
     private Vector<Peon> peons;
@@ -26,10 +29,14 @@ public class Peons {
         map = new MultiMap<Point, Peon>();
     }
 
-    public void addPeon(float x, float y, float strength) {
-        Peon p = new Peon(x, y, strength);
+    public void addPeon(float x, float y, float strength, Player player) {
+        Peon p = new Peon(x, y, strength, player);
         peons.add(p);
         map.put(p.getPoint(), p);
+    }
+    
+    public void addPeon(int x, int y, float strength, Player player) {
+        addPeon(x+0.5f,y+0.5f, strength, player);
     }
 
     public void step(float seconds) {
@@ -48,8 +55,8 @@ public class Peons {
                     pds.add(pd);
                 }
                 switch (p.state) {
-                    case DEAD:   
-                    case SETTLED:                      
+                    case DEAD:
+                    case SETTLED:
                         i.remove();
                         map.remove(p.getPoint(), p);
                         break;
@@ -70,16 +77,18 @@ public class Peons {
         private Point dest; // destination to walk to.
         private State state;
         private float dx,  dy;
+        private Player player;
 
         public Point getPoint() {
-            return new Point((int) Math.floor(pos.x), (int) Math.floor(pos.y));
+            return new Point((int) floor(pos.x), (int) floor(pos.y));
         }
 
-        public Peon(float x, float y, float strength) {
+        public Peon(float x, float y, float strength, Player p) {
             id = nextId++;
             pos = new Vector2(x, y);
             this.strength = strength;
             state = State.ALIVE;
+            player = p;
         }
 
         private PeonUpdate.Detail step(float seconds) {
@@ -88,29 +97,29 @@ public class Peons {
             strength -= seconds;
             if (strength < 1) {
                 state = State.DEAD;
-                return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
             }
 
             switch (state) {
                 case WALKING:
                     if (game.heightMap.isSea(oldPos)) {
                         state = State.DROWNING;
-                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);    
+                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
                     }
                     if (map.size(oldPos) > 1) {
                         state = State.MERGING;
-                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
                     }
                     if (oldPos.equals(dest)) {
 
                         //Yay we're here
                         state = State.ALIVE;
-                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
                     }
 
                     pos.x += seconds * dx;
                     pos.y += seconds * dy;
-                    Point newPos = new Point((int) Math.floor(pos.x), (int) Math.floor(pos.y));
+                    Point newPos = new Point((int) floor(pos.x), (int) floor(pos.y));
                     if (!oldPos.equals(newPos)) {
                         map.remove(oldPos, this);
                         map.put(newPos, this);
@@ -120,38 +129,45 @@ public class Peons {
                 case ALIVE:
                     if (game.houses.canBuild(oldPos)) {
                         state = State.SETTLED;
-                        game.houses.addHouse(oldPos, 1, strength);
-                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                        game.houses.addHouse(oldPos, player, strength);
+                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
                     }
-
-                    dest = findFlatLand(oldPos);
+                    switch (player.peonMode) {
+                        case SETTLE:
+                            dest = findFlatLand(oldPos);
+                            break;
+                        case ANKH:
+                            dest = player.info.ankh;
+                            break;
+                        default:
+                    }
                     dx = dest.x + 0.5f - pos.x;
                     dy = dest.y + 0.5f - pos.y;
-                    float dist = (float) Math.sqrt(dx * dx + dy * dy);
+                    float dist = (float) sqrt(dx * dx + dy * dy);
                     dx = dx / dist;
                     dy = dy / dist;
                     state = State.WALKING;
-                    return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
-                    
+                    return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
+
                 case DROWNING:
                     if (!(game.heightMap.getHeight(oldPos) == 0 && game.heightMap.isFlat(oldPos))) {
                         state = State.ALIVE;
-                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
                     }
                     strength -= 10.0f * seconds;
                     return null;
-                    
+
                 case MERGING:
                     if (map.size(oldPos) == 1) {
                         state = State.ALIVE;
-                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
                     }
                     map.remove(oldPos, this);
                     Peon other =
                             map.get(oldPos).get(0);
                     other.strength += strength;
                     state = state.DEAD;
-                    return new PeonUpdate.Detail(id, state, pos, dest, dx, dy);
+                    return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
             }
             return null;
         }

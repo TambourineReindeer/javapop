@@ -57,8 +57,9 @@ public class Houses {
                         gl.glScalef(1.0f, 1.0f, 2.0f);
                     }
                     gl.glEnable(GL.GL_LIGHTING);
-                    gl.glBegin(GL.GL_QUADS);
                     gl.glColor3f(1, 1, 1);
+                    gl.glBegin(GL.GL_QUADS);
+
                     gl.glNormal3f(-1, 0, 0);
                     gl.glVertex3f(-0.3f, -0.3f, 0.0f);
                     gl.glVertex3f(-0.3f, 0.3f, 0.0f);

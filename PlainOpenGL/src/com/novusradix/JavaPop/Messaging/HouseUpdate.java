@@ -4,6 +4,7 @@
  */
 package com.novusradix.JavaPop.Messaging;
 
+import com.novusradix.JavaPop.Server.Player;
 import java.awt.Point;
 import java.io.Serializable;
 import java.util.Vector;
@@ -16,6 +17,7 @@ public class HouseUpdate extends Message {
 
     public Vector<Detail> details;
 
+    @SuppressWarnings("unchecked")
     public HouseUpdate(Vector<Detail> ds) {
         details = (Vector<Detail>) ds.clone();
     }
@@ -23,7 +25,7 @@ public class HouseUpdate extends Message {
     @Override
     public void execute() {
         for (Detail d : details) {
-            client.game.houses.updateHouse(d.pos, d.team, d.level);
+            client.game.houses.updateHouse(d.pos, d.playerId, d.level);
         }
     }
 
@@ -31,11 +33,11 @@ public class HouseUpdate extends Message {
 
         Point pos;
         int level;
-        int team;
+        int playerId;
 
-        public Detail(Point pos, int team, int level) {
+        public Detail(Point pos, Player p, int level) {
             this.pos = pos;
-            this.team = team;
+            this.playerId = p.getId();
             this.level = level;
         }
     }

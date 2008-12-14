@@ -4,12 +4,11 @@ import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.PeonUpdate.Detail;
 import com.novusradix.JavaPop.Server.Peons.State;
 import java.awt.Point;
-import java.sql.Time;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.media.opengl.GL;
+
+import static java.lang.Math.*;
 
 public class Peons {
 
@@ -63,13 +62,15 @@ public class Peons {
         private Point dest;
         private float dx,  dy;
         private State state;
-
+        private Player player;
+        
         public Peon(Detail d) {
             pos = d.pos;
             dest = d.dest;
             dx = d.dx;
             dy = d.dy;
             state = d.state;
+            player = game.players.get(d.playerId);
         }
 
         public void Update(Detail d) {
@@ -85,12 +86,15 @@ public class Peons {
             time += hashCode();
             switch (state) {
                 case DROWNING:
-                    gl.glTranslatef(0.0f, 0.0f, (float) Math.abs(Math.sin(time * 4.0f) / 2.0f + 0.1f));
+                    gl.glTranslatef(0.0f, 0.0f, (float) abs(sin(time * 4.0f) / 2.0f + 0.1f));
                 default:
 
             }
+            gl.glDisable(GL.GL_LIGHTING);
+            gl.glColor3fv(player.colour, 0);
+            
             gl.glBegin(GL.GL_TRIANGLES);
-            gl.glColor3f(0, 0, 1);
+
 
             gl.glVertex3f(0, 0, 0.3f);
             gl.glVertex3f(0.1f, -0.1f, 0);

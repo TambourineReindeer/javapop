@@ -27,7 +27,7 @@ public class Server implements Runnable {
     private boolean keepAlive = true;
     Announcer a;
     ServerForm form;
-    ServerSocket s;
+    private ServerSocket s;
 
     public void main(){
         new Server(13579);
