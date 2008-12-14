@@ -1,0 +1,13 @@
+#summary The necessary steps to add a new spell or tool
+
+  # Add a new enum value to ToolType in the Client.Tools.Tool interface.
+  # Make a new class for your tool in Client.Tools, extending BaseTool.
+  # Add an instance of your new class to the BaseTool.tools collection in `BaseTool.Initialise`. This is the link between the enum and your actual tool.
+  # Make an icon. Current icons are 64x64 png images in com.novusradix.javapop.icons
+  # Add a JToggle button in ControlPalette.
+    * Assign the icon
+    * Add a tooltip
+    * Add it to the ToolGroup button group
+    * Create an action method that calls `BaseTool.setTool(ToolType.MyNewTool, false);` (Double click it the button in Netbeans to create the method, then fill it in.)
+
+In most cases I imagine you'll also want to create a new Message subtype and send an instance in the tool's PrimaryAction method if the spell is to execute on the server.
