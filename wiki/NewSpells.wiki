@@ -11,3 +11,5 @@
     * Create an action method that calls `BaseTool.setTool(ToolType.MyNewTool, false);` (Double click it the button in Netbeans to create the method, then fill it in.)
 
 In most cases I imagine you'll also want to create a new Message subtype and send an instance in the tool's `PrimaryAction` method if the spell is to execute on the server.
+
+n.b. I think this is currently too many steps (hence the documentation!) and as I add more tools this will probably become more programmatic.
