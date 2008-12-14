@@ -23,6 +23,8 @@ import com.sun.opengl.util.texture.TextureIO;
 import java.awt.Point;
 import java.util.Map.Entry;
 
+import static java.lang.Math.*;
+
 public class HeightMap {
 
     private final int width,  breadth;
@@ -272,10 +274,10 @@ public class HeightMap {
     public Vector2 getSlope(float x, float y) {
         int x1, x2, y1, y2;
         float ha, hb, hc, hd, hm;
-        x1 = (int) Math.floor(x);
-        x2 = (int) Math.ceil(x);
-        y1 = (int) Math.floor(y);
-        y2 = (int) Math.ceil(y);
+        x1 = (int) floor(x);
+        x2 = (int) ceil(x);
+        y1 = (int) floor(y);
+        y2 = (int) ceil(y);
 
         x = x - x1;
         y = y - y1;
@@ -344,7 +346,7 @@ public class HeightMap {
             return;
         }
         float m;
-        m = Math.max(Math.max(getHeight(x, y), getHeight(x, y + 1)), Math.max(getHeight(x + 1, y), getHeight(x + 1, y + 1))) + Math.min(Math.min(getHeight(x, y), getHeight(x, y + 1)), Math.min(getHeight(x + 1, y), getHeight(x + 1, y + 1)));
+        m = max(max(getHeight(x, y), getHeight(x, y + 1)), max(getHeight(x + 1, y), getHeight(x + 1, y + 1))) + min(min(getHeight(x, y), getHeight(x, y + 1)), min(getHeight(x + 1, y), getHeight(x + 1, y + 1)));
 
         try {
             b.put(bufPos(x, y, 2, VZ), m * 0.5f);

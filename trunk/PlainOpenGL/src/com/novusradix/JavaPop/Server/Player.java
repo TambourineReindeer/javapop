@@ -22,6 +22,11 @@ import java.util.logging.Logger;
  */
 public class Player implements Runnable {
 
+    private static float[][] defaultColors={{0,0,1},{1,0,0},{0,1,0}};
+    
+    public enum PeonMode {
+        SETTLE, ANKH, FIGHT, GROUP
+    }
     public Server s;
     public Socket socket;
     public Game currentGame;
@@ -31,20 +36,22 @@ public class Player implements Runnable {
     private int id;
     public boolean ready = false;
     Info info;
+    PeonMode peonMode;
 
     public Player(Server s, Socket sock) {
         this.s = s;
         this.socket = sock;
         id = nextId++;
-        info = new Info(id, "Player " + id, new Point(0, 0), new float[]{0,0,1});
+        info = new Info(id, "Player " + id, new Point(0, 0), defaultColors[id]);
+        peonMode = PeonMode.SETTLE;
         try {
             socket.setTcpNoDelay(true);
             oos = new ObjectOutputStream(socket.getOutputStream());
             oos.flush();
             ois = new ObjectInputStream(socket.getInputStream());
-            
+
             oos.writeObject(info);
-            
+
             (new Thread(this, "Server Player")).start();
             sendMessage(new GameList(s.getGames()));
         } catch (IOException ioe) {
@@ -101,13 +108,13 @@ public class Player implements Runnable {
         }
     }
 
-    public static class Info implements Serializable{
+    public static class Info implements Serializable {
 
         public int id;
         public String name;
         public Point ankh;
         public float[] colour;
-        
+
         private Info(int id, String name, Point ankh, float[] colour) {
             this.id = id;
             this.name = name;

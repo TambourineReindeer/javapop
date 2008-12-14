@@ -3,11 +3,11 @@ package com.novusradix.JavaPop.Server;
 import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Messaging.HouseUpdate;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.util.Iterator;
 import java.util.Vector;
 
 import javax.media.opengl.GL;
+import static java.lang.Math.*;
 
 public class Houses {
 
@@ -30,10 +30,10 @@ public class Houses {
         hds = new Vector<HouseUpdate.Detail>();
     }
 
-    public void addHouse(Point p, int team, float strength) {
+    public void addHouse(Point p, Player player, float strength) {
         synchronized (houses) {
             if (canBuild(p)) {
-                houses.add(new House(p, team, strength));
+                houses.add(new House(p, player, strength));
             }
         }
     }
@@ -63,8 +63,8 @@ public class Houses {
                     h.step(seconds);
                 } else {
                     i.remove();
-                    game.peons.addPeon(h.pos.x + 0.5f, h.pos.y + 0.5f, h.strength);
-                    hds.add(new HouseUpdate.Detail(h.pos, 0, -1));
+                    game.peons.addPeon(h.pos.x, h.pos.y, h.strength,h.player);
+                    hds.add(new HouseUpdate.Detail(h.pos, h.player, -1));
                 }
             }
         }
@@ -115,10 +115,10 @@ public class Houses {
                     flat++;
                 }
             }
-                if (flat < (2 * radius + 1) * (2 * radius + 1) - 1) {
-                    break;
-                }
-            
+            if (flat < (2 * radius + 1) * (2 * radius + 1) - 1) {
+                break;
+            }
+
         }
         return flat;
     }
@@ -166,20 +166,20 @@ public class Houses {
 
         private Point pos;
         private int level;
-        private int team;
+        private Player player;
         private float strength;
         private boolean changed;
 
-        public House(Point p, int team, float strength) {
+        public House(Point p, Player player, float strength) {
             changed = true;
             pos = p;
             level = 1;
-            this.team = team;
+            this.player = player;
             this.strength = strength;
         }
 
         private void paintmap(int[][] newmap) {
-            newmap[pos.x][pos.y] = HOUSE + team;
+            newmap[pos.x][pos.y] = HOUSE;
             int radiuslimit = 0;
             if (level > 0) {
                 radiuslimit = 1;
@@ -196,7 +196,7 @@ public class Houses {
                 for (Point offset : Helpers.rings[radius]) {
                     Point p = new Point(pos.x + offset.x, pos.y + offset.y);
                     if (game.heightMap.getHeight(p) == h && game.heightMap.isFlat(p)) {
-                        newmap[p.x][p.y] = FARM + team;
+                        newmap[p.x][p.y] = FARM;
                     }
                 }
 
@@ -221,14 +221,14 @@ public class Houses {
 
             strength += rate * seconds;
             if (strength > rate * 100.0f) {
-                float houseStrength = rate * 100.0f - Math.min(500.0f, rate * 100.0f / 2.0f);
-                game.peons.addPeon(pos.x, pos.y, strength - houseStrength);
+                float houseStrength = rate * 100.0f - min(500.0f, rate * 100.0f / 2.0f);
+                game.peons.addPeon(pos.x, pos.y, strength - houseStrength, player);
                 strength = houseStrength;
             }
 
             if (changed) {
                 changed = false;
-                hds.add(new HouseUpdate.Detail(pos, team, level));
+                hds.add(new HouseUpdate.Detail(pos, player, level));
             }
         }
     }

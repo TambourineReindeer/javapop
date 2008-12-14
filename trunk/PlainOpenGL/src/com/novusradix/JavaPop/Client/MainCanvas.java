@@ -24,7 +24,7 @@ import javax.media.opengl.GLEventListener;
 
 
 import java.awt.event.MouseWheelListener;
-import java.util.Date;
+import static java.lang.Math.*;
 
 public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener, MouseMotionListener, MouseListener, MouseWheelListener {
 
@@ -41,11 +41,11 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Matrix4 mvpInverse;
     private Game game;
     private long startMillis;
-    
+
     public MainCanvas(GLCapabilities caps, Game g) {
         super(caps);
-    
-       
+
+
         startMillis = System.currentTimeMillis();
         this.game = g;
         mvpInverse = new Matrix4();
@@ -100,10 +100,10 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         gl.glEnable(GL.GL_BLEND);
         gl.glEnable(GL.GL_MULTISAMPLE);
-        
 
-        double time = (System.currentTimeMillis()-startMillis)/1000.0;
-        
+
+        double time = (System.currentTimeMillis() - startMillis) / 1000.0;
+
         game.heightMap.display(gl, time);
         game.peons.display(gl, time);
         game.houses.display(gl, time);
@@ -205,7 +205,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     public void keyPressed(final KeyEvent e) {
         // TODO Auto-generated method stub
-
     }
 
     public void keyReleased(final KeyEvent e) {
@@ -250,8 +249,8 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             s.scaleAdd(l, z1, z0);
 
 
-            selected.x = Math.max(Math.min((int) Math.round(s.x), game.heightMap.getWidth() - 1), 0);
-            selected.y = Math.max(Math.min((int) Math.round(s.y), game.heightMap.getBreadth() - 1), 0);
+            selected.x = max(min((int) Math.round(s.x), game.heightMap.getWidth() - 1), 0);
+            selected.y = max(min((int) Math.round(s.y), game.heightMap.getBreadth() - 1), 0);
 
 
             selected = iterateSelection(selected, v0n, v1n);
@@ -307,7 +306,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     public void mouseReleased(MouseEvent e) {
         // TODO Auto-generated method stub
-        if (Math.abs(e.getX() - dragOrigin.x) < 16 && Math.abs(e.getY() - dragOrigin.y) < 16) {
+        if (abs(e.getX() - dragOrigin.x) < 16 && abs(e.getY() - dragOrigin.y) < 16) {
             boolean primary;
             if (e.getButton() == MouseEvent.BUTTON1) {
                 if ((e.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) != 0) {
