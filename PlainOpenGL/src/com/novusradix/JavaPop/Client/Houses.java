@@ -36,14 +36,15 @@ public class Houses {
         }
     }
 
-    public boolean canBuild(int x, int y) {
-        if (x < 0 || y < 0 || x >= game.heightMap.getWidth() || y >= game.heightMap.getBreadth()) {
-            return false;
-        }
-        return (map[x][y] == EMPTY && game.heightMap.getHeight(x, y) > 0 && game.heightMap.isFlat(x, y));
-    }
+    public boolean canBuild(Point p) {
+        if (game.heightMap.inBounds(p)) {
+            return (map[p.x][p.y] == EMPTY && game.heightMap.getHeight(p) > 0 && game.heightMap.isFlat(p));
 
-    public void display(GL gl) {
+        }
+        return false;
+    }    
+
+    public void display(GL gl, double time) {
         synchronized (houses) {
             if (houses != null) {
                 for (House h : houses.values()) {

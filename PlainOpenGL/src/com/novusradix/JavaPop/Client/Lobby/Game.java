@@ -8,6 +8,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
 
 import com.novusradix.JavaPop.Server.GameInfo;
+import com.novusradix.JavaPop.Server.Player.Info;
 
 /**
  *
@@ -25,8 +26,8 @@ public class Game {
     Game(GameInfo gi) {
         id = gi.id;
         playerList = new DefaultListModel();
-        for (String player : gi.players) {
-            playerList.addElement(player);
+        for (Info player : gi.players.values()) {
+            playerList.addElement(player.name);
         }
     }
 
@@ -37,8 +38,8 @@ public class Game {
     void update(GameInfo gi) {
 
         playerList.clear();
-        for (String player : gi.players) {
-            playerList.addElement(player);
+        for (Info player : gi.players.values()) {
+            playerList.addElement(player.name);
         }
     }
 }

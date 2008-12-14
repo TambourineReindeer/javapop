@@ -31,18 +31,18 @@ public class Peons {
                 }
             } else {
                 if (!(d.state == State.DEAD || d.state == State.SETTLED)) {
-                peons.put(d.id, new Peon(d));
+                    peons.put(d.id, new Peon(d));
                 }
             }
         }
     }
 
-    public void display(GL gl) {
+    public void display(GL gl, double time) {
         synchronized (peons) {
             for (Peon p : peons.values()) {
                 gl.glPushMatrix();
                 gl.glTranslatef(p.pos.x, p.pos.y, game.heightMap.getHeight(p.pos.x, p.pos.y));
-                p.display(gl);
+                p.display(gl, time);
                 gl.glPopMatrix();
             }
         }
@@ -80,26 +80,24 @@ public class Peons {
             state = d.state;
         }
 
-        private void display(GL gl) {
+        private void display(GL gl, double time) {
             gl.glPushMatrix();
-            Date d = new Date();
-            long t = (this.hashCode() + d.getTime()) % 1000;
-            float f = t/100.0f;
-            switch(state)
-            {
+            time += hashCode();
+            switch (state) {
                 case DROWNING:
-                gl.glTranslatef(0.0f, 0.0f,(float) Math.sin(f)/2.0f+0.1f);
+                    gl.glTranslatef(0.0f, 0.0f, (float) Math.abs(Math.sin(time * 4.0f) / 2.0f + 0.1f));
                 default:
-          
+
             }
-              gl.glBegin(GL.GL_TRIANGLES);
+            gl.glBegin(GL.GL_TRIANGLES);
             gl.glColor3f(0, 0, 1);
 
             gl.glVertex3f(0, 0, 0.3f);
             gl.glVertex3f(0.1f, -0.1f, 0);
             gl.glVertex3f(-0.1f, +0.1f, 0);
 
-            gl.glEnd();gl.glPopMatrix();
+            gl.glEnd();
+            gl.glPopMatrix();
         }
 
         public void step(float seconds) {

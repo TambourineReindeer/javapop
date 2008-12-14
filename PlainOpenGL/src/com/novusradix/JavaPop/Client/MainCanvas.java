@@ -1,6 +1,5 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Renders the main game view, and reacts to user input.
  */
 package com.novusradix.JavaPop.Client;
 
@@ -25,11 +24,13 @@ import javax.media.opengl.GLEventListener;
 
 
 import java.awt.event.MouseWheelListener;
+import java.util.Date;
 
 public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener, MouseMotionListener, MouseListener, MouseWheelListener {
 
     /**
      *
+     * @author gef
      */
     private static final long serialVersionUID = 1L;
     private static final float fHeightScale = 0.4082f;
@@ -39,10 +40,13 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Point selected;
     private Matrix4 mvpInverse;
     private Game game;
- 
+    private long startMillis;
+    
     public MainCanvas(GLCapabilities caps, Game g) {
         super(caps);
+    
        
+        startMillis = System.currentTimeMillis();
         this.game = g;
         mvpInverse = new Matrix4();
 
@@ -96,11 +100,14 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         gl.glEnable(GL.GL_BLEND);
         gl.glEnable(GL.GL_MULTISAMPLE);
+        
 
-        game.heightMap.display(gl);
-        game.peons.display(gl);
-        game.houses.display(gl);
-
+        double time = (System.currentTimeMillis()-startMillis)/1000.0;
+        
+        game.heightMap.display(gl, time);
+        game.peons.display(gl, time);
+        game.houses.display(gl, time);
+        game.me.display(gl, time);
         displayCursor(gl);
 
         gl.glPopMatrix();
@@ -256,7 +263,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         Vector3 p;
 
         float d, oldD;
-        p = new Vector3(current.x, current.y, game.heightMap.getHeight(current.x, current.y));
+        p = new Vector3(current.x, current.y, game.heightMap.getHeight(current));
         d = Helpers.PointLineDistance(v0, v1, p);
         oldD = d;
 

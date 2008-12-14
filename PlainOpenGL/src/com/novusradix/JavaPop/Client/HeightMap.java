@@ -1,3 +1,8 @@
+/*
+ * This class is the client side map. It specifies creation, response to server update messages, and rendering.
+ * Other client classes can also query points on the map.
+ */
+
 package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Math.Helpers;
@@ -175,6 +180,9 @@ public class HeightMap {
     public boolean inBounds(int x, int y) {
         return (x >= 0 && y >= 0 && x < width && y < breadth);
     }
+    public boolean inBounds(Point p) {
+        return (p.x >= 0 && p.y >= 0 && p.x < width && p.y < breadth);
+    }
 
     public int getWidth() {
         return width;
@@ -192,8 +200,9 @@ public class HeightMap {
         return p.y * rowstride + p.x * tilestride + vertex * vertexstride + index;
     }
 
-    public int getHeight(int x, int y) {
-
+    public int getHeight(Point p) {
+    int x,y;
+    x=p.x; y=p.y;
         if (x == width - 1 && y == breadth - 1) {
             return (int) b.get(bufPos(x - 1, y - 1, 4, VZ));
         }
@@ -230,10 +239,10 @@ public class HeightMap {
         x = x - x1;
         y = y - y1;
 
-        ha = getHeight(x1, y1);
-        hb = getHeight(x1, y2);
-        hc = getHeight(x2, y1);
-        hd = getHeight(x2, y2);
+        ha = getHeight(new Point(x1, y1));
+        hb = getHeight(new Point(x1, y2));
+        hc = getHeight(new Point(x2, y1));
+        hd = getHeight(new Point(x2, y2));
         hm = ha;
         if (hb > ha || hc > ha || hd > ha) {
             hm = ha + 0.5f;
@@ -413,19 +422,20 @@ public class HeightMap {
         }
     }
 
-    public boolean isFlat(int x, int y) {
+    public boolean isFlat(Point p) {
+        int x,y;x=p.x;y=p.y;
         int ha = 0, hb = 0, hc = 0, hd = 0;
         if (x < 0 || y < 0 || x + 1 >= width || y + 1 >= breadth) {
             return false;
         }
-        ha = getHeight(x, y);
-        hb = getHeight(x, y + 1);
-        hc = getHeight(x + 1, y);
-        hd = getHeight(x + 1, y + 1);
+        ha = getHeight(p);
+        hb = getHeight(new Point(x, y + 1));
+        hc = getHeight(new Point(x + 1, y));
+        hd = getHeight(new Point(x + 1, y + 1));
         return (ha == hb && hb == hc && hc == hd);
     }
 
-    public void display(GL gl) {
+    public void display(GL gl, double time) {
         Vector3 l = new Vector3(-9, -5, 10);
         l.normalize();
         gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 0.0f}));

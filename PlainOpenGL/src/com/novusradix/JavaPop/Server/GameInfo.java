@@ -6,7 +6,8 @@ package com.novusradix.JavaPop.Server;
 
 import java.awt.Dimension;
 import java.io.Serializable;
-import java.util.Vector;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -20,16 +21,16 @@ public class GameInfo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public int id;
     public Dimension mapSize;
-    public Vector<String> players;
+    public Map<Integer,Player.Info> players;
 
     public GameInfo(Game g) {
         id = g.getId();
         if (g.heightMap != null) {
             mapSize = new Dimension(g.heightMap.getWidth(), g.heightMap.getBreadth());
         }
-        players = new Vector<String>();
+        players = new HashMap<Integer, Player.Info>();
         for (Player p : g.players) {
-            players.add(p.name);
+            players.put(p.getId(), p.info);
         }
     }
 

@@ -42,6 +42,7 @@ public class ControlPalette extends javax.swing.JPanel {
         ToolGroup = new javax.swing.ButtonGroup();
         UpDownButton = new javax.swing.JToggleButton();
         LightningButton = new javax.swing.JToggleButton();
+        MoveAnkhButton = new javax.swing.JToggleButton();
 
         setMaximumSize(new java.awt.Dimension(128, 64));
         setMinimumSize(new java.awt.Dimension(128, 64));
@@ -70,6 +71,18 @@ public class ControlPalette extends javax.swing.JPanel {
             }
         });
         add(LightningButton);
+
+        ToolGroup.add(MoveAnkhButton);
+        MoveAnkhButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/novusradix/JavaPop/icons/Ankh.png"))); // NOI18N
+        MoveAnkhButton.setToolTipText("Move Ankh");
+        MoveAnkhButton.setMaximumSize(new java.awt.Dimension(64, 64));
+        MoveAnkhButton.setMinimumSize(new java.awt.Dimension(64, 64));
+        MoveAnkhButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MoveAnkhButtonActionPerformed(evt);
+            }
+        });
+        add(MoveAnkhButton);
     }// </editor-fold>//GEN-END:initComponents
 
 private void UpDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpDownButtonActionPerformed
@@ -79,8 +92,14 @@ private void UpDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 private void LightningButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LightningButtonActionPerformed
     BaseTool.setTool(ToolType.Lightning, false);
 }//GEN-LAST:event_LightningButtonActionPerformed
+
+private void MoveAnkhButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MoveAnkhButtonActionPerformed
+BaseTool.setTool(ToolType.MoveAnkh, false);
+}//GEN-LAST:event_MoveAnkhButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton LightningButton;
+    private javax.swing.JToggleButton MoveAnkhButton;
     private javax.swing.ButtonGroup ToolGroup;
     private javax.swing.JToggleButton UpDownButton;
     // End of variables declaration//GEN-END:variables
