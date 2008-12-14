@@ -6,6 +6,7 @@ package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
 import com.novusradix.JavaPop.Client.ControlPalette;
+import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ public abstract class BaseTool implements Tool {
         tools = new HashMap<ToolType, Tool>();
         tools.put(ToolType.RaiseLower, new RaiseLowerTool());
         tools.put(ToolType.Lightning, new LightningTool());
+        tools.put(ToolType.MoveAnkh, new MoveAnkhTool());
 
         current = tools.get(ToolType.RaiseLower);
     }
@@ -51,5 +53,9 @@ public abstract class BaseTool implements Tool {
 
     public static final Tool getCurrentTool() {
         return current;
+    }
+
+    public void SecondaryAction(Point p) {
+        setTool(ToolType.RaiseLower);
     }
 }

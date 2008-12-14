@@ -1,6 +1,5 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * The main window for the active game.
  */
 package com.novusradix.JavaPop.Client;
 
@@ -13,7 +12,7 @@ import javax.swing.JFrame;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class GameFrame extends JFrame implements WindowListener {
 

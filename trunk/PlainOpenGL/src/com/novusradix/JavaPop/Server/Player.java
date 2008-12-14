@@ -1,22 +1,24 @@
+/*
+ * This class handles the networking functions of the client on the server side. 
+ * It also (somewhat akwardly) contains per player in-game data.
+ */
 package com.novusradix.JavaPop.Server;
 
 import com.novusradix.JavaPop.Messaging.GameList;
 import com.novusradix.JavaPop.Messaging.Message;
+import com.novusradix.JavaPop.Messaging.PlayerUpdate;
+import java.awt.Point;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.Socket;
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
- * @author erinhowie
+ * @author gef
  */
 public class Player implements Runnable {
 
@@ -25,26 +27,24 @@ public class Player implements Runnable {
     public Game currentGame;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
-    public String name;
     private static int nextId = 1;
     private int id;
     public boolean ready = false;
-
-    enum PlayerState {
-
-        InServerLobby, InGameLobby, InGame
-    };
+    Info info;
 
     public Player(Server s, Socket sock) {
         this.s = s;
         this.socket = sock;
         id = nextId++;
-        name = "Player " + id;
+        info = new Info(id, "Player " + id, new Point(0, 0), new float[]{0,0,1});
         try {
             socket.setTcpNoDelay(true);
             oos = new ObjectOutputStream(socket.getOutputStream());
             oos.flush();
             ois = new ObjectInputStream(socket.getInputStream());
+            
+            oos.writeObject(info);
+            
             (new Thread(this, "Server Player")).start();
             sendMessage(new GameList(s.getGames()));
         } catch (IOException ioe) {
@@ -52,14 +52,17 @@ public class Player implements Runnable {
         }
     }
 
+    public void MoveAnkh(Point where) {
+        info.ankh = where;
+        currentGame.sendAllPlayers(new PlayerUpdate(info));
+    }
+
     public int getId() {
         return id;
     }
 
     public void run() {
-
         //Message loop
-
         try {
 
             Message message;
@@ -80,7 +83,12 @@ public class Player implements Runnable {
             currentGame.removePlayer(this);
         }
         s.removePlayer(this);
-    //Disconnect
+        try {
+            socket.close();
+        //Disconnect
+        } catch (IOException ex) {
+            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public synchronized void sendMessage(Message m) {
@@ -88,9 +96,23 @@ public class Player implements Runnable {
             oos.writeObject(m);
             oos.flush();
             oos.reset();
-            //System.out.println("Server sending " + name + " " + m.getClass().getSimpleName());
         } catch (IOException ex) {
             Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public static class Info implements Serializable{
+
+        public int id;
+        public String name;
+        public Point ankh;
+        public float[] colour;
+        
+        private Info(int id, String name, Point ankh, float[] colour) {
+            this.id = id;
+            this.name = name;
+            this.ankh = ankh;
+            this.colour = colour;
         }
     }
 }

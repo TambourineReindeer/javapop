@@ -2,18 +2,20 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package com.novusradix.JavaPop.Client.Tools;
 
+import com.novusradix.JavaPop.Messaging.MoveAnkh;
 import java.awt.Point;
 
 /**
  *
  * @author mom
  */
-public interface Tool {
-    enum ToolType {RaiseLower, Lightning, MoveAnkh };
+public class MoveAnkhTool extends BaseTool{
+
+    public void PrimaryAction(Point p) {
+        client.sendMessage(new MoveAnkh(p));
+    }
     
-    public void PrimaryAction(Point p);
-    public void SecondaryAction(Point p);
-  
 }

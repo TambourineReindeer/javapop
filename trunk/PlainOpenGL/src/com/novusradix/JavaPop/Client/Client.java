@@ -1,6 +1,5 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * This class performs the network functions of the local client.
  */
 package com.novusradix.JavaPop.Client;
 
@@ -17,6 +16,7 @@ import com.novusradix.JavaPop.Client.Tools.BaseTool;
 import com.novusradix.JavaPop.Messaging.Bye;
 import com.novusradix.JavaPop.Messaging.GameStarted;
 import com.novusradix.JavaPop.Messaging.Message;
+import com.novusradix.JavaPop.Server.Player.Info;
 
 /**
  *
@@ -30,6 +30,7 @@ public class Client implements Runnable {
     private boolean connected;
     public Lobby lobby;
     public Game game;
+    public Info info;
     
     public Client(String host, Lobby l) {
         lobby = l;
@@ -48,6 +49,13 @@ public class Client implements Runnable {
             oos = new ObjectOutputStream(socket.getOutputStream());
             oos.flush();
             ois = new ObjectInputStream(socket.getInputStream());
+            try {
+                info = (Info) ois.readObject();
+            } catch (IOException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
             connected = true;
             (new Thread(this, "Client Player")).start();
         } catch (IOException ioe) {
