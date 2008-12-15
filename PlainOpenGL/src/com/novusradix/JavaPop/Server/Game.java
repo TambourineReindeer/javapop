@@ -11,6 +11,8 @@ import com.novusradix.JavaPop.Messaging.Message;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -67,16 +69,28 @@ public class Game extends TimerTask {
     }
 
     public void startGame() {
-        id = nextId++;
         heightMap = new HeightMap(128, 128);
         heightMap.randomize(1);
         peons = new Peons(this);
         houses = new Houses(this);
 
-        for(Player p:players)
-        {
-            peons.addPeon(2.5f, 2.5f, 200,players.get(0));
+        if (players.size() == 1) {
+            //Add an AI player
+            new com.novusradix.JavaPop.AI.Client(server.port, id);
         }
+
+        try {
+            while (players.size() == 1) {
+                Thread.sleep(500);
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        for (Player p : players) {
+            peons.addPeon(2.5f, 2.5f, 200, players.get(0));
+        }
+
         GameStarted go = new GameStarted(this);
         server.sendAllPlayers(go);
         HeightMapUpdate m = heightMap.GetUpdate();

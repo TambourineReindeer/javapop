@@ -31,8 +31,9 @@ public class GameList extends Message implements Serializable {
 
     @Override
     public void execute() {
-
-        client.lobby.setGames(games);
+        
+        if(client.lobby!=null)
+            client.lobby.setGames(games);
 
         
     }
