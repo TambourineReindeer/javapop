@@ -7,6 +7,7 @@ package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Client.Tools.BaseTool;
 import com.novusradix.JavaPop.Client.Tools.Tool.ToolType;
+import com.novusradix.JavaPop.Server.Player.PeonMode;
 
 /**
  *
@@ -40,14 +41,22 @@ public class ControlPalette extends javax.swing.JPanel {
     private void initComponents() {
 
         ToolGroup = new javax.swing.ButtonGroup();
+        BehaviourGroup = new javax.swing.ButtonGroup();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        LandPanel = new javax.swing.JPanel();
         UpDownButton = new javax.swing.JToggleButton();
-        LightningButton = new javax.swing.JToggleButton();
         MoveAnkhButton = new javax.swing.JToggleButton();
+        WeatherPanel = new javax.swing.JPanel();
+        LightningButton = new javax.swing.JToggleButton();
+        jPanel5 = new javax.swing.JPanel();
+        SettleButton = new javax.swing.JToggleButton();
+        GoToAnkhButton = new javax.swing.JToggleButton();
+        FightButton = new javax.swing.JToggleButton();
+        GatherButton = new javax.swing.JToggleButton();
 
         setMaximumSize(new java.awt.Dimension(128, 64));
         setMinimumSize(new java.awt.Dimension(128, 64));
-        setPreferredSize(new java.awt.Dimension(128, 64));
-        setLayout(new java.awt.GridLayout(1, 0));
+        setPreferredSize(null);
 
         ToolGroup.add(UpDownButton);
         UpDownButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/novusradix/JavaPop/icons/UpDown.png"))); // NOI18N
@@ -59,7 +68,22 @@ public class ControlPalette extends javax.swing.JPanel {
                 UpDownButtonActionPerformed(evt);
             }
         });
-        add(UpDownButton);
+        LandPanel.add(UpDownButton);
+
+        ToolGroup.add(MoveAnkhButton);
+        MoveAnkhButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/novusradix/JavaPop/icons/Ankh.png"))); // NOI18N
+        MoveAnkhButton.setToolTipText("Move Ankh");
+        MoveAnkhButton.setMaximumSize(new java.awt.Dimension(64, 64));
+        MoveAnkhButton.setMinimumSize(new java.awt.Dimension(64, 64));
+        MoveAnkhButton.setPreferredSize(new java.awt.Dimension(64, 64));
+        MoveAnkhButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MoveAnkhButtonActionPerformed(evt);
+            }
+        });
+        LandPanel.add(MoveAnkhButton);
+
+        jTabbedPane1.addTab("Land", LandPanel);
 
         ToolGroup.add(LightningButton);
         LightningButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/novusradix/JavaPop/icons/Lightning.png"))); // NOI18N
@@ -70,19 +94,69 @@ public class ControlPalette extends javax.swing.JPanel {
                 LightningButtonActionPerformed(evt);
             }
         });
-        add(LightningButton);
+        WeatherPanel.add(LightningButton);
 
-        ToolGroup.add(MoveAnkhButton);
-        MoveAnkhButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/novusradix/JavaPop/icons/Ankh.png"))); // NOI18N
-        MoveAnkhButton.setToolTipText("Move Ankh");
-        MoveAnkhButton.setMaximumSize(new java.awt.Dimension(64, 64));
-        MoveAnkhButton.setMinimumSize(new java.awt.Dimension(64, 64));
-        MoveAnkhButton.addActionListener(new java.awt.event.ActionListener() {
+        jTabbedPane1.addTab("Weather", WeatherPanel);
+
+        BehaviourGroup.add(SettleButton);
+        SettleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/novusradix/JavaPop/icons/Settle.png"))); // NOI18N
+        SettleButton.setSelected(true);
+        SettleButton.setToolTipText("Settle");
+        SettleButton.setPreferredSize(new java.awt.Dimension(64, 64));
+        SettleButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                MoveAnkhButtonActionPerformed(evt);
+                SettleButtonActionPerformed(evt);
             }
         });
-        add(MoveAnkhButton);
+        jPanel5.add(SettleButton);
+
+        BehaviourGroup.add(GoToAnkhButton);
+        GoToAnkhButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/novusradix/JavaPop/icons/GoToAnkh.png"))); // NOI18N
+        GoToAnkhButton.setToolTipText("Go to Ankh");
+        GoToAnkhButton.setPreferredSize(new java.awt.Dimension(64, 64));
+        GoToAnkhButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GoToAnkhButtonActionPerformed(evt);
+            }
+        });
+        jPanel5.add(GoToAnkhButton);
+
+        BehaviourGroup.add(FightButton);
+        FightButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/novusradix/JavaPop/icons/Fight.png"))); // NOI18N
+        FightButton.setToolTipText("Fight");
+        FightButton.setPreferredSize(new java.awt.Dimension(64, 64));
+        FightButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                FightButtonActionPerformed(evt);
+            }
+        });
+        jPanel5.add(FightButton);
+
+        BehaviourGroup.add(GatherButton);
+        GatherButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/novusradix/JavaPop/icons/Gather.png"))); // NOI18N
+        GatherButton.setToolTipText("Gather");
+        GatherButton.setPreferredSize(new java.awt.Dimension(64, 64));
+        GatherButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GatherButtonActionPerformed(evt);
+            }
+        });
+        jPanel5.add(GatherButton);
+
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 125, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+        );
     }// </editor-fold>//GEN-END:initComponents
 
 private void UpDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UpDownButtonActionPerformed
@@ -94,13 +168,37 @@ private void LightningButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
 }//GEN-LAST:event_LightningButtonActionPerformed
 
 private void MoveAnkhButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MoveAnkhButtonActionPerformed
-BaseTool.setTool(ToolType.MoveAnkh, false);
+    BaseTool.setTool(ToolType.MoveAnkh, false);
 }//GEN-LAST:event_MoveAnkhButtonActionPerformed
 
+private void SettleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SettleButtonActionPerformed
+    BaseTool.SetBehaviour(PeonMode.SETTLE);
+}//GEN-LAST:event_SettleButtonActionPerformed
+
+private void GoToAnkhButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GoToAnkhButtonActionPerformed
+    BaseTool.SetBehaviour(PeonMode.ANKH);
+}//GEN-LAST:event_GoToAnkhButtonActionPerformed
+
+private void FightButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FightButtonActionPerformed
+    BaseTool.SetBehaviour(PeonMode.FIGHT);//GEN-LAST:event_FightButtonActionPerformed
+}
+
+private void GatherButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GatherButtonActionPerformed
+    BaseTool.SetBehaviour(PeonMode.GROUP);//GEN-LAST:event_GatherButtonActionPerformed
+}
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup BehaviourGroup;
+    private javax.swing.JToggleButton FightButton;
+    private javax.swing.JToggleButton GatherButton;
+    private javax.swing.JToggleButton GoToAnkhButton;
+    private javax.swing.JPanel LandPanel;
     private javax.swing.JToggleButton LightningButton;
     private javax.swing.JToggleButton MoveAnkhButton;
+    private javax.swing.JToggleButton SettleButton;
     private javax.swing.ButtonGroup ToolGroup;
     private javax.swing.JToggleButton UpDownButton;
+    private javax.swing.JPanel WeatherPanel;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JTabbedPane jTabbedPane1;
     // End of variables declaration//GEN-END:variables
 }

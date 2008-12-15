@@ -36,7 +36,7 @@ public class Player implements Runnable {
     private int id;
     public boolean ready = false;
     Info info;
-    PeonMode peonMode;
+    public PeonMode peonMode;
 
     public Player(Server s, Socket sock) {
         this.s = s;

@@ -3,6 +3,7 @@
  */
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Server.Player.PeonMode;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,6 +17,7 @@ import com.novusradix.JavaPop.Client.Tools.BaseTool;
 import com.novusradix.JavaPop.Messaging.Bye;
 import com.novusradix.JavaPop.Messaging.GameStarted;
 import com.novusradix.JavaPop.Messaging.Message;
+import com.novusradix.JavaPop.Messaging.SetBehaviour;
 import com.novusradix.JavaPop.Server.Player.Info;
 
 /**
@@ -31,6 +33,7 @@ public class Client implements Runnable {
     public Lobby lobby;
     public Game game;
     public Info info;
+    public PeonMode behaviour;
     
     public Client(String host, Lobby l) {
         lobby = l;
@@ -110,5 +113,10 @@ public class Client implements Runnable {
             //probably already quit...
         }
 
+    }
+
+    public void setBehaviour(PeonMode m) {
+        behaviour = m;
+        sendMessage(new SetBehaviour(m));
     }
 }

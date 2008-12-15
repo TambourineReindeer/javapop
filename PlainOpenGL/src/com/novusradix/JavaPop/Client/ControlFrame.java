@@ -33,6 +33,10 @@ public class ControlFrame extends javax.swing.JFrame {
         setFocusableWindowState(false);
         setResizable(false);
         getContentPane().setLayout(new java.awt.GridLayout(1, 0));
+
+        controlPalette1.setMaximumSize(null);
+        controlPalette1.setMinimumSize(null);
+        controlPalette1.setPreferredSize(null);
         getContentPane().add(controlPalette1);
 
         pack();

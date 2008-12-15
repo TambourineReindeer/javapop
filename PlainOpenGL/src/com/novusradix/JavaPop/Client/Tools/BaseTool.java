@@ -6,6 +6,7 @@ package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
 import com.novusradix.JavaPop.Client.ControlPalette;
+import com.novusradix.JavaPop.Server.Player.PeonMode;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,4 +59,10 @@ public abstract class BaseTool implements Tool {
     public void SecondaryAction(Point p) {
         setTool(ToolType.RaiseLower);
     }
+    
+    public static void SetBehaviour(PeonMode m)
+    {
+        client.setBehaviour(m);
+    }
+    
 }
