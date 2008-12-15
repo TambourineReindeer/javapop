@@ -107,7 +107,9 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         game.heightMap.display(gl, time);
         game.peons.display(gl, time);
         game.houses.display(gl, time);
-        game.me.display(gl, time);
+        for (Player p : game.players.values()) {
+            p.display(gl, time);
+        }
         displayCursor(gl);
 
         gl.glPopMatrix();
@@ -115,7 +117,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     private void displayCursor(final GL gl) {
-        float cW, cH;
+        float cW,  cH;
         cW = 0.02f;
         cH = 0.1f;
         gl.glDisable(GL.GL_LIGHTING);
@@ -225,21 +227,21 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     public void mouseMoved(MouseEvent e) {
         // TODO Auto-generated method stub
-        float xMouse, yMouse;
+        float xMouse,  yMouse;
         if (width > 0 && height > 0) {
             xMouse = (2.0f * e.getX() / width - 1.0f);
             yMouse = (-2.0f * e.getY() / height + 1.0f);
 
             float l;
 
-            Vector3 z0, z1, s;
+            Vector3 z0,z1 ,s ;
             z0 = new Vector3(xMouse, yMouse, 10);
             z1 = new Vector3(xMouse, yMouse, 11);
 
             mvpInverse.transform(z0);
             mvpInverse.transform(z1);
 
-            Vector3 v0n, v1n;
+            Vector3 v0n,v1n ;
             v0n = new Vector3(z0);
             v1n = new Vector3(z1);
 
@@ -261,12 +263,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Point iterateSelection(Point current, Vector3 v0, Vector3 v1) {
         Vector3 p;
 
-        float d, oldD;
+        float d,  oldD;
         p = new Vector3(current.x, current.y, game.heightMap.getHeight(current));
         d = Helpers.PointLineDistance(v0, v1, p);
         oldD = d;
 
-        int x, y;
+        int x,  y;
         for (Point offset : Helpers.rings[1]) {
             x = current.x + offset.x;
             y = current.y + offset.y;

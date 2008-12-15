@@ -42,7 +42,7 @@ public class Game extends TimerTask {
         timer = new Timer("Client Game Animator");
         seconds = 1.0f / 20.0f;
         timer.scheduleAtFixedRate(this, 0, (int) (seconds * 1000.0f));
-        new GameFrame(this);
+        
     }
 
     public void kill() {

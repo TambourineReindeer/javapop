@@ -23,15 +23,16 @@ public class Server implements Runnable {
 
     private Map<Integer, Game> games;
     private Vector<Player> players;
-    private int port;
+    int port;
     private boolean keepAlive = true;
     Announcer a;
     ServerForm form;
     private ServerSocket s;
 
-    public void main(){
+    public void main() {
         new Server(13579);
     }
+
     public Server(int port) {
         games = new HashMap<Integer, Game>();
         players = new Vector<Player>();
@@ -39,7 +40,7 @@ public class Server implements Runnable {
         form = new ServerForm(this);
         new Thread(this, "Server").start();
         a = new Announcer(port);
-        form.setBounds(500,500,150, 150);
+        form.setBounds(500, 500, 150, 150);
         form.setVisible(true);
     }
 
@@ -97,14 +98,17 @@ public class Server implements Runnable {
     }
 
     public void removePlayer(Player p) {
+       
         players.remove(p);
         GameList gl = new GameList(games.values());
         sendAllPlayers(gl);
     }
 
     public void sendAllPlayers(Message m) {
-        for (Player pl : players) {
-            pl.sendMessage(m);
+        synchronized (players) {
+            for (Player pl : players) {
+                pl.sendMessage(m);
+            }
         }
     }
 }

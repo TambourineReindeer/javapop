@@ -26,20 +26,23 @@ import com.novusradix.JavaPop.Server.Player.Info;
  */
 public class Client implements Runnable {
 
-    private Socket socket;
-    private ObjectInputStream ois;
-    private ObjectOutputStream oos;
+    protected Socket socket;
+    protected ObjectInputStream ois;
+    protected ObjectOutputStream oos;
     private boolean connected;
     public Lobby lobby;
     public Game game;
     public Info info;
     public PeonMode behaviour;
-    
+
+    protected Client() {
+    }
+
     public Client(String host, Lobby l) {
         lobby = l;
         connected = false;
         BaseTool.Initialise(this);
-        
+
         try {
             socket = new Socket(host, 13579);
             socket.setTcpNoDelay(true);
@@ -92,16 +95,18 @@ public class Client implements Runnable {
             oos.writeObject(m);
             oos.flush();
             oos.reset();
-            //System.out.println("Client sending " + m.getClass().getSimpleName());
+        //System.out.println("Client sending " + m.getClass().getSimpleName());
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public void newGame(GameStarted g) {
-        lobby.hide();
+        if (lobby != null) {
+            lobby.hide();
+        }
         game = new Game(g, this);
-
+        new GameFrame(game);
 
     }
 
