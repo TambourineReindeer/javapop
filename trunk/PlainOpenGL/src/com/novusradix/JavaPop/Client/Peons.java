@@ -107,8 +107,12 @@ public class Peons {
         public void step(float seconds) {
             switch (state) {
                 case WALKING:
+                    //if already reached destination, wait there - there'll be another message along shortly!
+                    if(dest.x == (int)pos.x && dest.y == (int)pos.y)
+                        break;
                     pos.x += seconds * dx;
                     pos.y += seconds * dy;
+                    
                     break;
 
             }
