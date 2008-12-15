@@ -34,9 +34,9 @@ public class Peons {
         peons.add(p);
         map.put(p.getPoint(), p);
     }
-    
+
     public void addPeon(int x, int y, float strength, Player player) {
-        addPeon(x+0.5f,y+0.5f, strength, player);
+        addPeon(x + 0.5f, y + 0.5f, strength, player);
     }
 
     public void step(float seconds) {
@@ -127,13 +127,13 @@ public class Peons {
                     return null;
 
                 case ALIVE:
-                    if (game.houses.canBuild(oldPos)) {
-                        state = State.SETTLED;
-                        game.houses.addHouse(oldPos, player, strength);
-                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
-                    }
                     switch (player.peonMode) {
                         case SETTLE:
+                            if (game.houses.canBuild(oldPos)) {
+                                state = State.SETTLED;
+                                game.houses.addHouse(oldPos, player, strength);
+                                return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
+                            }
                             dest = findFlatLand(oldPos);
                             break;
                         case ANKH:
