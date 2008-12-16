@@ -16,10 +16,12 @@ public class JoinGame extends Message{
 	 */
 	private static final long serialVersionUID = 1L;
 	int gameId;
+
     
     public JoinGame(int gameId)
     {
         this.gameId = gameId;
+
     }
     
     @Override

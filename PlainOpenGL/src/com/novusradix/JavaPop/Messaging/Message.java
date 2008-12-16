@@ -31,7 +31,7 @@ public abstract class Message implements Serializable {
     }
     transient com.novusradix.JavaPop.Client.Client client;
     transient com.novusradix.JavaPop.Client.Game clientGame;
-    transient com.novusradix.JavaPop.Client.HeightMap clientMap;
+    transient com.novusradix.JavaPop.HeightMap clientMap;
 
     public abstract void execute();
 }

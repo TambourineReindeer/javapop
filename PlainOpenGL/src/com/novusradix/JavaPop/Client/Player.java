@@ -20,7 +20,7 @@ public class Player {
     public Point ankh;
     private Game game;
 
-    Player(Info i, Game g) {
+    public Player(Info i, Game g) {
         update(i);
         game = g;
     }

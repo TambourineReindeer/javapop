@@ -4,10 +4,12 @@
  */
 package com.novusradix.JavaPop.Server;
 
+import com.novusradix.JavaPop.Messaging.GameOver;
 import com.novusradix.JavaPop.Messaging.GameStarted;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.novusradix.JavaPop.Messaging.JoinedGame;
 import com.novusradix.JavaPop.Messaging.Message;
+import java.awt.Dimension;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -30,15 +32,16 @@ public class Game extends TimerTask {
     public HeightMap heightMap;
     public Peons peons;
     public Houses houses;
+    private int humancount;
 
     public Game(Player owner) {
         this.owner = owner;
         server = owner.s;
         players = new Vector<Player>();
-        players.add(owner);
         owner.currentGame = this;
-        owner.sendMessage(new JoinedGame(this));
         id = nextId++;
+        humancount = 0;
+        addPlayer(owner);
     }
 
     public int getId() {
@@ -46,16 +49,29 @@ public class Game extends TimerTask {
     }
 
     public void addPlayer(Player p) {
-        players.add(p);
-        p.currentGame = this;
-        p.sendMessage(new JoinedGame(this));
-
+        synchronized (players) {
+            players.add(p);
+            p.currentGame = this;
+            p.sendMessage(new JoinedGame(this));
+            if (p.human) {
+                humancount++;
+            }
+        }
     }
 
     public void removePlayer(Player p) {
-        players.remove(p);
-        p.currentGame = null;
-    //TODO: send a message?
+        synchronized (players) {
+            players.remove(p);
+            p.currentGame = null;
+            if (p.human) {
+                humancount--;
+                if (humancount == 0) {
+                    sendAllPlayers(new GameOver());
+                }
+            }
+            
+        }
+        //TODO: send a message?
     }
 
     public void PlayerReady(Player p) {
@@ -69,7 +85,7 @@ public class Game extends TimerTask {
     }
 
     public void startGame() {
-        heightMap = new HeightMap(128, 128);
+        heightMap = new HeightMap(new Dimension(128, 128));
         heightMap.randomize(1);
         peons = new Peons(this);
         houses = new Houses(this);
@@ -88,7 +104,7 @@ public class Game extends TimerTask {
         }
 
         for (Player p : players) {
-            peons.addPeon(2.5f, 2.5f, 200, players.get(0));
+            peons.addPeon(2.5f+p.getId(), 2.5f+p.getId()*2, 200, p);
         }
 
         GameStarted go = new GameStarted(this);

@@ -6,7 +6,6 @@
 package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Math.Helpers;
-import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Math.Vector3;
 import java.awt.Dimension;
 import java.io.IOException;
@@ -25,9 +24,8 @@ import java.util.Map.Entry;
 
 import static java.lang.Math.*;
 
-public class HeightMap {
+public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
-    private final int width,  breadth;
     private FloatBuffer b;
     private static int rowstride,  tilestride,  vertexstride;
     private static final int VX = 0,  VY = 1,  VZ = 2,  NX = 3,  NY = 4,  NZ = 5,  TX = 6,  TY = 7;
@@ -53,8 +51,7 @@ public class HeightMap {
     com.sun.opengl.util.texture.Texture tex;
 
     public HeightMap(Dimension mapSize) {
-        this.breadth = mapSize.height;
-        this.width = mapSize.width;
+        super(mapSize);
 
         vertexstride = 8;
         tilestride = 12 * vertexstride;
@@ -182,17 +179,6 @@ public class HeightMap {
     public boolean inBounds(int x, int y) {
         return (x >= 0 && y >= 0 && x < width && y < breadth);
     }
-    public boolean inBounds(Point p) {
-        return (p.x >= 0 && p.y >= 0 && p.x < width && p.y < breadth);
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getBreadth() {
-        return breadth;
-    }
 
     private static int bufPos(int x, int y, int vertex, int index) {
         return y * rowstride + x * tilestride + vertex * vertexstride + index;
@@ -202,20 +188,20 @@ public class HeightMap {
         return p.y * rowstride + p.x * tilestride + vertex * vertexstride + index;
     }
 
-    public int getHeight(Point p) {
+    public byte getHeight(Point p) {
     int x,y;
     x=p.x; y=p.y;
         if (x == width - 1 && y == breadth - 1) {
-            return (int) b.get(bufPos(x - 1, y - 1, 4, VZ));
+            return (byte) b.get(bufPos(x - 1, y - 1, 4, VZ));
         }
         if (x == width - 1) {
-            return (int) b.get(bufPos(x - 1, y, 3, VZ));
+            return (byte) b.get(bufPos(x - 1, y, 3, VZ));
         }
         if (y == breadth - 1) {
-            return (int) b.get(bufPos(x, y - 1, 7, VZ));
+            return (byte) b.get(bufPos(x, y - 1, 7, VZ));
         }
         if (inBounds(x, y)) {
-            return (int) b.get(bufPos(x, y, 0, VZ));
+            return (byte) b.get(bufPos(x, y, 0, VZ));
         }
         return 0;
     }
@@ -230,133 +216,52 @@ public class HeightMap {
         return 0;
     }
 
-    public float getHeight(float x, float y) {
-        int x1, x2, y1, y2;
-        float ha, hb, hc, hd, hm;
-        x1 = (int) Math.floor(x);
-        x2 = (int) Math.ceil(x);
-        y1 = (int) Math.floor(y);
-        y2 = (int) Math.ceil(y);
-
-        x = x - x1;
-        y = y - y1;
-
-        ha = getHeight(new Point(x1, y1));
-        hb = getHeight(new Point(x1, y2));
-        hc = getHeight(new Point(x2, y1));
-        hd = getHeight(new Point(x2, y2));
-        hm = ha;
-        if (hb > ha || hc > ha || hd > ha) {
-            hm = ha + 0.5f;
-        }
-        if (hb < ha || hc < ha || hd < ha) {
-            hm = ha - 0.5f;
-        }
-        if (y > x) {
-            if (y > 1 - x) {
-                // BMD
-                return hb + (hd - hb) * x + (hm - (hd + hb) / 2.0f) * (1 - y);
-            } else {
-                // AMB
-                return ha + (hb - ha) * y + (hm - (hb + ha) / 2.0f) * x;
-            }
-        } else {
-            if (y > 1 - x) {
-                // CMD
-                return hc + (hd - hc) * y + (hm - (hd + hc) / 2.0f) * (1 - x);
-            } else {
-                // AMC
-                return ha + (hc - ha) * x + (hm - (ha + hb) / 2.0f) * y;
-            }
-        }
-    }
-
-    public Vector2 getSlope(float x, float y) {
-        int x1, x2, y1, y2;
-        float ha, hb, hc, hd, hm;
-        x1 = (int) floor(x);
-        x2 = (int) ceil(x);
-        y1 = (int) floor(y);
-        y2 = (int) ceil(y);
-
-        x = x - x1;
-        y = y - y1;
-
-        ha = getHeight(x1, y1);
-        hb = getHeight(x1, y2);
-        hc = getHeight(x2, y1);
-        hd = getHeight(x2, y2);
-
-        if (ha == hb && hb == hc && hc == hd) {
-            return new Vector2(0, 0);
-        }
-        hm = ha;
-        if (hb > ha || hc > ha || hd > ha) {
-            hm = ha + 0.5f;
-        }
-        if (hb < ha || hc < ha || hd < ha) {
-            hm = ha - 0.5f;
-        }
-        if (y > x) {
-            if (y > 1 - x) {
-                // BMD
-                return new Vector2(hd - hb, 2.0f * ((hd + hb) / 2.0f - hm));
-            } else {
-                // AMB
-                return new Vector2(2.0f * (hm - (ha + hb) / 2.0f), hb - ha);
-            }
-        } else {
-            if (y > 1 - x) {
-                // CMD
-                return new Vector2(2.0f * ((hc + hd) / 2.0f - hm), hd - hc);
-            } else {
-                // AMC
-                return new Vector2(hc - ha, 2.0f * (hm - (ha + hc) / 2.0f));
-            }
-        }
-    }
-
-    private void setHeight(int x, int y, int height) {
+    protected void setHeight(Point p, byte height) {
         try {
-            if (x >= 0 && y >= 0 && x < width && y < breadth) {
-                if (x < width - 1 && y < width - 1) {
-                    b.put(bufPos(x, y, 0, VZ), height);
-                    b.put(bufPos(x, y, 10, VZ), height);
+            if (inBounds(p)) {
+                if (p.x < width - 1 && p.y < width - 1) {
+                    b.put(bufPos(p.x, p.y, 0, VZ), height);
+                    b.put(bufPos(p.x, p.y, 10, VZ), height);
                 }
-                if (x >= 1 && y >= 1) {
-                    b.put(bufPos(x - 1, y - 1, 4, VZ), height);
-                    b.put(bufPos(x - 1, y - 1, 6, VZ), height);
+                if (p.x >= 1 && p.y >= 1) {
+                    b.put(bufPos(p.x - 1, p.y - 1, 4, VZ), height);
+                    b.put(bufPos(p.x - 1, p.y - 1, 6, VZ), height);
                 }
-                if (y >= 1 && x < width - 1) {
-                    b.put(bufPos(x, y - 1, 7, VZ), height);
-                    b.put(bufPos(x, y - 1, 9, VZ), height);
+                if (p.y >= 1 && p.x < width - 1) {
+                    b.put(bufPos(p.x, p.y - 1, 7, VZ), height);
+                    b.put(bufPos(p.x, p.y - 1, 9, VZ), height);
                 }
-                if (x >= 1 && y < width - 1) {
-                    b.put(bufPos(x - 1, y, 1, VZ), height);
-                    b.put(bufPos(x - 1, y, 3, VZ), height);
+                if (p.x >= 1 && p.y < width - 1) {
+                    b.put(bufPos(p.x - 1, p.y, 1, VZ), height);
+                    b.put(bufPos(p.x - 1, p.y, 3, VZ), height);
                 }
             }
         } catch (IndexOutOfBoundsException e) {
-            System.out.print(x + ", " + y + ": out of bounds in SetHeight()");
+            System.out.print(p.x + ", " + p.y + ": out of bounds in SetHeight()");
         }
     }
 
-    private void setMidTile(int x, int y) {
-        if (x < 0 || y < 0 || x >= width - 1 || y >= breadth - 1) {
+    protected void setMidTile(Point p) {
+        
+        if (p.x < 0 || p.y < 0 || p.x >= width - 1 || p.y >= breadth - 1) {
             return;
         }
         float m;
-        m = max(max(getHeight(x, y), getHeight(x, y + 1)), max(getHeight(x + 1, y), getHeight(x + 1, y + 1))) + min(min(getHeight(x, y), getHeight(x, y + 1)), min(getHeight(x + 1, y), getHeight(x + 1, y + 1)));
+        Point pb,pc,pd;
+        pb = new Point(p.x,p.y+1);
+        pc = new Point(p.x+1,p.y);
+        pd = new Point(p.x+1,p.y+1);
+        m = max(max(getHeight(p), getHeight(pb)), max(getHeight(pc), getHeight(pd))) + min(min(getHeight(p), getHeight(pb)), min(getHeight(pc), getHeight(pd)));
 
         try {
-            b.put(bufPos(x, y, 2, VZ), m * 0.5f);
-            b.put(bufPos(x, y, 5, VZ), m * 0.5f);
-            b.put(bufPos(x, y, 8, VZ), m * 0.5f);
-            b.put(bufPos(x, y, 11, VZ), m * 0.5f);
+            b.put(bufPos(p, 2, VZ), m * 0.5f);
+            b.put(bufPos(p, 5, VZ), m * 0.5f);
+            b.put(bufPos(p, 8, VZ), m * 0.5f);
+            b.put(bufPos(p, 11, VZ), m * 0.5f);
         } catch (IndexOutOfBoundsException e) {
-            System.out.println("Array out of bounds in Client setMidTile:" + x + ", " + y);
+            System.out.println("Array out of bounds in Client setMidTile:" + p.x + ", " + p.y);
         }
-        setNormals(x, y);
+        setNormals(p);
     }
 
     public void setTexture(Point p, int t) {
@@ -380,61 +285,48 @@ public class HeightMap {
 
     }
 
-    private void setNormals(int x, int y) {
-        setNormals(x, y, 0, 1, 2);
-        setNormals(x, y, 3, 4, 5);
-        setNormals(x, y, 6, 7, 8);
-        setNormals(x, y, 9, 10, 11);
+    private void setNormals(Point p) {
+        setNormals(p, 0, 1, 2);
+        setNormals(p, 3, 4, 5);
+        setNormals(p, 6, 7, 8);
+        setNormals(p, 9, 10, 11);
     }
 
-    private void setNormals(int x, int y, int vertA, int vertB, int vertC) {
+    private void setNormals(Point p, int vertA, int vertB, int vertC) {
         Vector3 va, vb, vc, vn;
         va = new Vector3();
         vb = new Vector3();
         vc = new Vector3();
 
         try {
-            va.x = b.get(bufPos(x, y, vertA, VX));
-            va.y = b.get(bufPos(x, y, vertA, VY));
-            va.z = b.get(bufPos(x, y, vertA, VZ));
+            va.x = b.get(bufPos(p, vertA, VX));
+            va.y = b.get(bufPos(p, vertA, VY));
+            va.z = b.get(bufPos(p, vertA, VZ));
 
-            vb.x = b.get(bufPos(x, y, vertB, VX));
-            vb.y = b.get(bufPos(x, y, vertB, VY));
-            vb.z = b.get(bufPos(x, y, vertB, VZ));
+            vb.x = b.get(bufPos(p, vertB, VX));
+            vb.y = b.get(bufPos(p, vertB, VY));
+            vb.z = b.get(bufPos(p, vertB, VZ));
 
-            vc.x = b.get(bufPos(x, y, vertC, VX));
-            vc.y = b.get(bufPos(x, y, vertC, VY));
-            vc.z = b.get(bufPos(x, y, vertC, VZ));
+            vc.x = b.get(bufPos(p, vertC, VX));
+            vc.y = b.get(bufPos(p, vertC, VY));
+            vc.z = b.get(bufPos(p, vertC, VZ));
 
             vn = Helpers.calcNormal(vc, va, vb);
 
-            b.put(bufPos(x, y, vertA, NX), vn.x);
-            b.put(bufPos(x, y, vertA, NY), vn.y);
-            b.put(bufPos(x, y, vertA, NZ), vn.z);
+            b.put(bufPos(p, vertA, NX), vn.x);
+            b.put(bufPos(p, vertA, NY), vn.y);
+            b.put(bufPos(p, vertA, NZ), vn.z);
 
-            b.put(bufPos(x, y, vertB, NX), vn.x);
-            b.put(bufPos(x, y, vertB, NY), vn.y);
-            b.put(bufPos(x, y, vertB, NZ), vn.z);
+            b.put(bufPos(p, vertB, NX), vn.x);
+            b.put(bufPos(p, vertB, NY), vn.y);
+            b.put(bufPos(p, vertB, NZ), vn.z);
 
-            b.put(bufPos(x, y, vertC, NX), vn.x);
-            b.put(bufPos(x, y, vertC, NY), vn.y);
-            b.put(bufPos(x, y, vertC, NZ), vn.z);
+            b.put(bufPos(p, vertC, NX), vn.x);
+            b.put(bufPos(p, vertC, NY), vn.y);
+            b.put(bufPos(p, vertC, NZ), vn.z);
         } catch (IndexOutOfBoundsException e) {
-            System.out.println("Array out of bounds in Client SetNormal:" + x + ", " + y);
+            System.out.println("Array out of bounds in Client SetNormal:" + p.x + ", " + p.y);
         }
-    }
-
-    public boolean isFlat(Point p) {
-        int x,y;x=p.x;y=p.y;
-        int ha = 0, hb = 0, hc = 0, hd = 0;
-        if (x < 0 || y < 0 || x + 1 >= width || y + 1 >= breadth) {
-            return false;
-        }
-        ha = getHeight(p);
-        hb = getHeight(new Point(x, y + 1));
-        hc = getHeight(new Point(x + 1, y));
-        hd = getHeight(new Point(x + 1, y + 1));
-        return (ha == hb && hb == hc && hc == hd);
     }
 
     public void display(GL gl, double time) {
@@ -494,12 +386,12 @@ public class HeightMap {
 
                 for (y = 0; y < u.dirtyRegion.height; y++) {
                     for (x = 0; x < u.dirtyRegion.width; x++) {
-                        setHeight(u.dirtyRegion.x + x, u.dirtyRegion.y + y, u.heightData[x + y * u.dirtyRegion.width]);
+                        setHeight(new Point(u.dirtyRegion.x + x, u.dirtyRegion.y + y), u.heightData[x + y * u.dirtyRegion.width]);
                     }
                 }
                 for (y = -1; y < u.dirtyRegion.height + 1; y++) {
                     for (x = -1; x < u.dirtyRegion.width + 1; x++) {
-                        setMidTile(u.dirtyRegion.x + x, u.dirtyRegion.y + y);
+                        setMidTile(new Point(u.dirtyRegion.x + x, u.dirtyRegion.y + y));
                     }
                 }
             }
@@ -508,4 +400,5 @@ public class HeightMap {
             }
         }
     }
+    
 }

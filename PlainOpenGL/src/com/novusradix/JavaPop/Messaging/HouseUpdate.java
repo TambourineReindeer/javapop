@@ -25,7 +25,8 @@ public class HouseUpdate extends Message {
     @Override
     public void execute() {
         for (Detail d : details) {
-            client.game.houses.updateHouse(d.pos, d.playerId, d.level);
+            
+            client.game.houses.updateHouse(d.pos, client.game.players.get(d.playerId), d.level);
         }
     }
 

@@ -4,7 +4,6 @@
  */
 package com.novusradix.JavaPop.AI;
 
-import com.novusradix.JavaPop.Client.Game;
 import com.novusradix.JavaPop.Messaging.GameStarted;
 import com.novusradix.JavaPop.Messaging.JoinGame;
 import com.novusradix.JavaPop.Messaging.Message;
@@ -36,6 +35,7 @@ public class Client extends com.novusradix.JavaPop.Client.Client {
             oos = new ObjectOutputStream(socket.getOutputStream());
             oos.flush();
             ois = new ObjectInputStream(socket.getInputStream());
+            oos.writeBoolean(false); //indicate we're not human
             try {
                 info = (Info) ois.readObject();
             } catch (IOException ex) {
