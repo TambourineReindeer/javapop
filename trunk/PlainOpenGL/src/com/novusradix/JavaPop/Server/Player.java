@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 public class Player implements Runnable {
 
     private static float[][] defaultColors={{0,0,1},{1,0,0},{0,1,0}};
+    boolean human;
     
     public enum PeonMode {
         SETTLE, ANKH, FIGHT, GROUP
@@ -51,7 +52,7 @@ public class Player implements Runnable {
             ois = new ObjectInputStream(socket.getInputStream());
 
             oos.writeObject(info);
-
+            human = ois.readBoolean();
             (new Thread(this, "Server Player")).start();
             sendMessage(new GameList(s.getGames()));
         } catch (IOException ioe) {

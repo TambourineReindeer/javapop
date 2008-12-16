@@ -50,7 +50,6 @@ public class Peons {
     void step(float seconds) {
         synchronized (peons) {
             for (Peon p : peons.values()) {
-
                 p.step(seconds);
             }
         }

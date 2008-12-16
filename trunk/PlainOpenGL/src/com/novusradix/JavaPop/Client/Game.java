@@ -17,7 +17,7 @@ import java.util.TimerTask;
  */
 public class Game extends TimerTask {
 
-    public HeightMap heightMap;
+    public com.novusradix.JavaPop.HeightMap heightMap;
     public Client client;
     public Peons peons;
     public Houses houses;
@@ -26,6 +26,8 @@ public class Game extends TimerTask {
     public Map<Integer, Player> players;
     public Player me;
 
+    protected Game(){}
+    
     public Game(GameStarted g, Client c) {
         heightMap = new HeightMap(g.gi.mapSize);
         client = c;

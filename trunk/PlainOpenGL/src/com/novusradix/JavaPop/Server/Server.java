@@ -90,7 +90,6 @@ public class Server implements Runnable {
 
     public void joinGame(int gId, Player p) {
         Game g = games.get(gId);
-
         g.addPlayer(p);
 
         GameList gl = new GameList(games.values());

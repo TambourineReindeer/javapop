@@ -5,6 +5,7 @@ import com.novusradix.JavaPop.Math.MultiMap;
 import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.PeonUpdate;
 import java.awt.Point;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
@@ -162,12 +163,23 @@ public class Peons {
                         state = State.ALIVE;
                         return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
                     }
-                    map.remove(oldPos, this);
                     Peon other =
                             map.get(oldPos).get(0);
-                    other.strength += strength;
-                    state = state.DEAD;
-                    return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
+                    if (other.player == this.player) {
+                        //merge
+                        other.strength += strength;
+                        map.remove(oldPos, this);
+                        state = state.DEAD;
+                        return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
+                    } else {
+                        //fight
+                        float damage = 2 + max(strength, other.strength) / 10.0f;
+                        strength -= damage;
+                        other.strength -= damage;
+                        return null;
+                    //wait in merging queue until someone dies...
+
+                    }
             }
             return null;
         }
@@ -175,7 +187,7 @@ public class Peons {
         private Point findFlatLand(Point start) {
             // TODO Auto-generated method stub
             Point p;
-            for (Point[] ring : Helpers.rings) {
+            for (Collection<Point> ring : Helpers.shuffledRings) {
                 for (Point offset : ring) {
                     p = new Point(start.x + offset.x, start.y + offset.y);
                     if (game.heightMap.inBounds(p)) {

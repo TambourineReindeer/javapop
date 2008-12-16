@@ -55,6 +55,7 @@ public class Client implements Runnable {
             oos = new ObjectOutputStream(socket.getOutputStream());
             oos.flush();
             ois = new ObjectInputStream(socket.getInputStream());
+            oos.writeBoolean(true);// indicate we're human
             try {
                 info = (Info) ois.readObject();
             } catch (IOException ex) {

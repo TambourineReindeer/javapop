@@ -23,7 +23,7 @@ public class Houses {
         houses = new HashMap<Point, House>();
     }
 
-    public void updateHouse(Point pos, int team, int level) {
+    public void updateHouse(Point pos, Player p, int level) {
         synchronized (houses) {
             if (level < 0) {
                 //remove
@@ -31,7 +31,7 @@ public class Houses {
                     houses.remove(pos);
                 }
             } else {
-                houses.put(pos, new House(pos, team, level));
+                houses.put(pos, new House(pos, p, level));
             }
         }
     }
@@ -85,6 +85,13 @@ public class Houses {
                     gl.glVertex3f(-0.3f, 0.3f, 1.3f);
 
                     gl.glEnd();
+                    gl.glDisable(GL.GL_LIGHTING);
+                    gl.glColor3fv(h.player.colour,0);
+                    gl.glBegin(GL.GL_TRIANGLES);
+                    gl.glVertex3f(0.3f, -0.3f,1.3f);
+                    gl.glVertex3f(0.3f, -0.3f,1.5f);
+                    gl.glVertex3f(0.4f, -0.4f,1.4f);
+                    gl.glEnd();
                     gl.glPopMatrix();
                 }
             }
@@ -95,13 +102,13 @@ public class Houses {
 
         private Point pos;
         private int level;
-        private int team;
+        private Player player;
 
-        public House(Point p, int team, int level) {
-            map[p.x][p.y] = HOUSE + team;
+        public House(Point p, Player player, int level) {
+            map[p.x][p.y] = HOUSE;
             pos = (Point) p.clone();
             this.level = level;
-            this.team = team;
+            this.player = player;
         }
     }
 }

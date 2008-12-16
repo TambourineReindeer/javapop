@@ -6,7 +6,6 @@ import java.awt.Point;
 import java.util.Iterator;
 import java.util.Vector;
 
-import javax.media.opengl.GL;
 import static java.lang.Math.*;
 
 public class Houses {
@@ -16,6 +15,7 @@ public class Houses {
     private int[][] newmap;
     private Vector<House> houses;
     private Vector<HouseUpdate.Detail> hds;
+    private Vector<Point> newHouses;
     private static final int TEAMS = 4;
     private static final int EMPTY = 0;
     private static final int FARM = EMPTY + 1;
@@ -27,6 +27,7 @@ public class Houses {
         map = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
         newmap = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
         houses = new Vector<House>();
+        newHouses = new Vector<Point>();
         hds = new Vector<HouseUpdate.Detail>();
     }
 
@@ -40,7 +41,7 @@ public class Houses {
 
     public boolean canBuild(Point p) {
         if (game.heightMap.inBounds(p)) {
-            return (map[p.x][p.y] == EMPTY && game.heightMap.getHeight(p) > 0 && game.heightMap.isFlat(p));
+            return (map[p.x][p.y] == EMPTY && game.heightMap.getHeight(p) > 0 && game.heightMap.isFlat(p) && !newHouses.contains(p));
 
         }
         return false;
@@ -53,6 +54,7 @@ public class Houses {
             }
         }
         synchronized (houses) {
+            newHouses.clear();
             Iterator<House> i = houses.iterator();
             House h;
             for (; i.hasNext();) {
@@ -63,7 +65,7 @@ public class Houses {
                     h.step(seconds);
                 } else {
                     i.remove();
-                    game.peons.addPeon(h.pos.x, h.pos.y, h.strength,h.player);
+                    game.peons.addPeon(h.pos.x, h.pos.y, h.strength, h.player);
                     hds.add(new HouseUpdate.Detail(h.pos, h.player, -1));
                 }
             }
@@ -83,7 +85,7 @@ public class Houses {
     }
 
     private void paint() {
-        int x, y;
+        int x,  y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (map[x][y] != EMPTY) {
@@ -94,7 +96,7 @@ public class Houses {
     }
 
     private void unpaint() {
-        int x, y;
+        int x,  y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (map[x][y] != EMPTY) {
@@ -118,50 +120,11 @@ public class Houses {
             if (flat < (2 * radius + 1) * (2 * radius + 1) - 1) {
                 break;
             }
-
         }
         return flat;
     }
 
-    public void display(GL gl) {
-        if (houses != null) {
-            for (House h : houses) {
-                gl.glPushMatrix();
-                gl.glTranslatef(h.pos.x, h.pos.y, game.heightMap.getHeight(h.pos));
-
-                gl.glEnable(GL.GL_LIGHTING);
-                gl.glBegin(GL.GL_QUADS);
-                gl.glColor3f(1, 1, 1);
-                gl.glNormal3f(-1, 0, 0);
-                gl.glVertex3f(0.2f, 0.2f, 0.0f);
-                gl.glVertex3f(0.2f, 0.8f, 0.0f);
-                gl.glVertex3f(0.2f, 0.8f, 0.8f);
-                gl.glVertex3f(0.2f, 0.2f, 0.8f);
-
-                gl.glNormal3f(1, 0, 0);
-                gl.glVertex3f(0.8f, 0.2f, 0.0f);
-                gl.glVertex3f(0.8f, 0.8f, 0.0f);
-                gl.glVertex3f(0.8f, 0.8f, 0.8f);
-                gl.glVertex3f(0.8f, 0.2f, 0.8f);
-
-                gl.glNormal3f(0, -1, 0);
-                gl.glVertex3f(0.2f, 0.2f, 0.0f);
-                gl.glVertex3f(0.8f, 0.2f, 0.0f);
-                gl.glVertex3f(0.8f, 0.2f, 0.8f);
-                gl.glVertex3f(0.2f, 0.2f, 0.8f);
-
-                gl.glNormal3f(0, 1, 0);
-                gl.glVertex3f(0.2f, 0.8f, 0.0f);
-                gl.glVertex3f(0.8f, 0.8f, 0.0f);
-                gl.glVertex3f(0.8f, 0.8f, 0.8f);
-                gl.glVertex3f(0.2f, 0.8f, 0.8f);
-
-                gl.glEnd();
-                gl.glPopMatrix();
-            }
-        }
-    }
-
+   
     public class House {
 
         private Point pos;
@@ -176,6 +139,7 @@ public class Houses {
             level = 1;
             this.player = player;
             this.strength = strength;
+            newHouses.add(p);
         }
 
         private void paintmap(int[][] newmap) {
@@ -199,7 +163,6 @@ public class Houses {
                         newmap[p.x][p.y] = FARM;
                     }
                 }
-
             }
         }
 

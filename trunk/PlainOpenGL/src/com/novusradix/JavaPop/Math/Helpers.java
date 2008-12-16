@@ -1,14 +1,21 @@
 package com.novusradix.JavaPop.Math;
 
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+
 
 
 public class Helpers {
 
     public static Point[][] rings;
+    public static ArrayList<ArrayList<Point>> shuffledRings;
     
     static {
         rings = new Point[64][];
+        shuffledRings = new ArrayList<ArrayList<Point>>();
+        
         rings[0] = new Point[1];
         rings[0][0] = new Point(0,0);
         for(int i=1;i<64;i++)
@@ -22,6 +29,16 @@ public class Helpers {
                 rings[i][n+6*i] = new Point(-i,n-i);
                 
             }
+            
+        
+        }
+        ArrayList<Point> a;
+        for(Point[] r:rings)
+        {
+            a = new ArrayList<Point>();
+            a.addAll(Arrays.asList(r));
+            Collections.shuffle(a);
+            shuffledRings.add(a);
         }
     }
     
