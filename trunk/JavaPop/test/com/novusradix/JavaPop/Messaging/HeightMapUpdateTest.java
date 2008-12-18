@@ -49,7 +49,7 @@ public class HeightMapUpdateTest {
         HeightMapUpdate instance = null;
         com.novusradix.JavaPop.Server.HeightMap serverh;
         com.novusradix.JavaPop.Client.HeightMap clienth;
-        serverh = new com.novusradix.JavaPop.Server.HeightMap(128, 128);
+        serverh = new com.novusradix.JavaPop.Server.HeightMap(new Dimension(128, 128));
         clienth = new com.novusradix.JavaPop.Client.HeightMap(new Dimension(128, 128));
 
         serverh.up(new Point(0, 0));
