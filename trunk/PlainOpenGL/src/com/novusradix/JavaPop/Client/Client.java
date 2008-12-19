@@ -107,7 +107,7 @@ public class Client implements Runnable {
             lobby.hide();
         }
         game = new Game(g, this);
-        new GameFrame(game);
+        
 
     }
 
