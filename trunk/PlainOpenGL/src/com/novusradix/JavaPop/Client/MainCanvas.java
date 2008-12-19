@@ -8,6 +8,7 @@ import com.novusradix.JavaPop.Client.Tools.BaseTool;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
 import java.awt.Point;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -25,6 +26,7 @@ import javax.media.opengl.GLEventListener;
 
 import java.awt.event.MouseWheelListener;
 import static java.lang.Math.*;
+import static java.awt.event.KeyEvent.*;
 
 public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener, MouseMotionListener, MouseListener, MouseWheelListener {
 
@@ -41,11 +43,15 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Matrix4 mvpInverse;
     private Game game;
     private long startMillis;
+    private boolean[] keys;
+    float xMouse, yMouse;
+    private int frameCount = 0;
+    private long frameTime;
 
     public MainCanvas(GLCapabilities caps, Game g) {
         super(caps);
 
-
+        keys = new boolean[0x20e];
         startMillis = System.currentTimeMillis();
         this.game = g;
         mvpInverse = new Matrix4();
@@ -114,6 +120,9 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         gl.glPopMatrix();
         gl.glFlush();
+        handleKeys();
+        printFPS();
+
     }
 
     private void displayCursor(final GL gl) {
@@ -208,17 +217,22 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     public void keyPressed(final KeyEvent e) {
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_F:
+            case VK_F:
                 game.frame.setFullscreen(!game.frame.fullscreen);
                 break;
-            case KeyEvent.VK_ESCAPE:
+            case VK_ESCAPE:
                 game.frame.setFullscreen(false);
                 break;
+        }
+        if (e.getKeyCode() < 0x20e) {
+            keys[e.getKeyCode()] = true;
         }
     }
 
     public void keyReleased(final KeyEvent e) {
-        // TODO Auto-generated method stub
+        if (e.getKeyCode() < 0x20e) {
+            keys[e.getKeyCode()] = false;
+        }
     }
 
     public void keyTyped(final KeyEvent e) {
@@ -235,48 +249,75 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     public void mouseMoved(MouseEvent e) {
         // TODO Auto-generated method stub
-        float xMouse,   yMouse;
+
         if (width > 0 && height > 0) {
             xMouse = (2.0f * e.getX() / width - 1.0f);
             yMouse = (-2.0f * e.getY() / height + 1.0f);
 
-            float l;
+            mousePick();
+        }
+    }
 
-            Vector3 z0,z1 ,s ;
-            z0 = new Vector3(xMouse, yMouse, 10);
-            z1 = new Vector3(xMouse, yMouse, 11);
+    private void mousePick() {
+        float l;
 
-            mvpInverse.transform(z0);
-            mvpInverse.transform(z1);
+        Vector3 z0, z1, s;
+        z0 = new Vector3(xMouse, yMouse, 10);
+        z1 = new Vector3(xMouse, yMouse, 11);
 
-            Vector3 v0n,v1n ;
-            v0n = new Vector3(z0);
-            v1n = new Vector3(z1);
+        mvpInverse.transform(z0);
+        mvpInverse.transform(z1);
 
-            z1.sub(z0);
-            l = -z0.z / z1.z;
-            s = new Vector3();
-            s.scaleAdd(l, z1, z0);
+        Vector3 v0n, v1n;
+        v0n = new Vector3(z0);
+        v1n = new Vector3(z1);
+
+        z1.sub(z0);
+        l = -z0.z / z1.z;
+        s = new Vector3();
+        s.scaleAdd(l, z1, z0);
 
 
-            selected.x = max(min((int) Math.round(s.x), game.heightMap.getWidth() - 1), 0);
-            selected.y = max(min((int) Math.round(s.y), game.heightMap.getBreadth() - 1), 0);
+        selected.x = max(min((int) Math.round(s.x), game.heightMap.getWidth() - 1), 0);
+        selected.y = max(min((int) Math.round(s.y), game.heightMap.getBreadth() - 1), 0);
 
 
-            selected = iterateSelection(selected, v0n, v1n);
+        selected = iterateSelection(selected, v0n, v1n);
 
+    }
+
+    private void handleKeys() {
+        boolean bPick = false;
+        if (keys[VK_UP]) {
+            yPos += 0.2f;
+            bPick = true;
+        }
+        if (keys[VK_DOWN]) {
+            yPos -= 0.2f;
+            bPick = true;
+        }
+        if (keys[VK_LEFT]) {
+            xPos += 0.2f;
+            bPick = true;
+        }
+        if (keys[VK_RIGHT]) {
+            xPos -= 0.2f;
+            bPick = true;
+        }
+        if (bPick) {
+            mousePick();
         }
     }
 
     private Point iterateSelection(Point current, Vector3 v0, Vector3 v1) {
         Vector3 p;
 
-        float d,   oldD;
+        float d, oldD;
         p = new Vector3(current.x, current.y, game.heightMap.getHeight(current));
         d = Helpers.PointLineDistance(v0, v1, p);
         oldD = d;
 
-        int x,   y;
+        int x, y;
         for (Point offset : Helpers.rings[1]) {
             x = current.x + offset.x;
             y = current.y + offset.y;
@@ -346,5 +387,18 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         } else {
             yPos -= e.getWheelRotation();
         }
+    }
+
+    private void printFPS() {
+        if (frameCount % 100 == 0) {
+            long t = System.currentTimeMillis();
+
+            if (frameCount > 0) {
+                float fps = 100000.0f / (t - frameTime);
+                System.out.print(fps + " fps\n");
+            }
+            frameTime = t;
+        }
+        frameCount++;
     }
 }

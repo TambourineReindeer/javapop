@@ -8,7 +8,6 @@ import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.Map.Entry;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 

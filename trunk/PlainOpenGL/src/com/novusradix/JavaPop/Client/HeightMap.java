@@ -2,7 +2,6 @@
  * This class is the client side map. It specifies creation, response to server update messages, and rendering.
  * Other client classes can also query points on the map.
  */
-
 package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Math.Helpers;
@@ -27,9 +26,9 @@ import static java.lang.Math.*;
 public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
     private FloatBuffer b;
-    private static int rowstride,  tilestride,  vertexstride;
+    private int rowstride,  tilestride,  vertexstride;
     private static final int VX = 0,  VY = 1,  VZ = 2,  NX = 3,  NY = 4,  NZ = 5,  TX = 6,  TY = 7;
-
+  
     /*
      * b layout: float x,y,z,nx,ny,nz,tx,ty;
      *
@@ -180,17 +179,18 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         return (x >= 0 && y >= 0 && x < width && y < breadth);
     }
 
-    private static int bufPos(int x, int y, int vertex, int index) {
+    private int bufPos(int x, int y, int vertex, int index) {
         return y * rowstride + x * tilestride + vertex * vertexstride + index;
     }
 
-    private static int bufPos(Point p, int vertex, int index) {
+    private int bufPos(Point p, int vertex, int index) {
         return p.y * rowstride + p.x * tilestride + vertex * vertexstride + index;
     }
 
     public byte getHeight(Point p) {
-    int x,y;
-    x=p.x; y=p.y;
+        int x, y;
+        x = p.x;
+        y = p.y;
         if (x == width - 1 && y == breadth - 1) {
             return (byte) b.get(bufPos(x - 1, y - 1, 4, VZ));
         }
@@ -242,15 +242,15 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
     }
 
     protected void setMidTile(Point p) {
-        
+
         if (p.x < 0 || p.y < 0 || p.x >= width - 1 || p.y >= breadth - 1) {
             return;
         }
         float m;
-        Point pb,pc,pd;
-        pb = new Point(p.x,p.y+1);
-        pc = new Point(p.x+1,p.y);
-        pd = new Point(p.x+1,p.y+1);
+        Point pb, pc, pd;
+        pb = new Point(p.x, p.y + 1);
+        pc = new Point(p.x + 1, p.y);
+        pd = new Point(p.x + 1, p.y + 1);
         m = max(max(getHeight(p), getHeight(pb)), max(getHeight(pc), getHeight(pd))) + min(min(getHeight(p), getHeight(pb)), min(getHeight(pc), getHeight(pd)));
 
         try {
@@ -329,24 +329,25 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         }
     }
 
+    @Override
     public void display(GL gl, double time) {
         Vector3 l = new Vector3(-9, -5, 10);
         l.normalize();
         gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 0.0f}));
         gl.glColor3f(1, 1, 1);
 
-        /*gl.glBindTexture(GL.GL_TEXTURE_2D, texture[0]);
-        gl.glEnable(GL.GL_TEXTURE_2D);
-         */
         tex.enable();
-        tex.bind();
+        //tex.bind();
 
         synchronized (this) {
             gl.glDrawArrays(GL.GL_TRIANGLES, 0, (width - 1) * (breadth - 1) * 4 * 3);
         }
         tex.disable();
+
+       
     }
 
+    @Override
     public void init(final GLAutoDrawable glDrawable) {
         final GL gl = glDrawable.getGL();
         gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
@@ -379,6 +380,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
     }
 
+    @Override
     public void applyUpdate(HeightMapUpdate u) {
         synchronized (this) {
             if (!u.dirtyRegion.isEmpty()) {
@@ -400,5 +402,4 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
             }
         }
     }
-    
 }

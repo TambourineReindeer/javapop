@@ -51,7 +51,7 @@ MainCanvas mc;
     private void init(boolean bFullScreen) {
         fullscreen = bFullScreen;
         setUndecorated(bFullScreen);
-        setSize(800, 600);
+        setSize(1024, 768);
         setVisible(true);
         GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(bFullScreen ? this : null);
         mc.requestFocus();
