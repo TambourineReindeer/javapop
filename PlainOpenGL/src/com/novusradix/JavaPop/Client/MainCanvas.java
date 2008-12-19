@@ -117,7 +117,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     private void displayCursor(final GL gl) {
-        float cW,  cH;
+        float cW, cH;
         cW = 0.02f;
         cH = 0.1f;
         gl.glDisable(GL.GL_LIGHTING);
@@ -173,6 +173,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
          * gl.isFunctionAvailable("glDeleteBuffersARB");
          */
 
+        gl.setSwapInterval(1);
         gl.glEnable(GL.GL_LIGHTING);
         float global_ambient[] = {0.1f, 0.1f, 0.1f, 1.0f};
         gl.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, FloatBuffer.wrap(global_ambient));
@@ -206,7 +207,14 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     public void keyPressed(final KeyEvent e) {
-        // TODO Auto-generated method stub
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_F:
+                game.frame.setFullscreen(!game.frame.fullscreen);
+                break;
+            case KeyEvent.VK_ESCAPE:
+                game.frame.setFullscreen(false);
+                break;
+        }
     }
 
     public void keyReleased(final KeyEvent e) {
@@ -227,7 +235,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     public void mouseMoved(MouseEvent e) {
         // TODO Auto-generated method stub
-        float xMouse,  yMouse;
+        float xMouse,   yMouse;
         if (width > 0 && height > 0) {
             xMouse = (2.0f * e.getX() / width - 1.0f);
             yMouse = (-2.0f * e.getY() / height + 1.0f);
@@ -263,12 +271,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Point iterateSelection(Point current, Vector3 v0, Vector3 v1) {
         Vector3 p;
 
-        float d,  oldD;
+        float d,   oldD;
         p = new Vector3(current.x, current.y, game.heightMap.getHeight(current));
         d = Helpers.PointLineDistance(v0, v1, p);
         oldD = d;
 
-        int x,  y;
+        int x,   y;
         for (Point offset : Helpers.rings[1]) {
             x = current.x + offset.x;
             y = current.y + offset.y;

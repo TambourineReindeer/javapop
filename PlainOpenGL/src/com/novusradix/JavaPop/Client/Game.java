@@ -25,9 +25,11 @@ public class Game extends TimerTask {
     private float seconds;
     public Map<Integer, Player> players;
     public Player me;
+    GameFrame frame;
 
-    protected Game(){}
-    
+    protected Game() {
+    }
+
     public Game(GameStarted g, Client c) {
         heightMap = new HeightMap(g.gi.mapSize);
         client = c;
@@ -44,7 +46,7 @@ public class Game extends TimerTask {
         timer = new Timer("Client Game Animator");
         seconds = 1.0f / 20.0f;
         timer.scheduleAtFixedRate(this, 0, (int) (seconds * 1000.0f));
-        
+        frame = new GameFrame(this);
     }
 
     public void kill() {

@@ -5,6 +5,7 @@ package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Messaging.LeaveGame;
 import com.sun.opengl.util.Animator;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import javax.media.opengl.GLCapabilities;
@@ -19,25 +20,27 @@ public class GameFrame extends JFrame implements WindowListener {
     ControlFrame cf;
     Game game;
     private Animator a;
+    boolean fullscreen;
+MainCanvas mc;
 
     GameFrame(Game g) {
         game = g;
         GLCapabilities caps = new GLCapabilities();
         caps.setSampleBuffers(true);
-        caps.setNumSamples(8);
-        
+        caps.setNumSamples(4);
+
         cf = new ControlFrame();
         cf.setBounds(1024, 0, cf.getWidth(), cf.getHeight());
         cf.setVisible(true);
 
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        setSize(1024, 768);
         setTitle("JavaPop");
-
-        MainCanvas mc = new MainCanvas(caps, game);
+        //setUndecorated(true);
+        mc = new MainCanvas(caps, game);
         add(mc);
         addWindowListener(this);
-        setVisible(true);
+
+        
+        init(false);
 
         a = new Animator(mc);
 
@@ -45,16 +48,37 @@ public class GameFrame extends JFrame implements WindowListener {
 
     }
 
-    public void windowOpened(WindowEvent e) {
+    private void init(boolean bFullScreen) {
+        fullscreen = bFullScreen;
+        setUndecorated(bFullScreen);
+        setSize(800, 600);
+        setVisible(true);
+        GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(bFullScreen ? this : null);
+        mc.requestFocus();
+
     }
 
-    public void windowClosing(WindowEvent e) {
+    public void setFullscreen(boolean bFullscreen) {
+        if (fullscreen != bFullscreen) {
+            this.dispose();
+            init(bFullscreen);
+        }
+    }
+    public void close() {
+        GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(null);
         game.kill();
         a.stop();
         this.dispose();
         cf.dispose();
         game.client.sendMessage(new LeaveGame());
         game.client.lobby.show();
+    }
+
+    public void windowOpened(WindowEvent e) {
+    }
+
+    public void windowClosing(WindowEvent e) {
+        close();
     }
 
     public void windowClosed(WindowEvent e) {
