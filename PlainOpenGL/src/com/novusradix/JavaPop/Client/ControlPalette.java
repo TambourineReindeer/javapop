@@ -9,12 +9,10 @@ import com.novusradix.JavaPop.Client.Tools.BaseTool;
 import com.novusradix.JavaPop.Client.Tools.RaiseLowerTool;
 import com.novusradix.JavaPop.Client.Tools.Tool;
 import com.novusradix.JavaPop.Server.Player.PeonMode;
-import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JPanel;
-import javax.swing.JToggleButton;
 
 /**
  *
@@ -32,15 +30,8 @@ public class ControlPalette extends javax.swing.JPanel {
         setupButtons(BaseTool.getAllTools());
     }
 
-    public void setTool(Class t) {
-       if (t==RaiseLowerTool.class)
-       {
-                defaultButton.setSelected(true);
-       }
-       else
-       {
-           throw new UnsupportedOperationException("setTool only implemented for RaiseLower");
-        }
+    public void setDefaultTool() {
+        defaultButton.setSelected(true);
     }
 
     private void setupButtons(Collection<Tool> tools)
@@ -57,7 +48,10 @@ public class ControlPalette extends javax.swing.JPanel {
             tabs.get(t.getType()).add(b);
          
             if(t.getClass() == RaiseLowerTool.class)
+            {
                 defaultButton = b;
+                defaultButton.setSelected(true);
+            }
         }
     }
     /** This method is called from within the constructor to
