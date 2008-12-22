@@ -11,9 +11,10 @@ import java.awt.Point;
  * @author mom
  */
 public interface Tool {
-    enum ToolType {RaiseLower, Lightning, MoveAnkh };
-    
+   
+    public String getIconName();
+    public String getToolTip();
+    public String getType();
     public void PrimaryAction(Point p);
     public void SecondaryAction(Point p);
-  
 }

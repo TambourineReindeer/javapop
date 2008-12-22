@@ -23,5 +23,16 @@ public class RaiseLowerTool extends BaseTool {
     public void SecondaryAction(Point p) {
         client.sendMessage(new UpDown(p, false));
     }
+    
+public String getIconName() {
+        return "/com/novusradix/JavaPop/icons/UpDown.png";
+    }
 
+    public String getToolTip() {
+        return "Raise/Lower land";
+    }
+
+    public String getType() {
+      return "Earth";
+    }
 }

@@ -11,12 +11,19 @@ import java.awt.Point;
  * @author mom
  */
 public class VolcanoTool extends BaseTool {
-    
+
     public void PrimaryAction(Point p) {
     }
 
-    public void SecondaryAction(Point p) {
-         setTool(ToolType.RaiseLower);
+    public String getIconName() {
+        return "/com/novusradix/JavaPop/icons/Volcano.png";
     }
- 
+
+    public String getToolTip() {
+        return "Volcano";
+    }
+
+    public String getType() {
+        return "Fire";
+    }
 }

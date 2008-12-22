@@ -15,8 +15,16 @@ public class TidalWaveTool extends BaseTool {
     public void PrimaryAction(Point p) {
     }
 
-    public void SecondaryAction(Point p) {
-         setTool(ToolType.RaiseLower);
+    public String getIconName() {
+        return "/com/novusradix/JavaPop/icons/TidalWave.png";
+    }
+
+    public String getToolTip() {
+        return "TidalWave";
+    }
+
+    public String getType() {
+        return "Water";
     }
  
 }

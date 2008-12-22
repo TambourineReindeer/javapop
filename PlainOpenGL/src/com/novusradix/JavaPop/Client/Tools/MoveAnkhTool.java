@@ -17,5 +17,15 @@ public class MoveAnkhTool extends BaseTool{
     public void PrimaryAction(Point p) {
         client.sendMessage(new MoveAnkh(p));
     }
-    
+    public String getIconName() {
+        return "/com/novusradix/JavaPop/icons/GoToAnkh.png";
+    }
+
+    public String getToolTip() {
+        return "MoveAnkh";
+    }
+
+    public String getType() {
+        return "Earth";
+    }
 }

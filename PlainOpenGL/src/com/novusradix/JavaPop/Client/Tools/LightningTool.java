@@ -15,8 +15,15 @@ public class LightningTool extends BaseTool {
     public void PrimaryAction(Point p) {
     }
 
-    public void SecondaryAction(Point p) {
-         setTool(ToolType.RaiseLower);
+   public String getIconName() {
+        return "/com/novusradix/JavaPop/icons/Lightning.png";
     }
- 
+
+    public String getToolTip() {
+        return "Lightning";
+    }
+
+    public String getType() {
+       return "Air";
+    }
 }
