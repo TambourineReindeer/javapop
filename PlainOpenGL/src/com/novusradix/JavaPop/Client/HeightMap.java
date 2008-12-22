@@ -264,7 +264,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         setNormals(p);
     }
 
-    public void setTexture(Point p, int t) {
+    public void setTexture(Point p, byte t) {
         float left, mid, right;
         left = t * 32.0f;
         right = left + 31.0f;
@@ -397,7 +397,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
                     }
                 }
             }
-            for (Entry<Point, Integer> e : u.texture.entrySet()) {
+            for (Entry<Point, Byte> e : u.texture.entrySet()) {
                 setTexture(e.getKey(), e.getValue());
             }
         }

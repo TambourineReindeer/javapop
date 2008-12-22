@@ -146,7 +146,7 @@ public abstract class HeightMap {
         return (ha == hb && hb == hc && hc == hd);
     }
 
-    public abstract void setTexture(Point p, int t);
+    public abstract void setTexture(Point p, byte t);
 
     protected abstract void setHeight(Point point, byte b);
 

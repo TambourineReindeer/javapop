@@ -77,9 +77,7 @@ public class Player implements Runnable {
             do {
                 message = (Message) ois.readObject();
                 if (message != null) {
-                    message.server = s;
-                    message.serverGame = currentGame;
-                    message.serverPlayer = this;
+                    message.setServer(s, currentGame, this);
                     message.execute();
                 }
             } while (message != null);
