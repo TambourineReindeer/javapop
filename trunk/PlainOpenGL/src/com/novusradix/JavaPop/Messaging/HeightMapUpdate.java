@@ -27,12 +27,12 @@ public class HeightMapUpdate extends Message implements Externalizable {
     private static final long serialVersionUID = 1L;
     public Rectangle dirtyRegion;
     public byte[] heightData;
-    public Map<Point, Integer> texture;
+    public Map<Point, Byte> texture;
 
     public HeightMapUpdate() {
     }
 
-    public HeightMapUpdate(Rectangle dirty, ByteBuffer b, int stride, Map<Point, Integer> texture) {
+    public HeightMapUpdate(Rectangle dirty, ByteBuffer b, int stride, Map<Point, Byte> texture) {
         dirtyRegion = dirty;
         if (dirtyRegion != null) {
             heightData = new byte[dirty.width * dirty.height];
@@ -44,7 +44,7 @@ public class HeightMapUpdate extends Message implements Externalizable {
         } else {
             dirtyRegion = new Rectangle();
         }
-        this.texture = new HashMap<Point, Integer>(texture);
+        this.texture = new HashMap<Point, Byte>(texture);
     }
 
     public void execute() {
@@ -63,10 +63,10 @@ public class HeightMapUpdate extends Message implements Externalizable {
             o.writeInt(0);
         }
         o.writeInt(texture.size());
-        for (Entry<Point, Integer> e : texture.entrySet()) {
+        for (Entry<Point, Byte> e : texture.entrySet()) {
             o.writeInt(e.getKey().x);
             o.writeInt(e.getKey().y);
-            o.writeInt(e.getValue());
+            o.writeByte(e.getValue());
         }
 
     }
@@ -87,13 +87,14 @@ public class HeightMapUpdate extends Message implements Externalizable {
         } while (heightBytes > 0);
 
         int texcount = i.readInt();
-        texture = new HashMap<Point, Integer>();
+        texture = new HashMap<Point, Byte>();
 
-        int x, y, n;
+        int x, y;
+        byte n;
         for (; texcount > 0; texcount--) {
             x = i.readInt();
             y = i.readInt();
-            n = i.readInt();
+            n = i.readByte();
             texture.put(new Point(x, y), n);
         }
 

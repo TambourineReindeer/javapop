@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.Math.*;
+
 /**
  *
  * @author mom
@@ -26,22 +27,25 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
     private static int rowstride;
     private Rectangle dirty;
     public final Rectangle bounds;
-    private Map<Point, Integer> texture;
-    private int[][] tex;
-    private int[][] oldTex;
+    private Map<Point, Byte> texture;
+    private byte[][] tex;
+    private byte[][] oldTex;
+    private boolean[][] flat;
 
     public HeightMap(Dimension mapSize) {
         super(mapSize);
         b = BufferUtil.newByteBuffer(width * breadth);
-        texture = new HashMap<Point, Integer>();
+        texture = new HashMap<Point, Byte>();
         rowstride = width;
         bounds = new Rectangle(0, 0, width, breadth);
-        tex = new int[width][breadth];
-        oldTex = new int[width][breadth];
+        tex = new byte[width][breadth];
+        oldTex = new byte[width][breadth];
+        flat = new boolean[width][breadth];
         int x, y;
         for (y = 0; y < breadth; y++) {
             for (x = 0; x < width; x++) {
                 b.put((byte) 0);
+                flat[x][y] = true;
             }
         }
         b.flip();
@@ -108,10 +112,12 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         }
     }
 
-    public void setTexture(Point p, int i) {
+    public void setTexture(Point p, byte i) {
         tex[p.x][p.y] = i;
+    }
 
-
+    public int getTexture(Point p) {
+        return tex[p.x][p.y];
     }
 
     private void difTex() {
@@ -125,15 +131,31 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         }
     }
 
+    @Override
+    public boolean isFlat(Point p) {
+        return flat[p.x][p.y];
+    }
+
+    private void reFlat(Point p, int r) {
+        for (int ex = p.x - r; ex < p.x + r; ex++) {
+            for (int wy = p.y - r; wy < p.y + r; wy++) {
+                if (ex >= 0 && wy >= 0 && ex + 1 < width && wy + 1 < breadth) {
+                    Point p2 = new Point(ex, wy);
+                    flat[ex][wy] = super.isFlat(p2);
+                }
+            }
+        }
+    }
+
     private void retexture(Point p, int r) {
         for (int ex = p.x - r; ex < p.x + r; ex++) {
             for (int wy = p.y - r; wy < p.y + r; wy++) {
                 if (ex >= 0 && wy >= 0 && ex + 1 < width && wy + 1 < breadth) {
                     Point p2 = new Point(ex, wy);
                     if (isSea(p2)) {
-                        setTexture(p2, 0);
+                        setTexture(p2, (byte) 0);
                     } else {
-                        setTexture(p2, 1);
+                        setTexture(p2, (byte) 1);
                     }
                 }
             }
@@ -169,6 +191,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
             if (!bChanged) {
                 markDirty(new Rectangle(p.x - r + 1, p.y - r + 1, r * 2 - 1, r * 2 - 1));
                 retexture(p, r);
+                reFlat(p, r);
                 return;
             }
         }
@@ -216,5 +239,4 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         }
         return m;
     }
-
 }
