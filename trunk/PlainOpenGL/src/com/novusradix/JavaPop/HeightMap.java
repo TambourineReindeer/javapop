@@ -1,6 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Abstract super class for heightmaps in server, client and AI.
+ * 
  */
 package com.novusradix.JavaPop;
 
@@ -13,7 +13,7 @@ import javax.media.opengl.GLAutoDrawable;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public abstract class HeightMap {
 

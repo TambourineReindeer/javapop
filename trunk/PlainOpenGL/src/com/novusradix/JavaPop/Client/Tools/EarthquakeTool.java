@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Client.Tools;
 
 import java.awt.Point;
@@ -15,8 +11,16 @@ public class EarthquakeTool extends BaseTool {
     public void PrimaryAction(Point p) {
     }
 
-    public void SecondaryAction(Point p) {
-         setTool(ToolType.RaiseLower);
+    public String getIconName() {
+        return "/com/novusradix/JavaPop/icons/Earthquake.png";
+    }
+
+    public String getToolTip() {
+        return "Earthquake";
+    }
+
+    public String getType() {
+        return "Earth";
     }
  
 }
