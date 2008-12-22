@@ -6,7 +6,7 @@ package com.novusradix.JavaPop.AI;
 
 import com.novusradix.JavaPop.Client.HeightMap;
 import com.novusradix.JavaPop.Client.Peons;
-import com.novusradix.JavaPop.Messaging.GameStarted;
+import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Client.Houses;
 import com.novusradix.JavaPop.Client.Player;
 import com.novusradix.JavaPop.Server.Player.Info;

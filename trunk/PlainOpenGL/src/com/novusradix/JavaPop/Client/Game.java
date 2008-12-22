@@ -4,7 +4,7 @@
  */
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Messaging.GameStarted;
+import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Server.Player.Info;
 import java.util.HashMap;
 import java.util.Map;

@@ -5,8 +5,8 @@
  */
 package com.novusradix.JavaPop.Client.Lobby;
 
-import com.novusradix.JavaPop.Messaging.JoinGame;
-import com.novusradix.JavaPop.Messaging.LobbyNewGame;
+import com.novusradix.JavaPop.Messaging.Lobby.JoinGame;
+import com.novusradix.JavaPop.Messaging.Lobby.LobbyNewGame;
 import com.novusradix.JavaPop.Server.GameInfo;
 
 /**

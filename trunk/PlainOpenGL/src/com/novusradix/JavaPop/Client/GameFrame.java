@@ -3,7 +3,7 @@
  */
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Messaging.LeaveGame;
+import com.novusradix.JavaPop.Messaging.Lobby.LeaveGame;
 import com.sun.opengl.util.Animator;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.WindowEvent;

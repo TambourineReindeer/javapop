@@ -5,7 +5,7 @@
 
 package com.novusradix.JavaPop.Client.Tools;
 
-import com.novusradix.JavaPop.Messaging.MoveAnkh;
+import com.novusradix.JavaPop.Messaging.Tools.MoveAnkh;
 import java.awt.Point;
 
 /**

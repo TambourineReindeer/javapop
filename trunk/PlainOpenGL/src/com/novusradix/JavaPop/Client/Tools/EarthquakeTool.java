@@ -1,5 +1,6 @@
 package com.novusradix.JavaPop.Client.Tools;
 
+import com.novusradix.JavaPop.Messaging.Tools.Earthquake;
 import java.awt.Point;
 
 /**
@@ -9,6 +10,7 @@ import java.awt.Point;
 public class EarthquakeTool extends BaseTool {
     
     public void PrimaryAction(Point p) {
+        client.sendMessage(new Earthquake(p));
     }
 
     public String getIconName() {

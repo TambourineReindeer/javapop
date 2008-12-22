@@ -4,7 +4,7 @@
  */
 package com.novusradix.JavaPop.Server;
 
-import com.novusradix.JavaPop.Messaging.GameList;
+import com.novusradix.JavaPop.Messaging.Lobby.GameList;
 import com.novusradix.JavaPop.Messaging.Message;
 import com.novusradix.JavaPop.Messaging.PlayerUpdate;
 import java.awt.Point;
