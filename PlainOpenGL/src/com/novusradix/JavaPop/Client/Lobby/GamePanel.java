@@ -5,7 +5,7 @@
  */
 package com.novusradix.JavaPop.Client.Lobby;
 
-import com.novusradix.JavaPop.Messaging.Ready;
+import com.novusradix.JavaPop.Messaging.Lobby.Ready;
 import javax.swing.DefaultListModel;
 
 /**

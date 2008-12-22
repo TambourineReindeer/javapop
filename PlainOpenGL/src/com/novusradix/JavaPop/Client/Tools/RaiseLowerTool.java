@@ -5,7 +5,7 @@
 
 package com.novusradix.JavaPop.Client.Tools;
 
-import com.novusradix.JavaPop.Messaging.UpDown;
+import com.novusradix.JavaPop.Messaging.Tools.UpDown;
 import java.awt.Point;
 
 /**

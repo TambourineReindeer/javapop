@@ -4,6 +4,7 @@
  */
 package com.novusradix.JavaPop.Client.Tools;
 
+import com.novusradix.JavaPop.Messaging.Tools.Volcano;
 import java.awt.Point;
 
 /**
@@ -13,6 +14,7 @@ import java.awt.Point;
 public class VolcanoTool extends BaseTool {
 
     public void PrimaryAction(Point p) {
+        client.sendMessage(new Volcano(p));
     }
 
     public String getIconName() {

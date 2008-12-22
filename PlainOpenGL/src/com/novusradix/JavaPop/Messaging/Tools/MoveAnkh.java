@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.novusradix.JavaPop.Messaging;
+package com.novusradix.JavaPop.Messaging.Tools;
 
+import com.novusradix.JavaPop.Messaging.*;
 import java.awt.Point;
 
 /**

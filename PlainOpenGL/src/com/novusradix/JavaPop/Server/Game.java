@@ -4,10 +4,10 @@
  */
 package com.novusradix.JavaPop.Server;
 
-import com.novusradix.JavaPop.Messaging.GameOver;
-import com.novusradix.JavaPop.Messaging.GameStarted;
+import com.novusradix.JavaPop.Messaging.Lobby.GameOver;
+import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
-import com.novusradix.JavaPop.Messaging.JoinedGame;
+import com.novusradix.JavaPop.Messaging.Lobby.JoinedGame;
 import com.novusradix.JavaPop.Messaging.Message;
 import java.awt.Dimension;
 import java.util.Timer;

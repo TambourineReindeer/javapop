@@ -14,10 +14,10 @@ import java.util.logging.Logger;
 
 import com.novusradix.JavaPop.Client.Lobby.Lobby;
 import com.novusradix.JavaPop.Client.Tools.BaseTool;
-import com.novusradix.JavaPop.Messaging.Bye;
-import com.novusradix.JavaPop.Messaging.GameStarted;
+import com.novusradix.JavaPop.Messaging.Lobby.Bye;
+import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Messaging.Message;
-import com.novusradix.JavaPop.Messaging.SetBehaviour;
+import com.novusradix.JavaPop.Messaging.Tools.SetBehaviour;
 import com.novusradix.JavaPop.Server.Player.Info;
 
 /**
