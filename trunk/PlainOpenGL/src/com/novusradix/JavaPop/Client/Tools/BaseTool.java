@@ -52,17 +52,7 @@ public abstract class BaseTool implements Tool {
 
     public static final void setTool(Class t) {
         if (current != tools.get(t)) {
-            current = tools.get(t);
-            controlPalette.setTool(t);
-        }
-    }
-
-    public static final void setTool(Class t, boolean updateControlPalette) {
-        if (current != tools.get(t)) {
-            current = tools.get(t);
-            if (updateControlPalette) {
-                controlPalette.setTool(t);
-            }
+            current = tools.get(t);          
         }
     }
 
@@ -71,7 +61,7 @@ public abstract class BaseTool implements Tool {
     }
 
     public void SecondaryAction(Point p) {
-        setTool(RaiseLowerTool.class);
+        setToolDefault();
     }
     
     public static void SetBehaviour(PeonMode m)
@@ -82,6 +72,11 @@ public abstract class BaseTool implements Tool {
     public static Collection<Tool> getAllTools()
     {
         return tools.values();
+    }
+
+    public void setToolDefault() {
+        current = tools.get(RaiseLowerTool.class);
+        controlPalette.setDefaultTool();
     }
     
 }
