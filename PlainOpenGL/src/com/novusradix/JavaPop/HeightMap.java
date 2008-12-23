@@ -16,7 +16,11 @@ import javax.media.opengl.GLAutoDrawable;
  * @author gef
  */
 public abstract class HeightMap {
-
+    public static final byte TILE_SEA = 0;
+    public static final byte TILE_LAND = 1;
+    public static final byte TILE_FARM = 2;
+    public static final byte TILE_LAVA = 3;
+    
     protected final int width,  breadth;
 
     public HeightMap(Dimension mapSize) {
@@ -146,18 +150,21 @@ public abstract class HeightMap {
         return (ha == hb && hb == hc && hc == hd);
     }
 
-    public abstract void setTexture(Point p, byte t);
+    public abstract void setTile(Point p, byte t);
 
     protected abstract void setHeight(Point point, byte b);
 
+    //Optional
     public void applyUpdate(HeightMapUpdate u) {
         throw new UnsupportedOperationException("Not implemented in superclass");
     }
 
+    //Optional
     public void init(GLAutoDrawable glDrawable) {
         throw new UnsupportedOperationException("Not implemented in superclass");
     }
 
+    //Optional
     public void display(GL gl, double time) {
         throw new UnsupportedOperationException("Not implemented in superclass");
     }
