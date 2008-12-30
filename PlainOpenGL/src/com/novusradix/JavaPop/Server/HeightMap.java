@@ -22,7 +22,8 @@ import static java.lang.Math.*;
  * @author mom
  */
 public class HeightMap extends com.novusradix.JavaPop.HeightMap {
-
+    
+    
     private ByteBuffer b;
     private static int rowstride;
     private Rectangle dirty;
@@ -79,7 +80,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
             int x, y;
             Random r = new Random(seed);
 
-            for (n = 0; n < 100; n++) {
+            for (n = 0; n < width*breadth/80; n++) {
                 x = r.nextInt(width);
                 y = r.nextInt(breadth);
                 for (m = 0; m < r.nextInt(8); m++) {
@@ -88,7 +89,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
                 for (m = 0; m < r.nextInt(8); m++) {
                     up(new Point(x - 5 + r.nextInt(10), y - 5 + r.nextInt(10)));
                 }
-                for (m = 0; m < r.nextInt(2); m++) {
+                for (m = 0; m < r.nextInt(8); m++) {
                     down(new Point(x - 5 + r.nextInt(10), -5 + r.nextInt(10)));
                 }
                 for (m = 0; m < r.nextInt(2); m++) {
@@ -112,7 +113,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         }
     }
 
-    public void setTexture(Point p, byte i) {
+    public void setTile(Point p, byte i) {
         tex[p.x][p.y] = i;
     }
 
@@ -153,9 +154,9 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
                 if (ex >= 0 && wy >= 0 && ex + 1 < width && wy + 1 < breadth) {
                     Point p2 = new Point(ex, wy);
                     if (isSea(p2)) {
-                        setTexture(p2, (byte) 0);
+                        setTile(p2, (byte) 0);
                     } else {
-                        setTexture(p2, (byte) 1);
+                        setTile(p2, (byte) 1);
                     }
                 }
             }

@@ -43,7 +43,7 @@ public class Player implements Runnable {
         this.s = s;
         this.socket = sock;
         id = nextId++;
-        info = new Info(id, "Player " + id, new Point(0, 0), defaultColors[id]);
+        info = new Info(id, "Player " + id, new Point(0, 0), defaultColors[id%3]);
         peonMode = PeonMode.SETTLE;
         try {
             socket.setTcpNoDelay(true);
@@ -69,13 +69,18 @@ public class Player implements Runnable {
         return id;
     }
 
+    private Message getMessage() throws IOException, ClassNotFoundException //method only exists to sepearate out blocking call for profiling purposes
+    {
+        return (Message) ois.readObject();
+    }
+    
     public void run() {
         //Message loop
         try {
 
             Message message;
             do {
-                message = (Message) ois.readObject();
+                message = getMessage();
                 if (message != null) {
                     message.setServer(s, currentGame, this);
                     message.execute();

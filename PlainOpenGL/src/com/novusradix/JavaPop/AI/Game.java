@@ -32,4 +32,5 @@ public class Game extends com.novusradix.JavaPop.Client.Game {
             }
         }
     }
+    
 }

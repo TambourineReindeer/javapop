@@ -79,7 +79,7 @@ public class Client implements Runnable {
         Message message;
         try {
             while (socket.isConnected()) {
-                message = (Message) ois.readObject();
+                message = getMessage();
                 message.setClient(this);
 
                 message.execute();
@@ -91,6 +91,11 @@ public class Client implements Runnable {
 
     }
 
+    private Message getMessage() throws IOException, ClassNotFoundException //method only exists to sepearate out blocking call for profiling purposes
+    {
+        return (Message) ois.readObject();
+    }
+    
     public synchronized void sendMessage(Message m) {
         try {
             oos.writeObject(m);

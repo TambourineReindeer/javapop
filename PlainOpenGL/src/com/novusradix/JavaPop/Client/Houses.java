@@ -56,6 +56,8 @@ public class Houses {
                     if (h.level == 48) {
                         gl.glScalef(1.0f, 1.0f, 2.0f);
                     }
+                    gl.glUseProgram(0);
+                    gl.glDisable(GL.GL_TEXTURE_2D);
                     gl.glEnable(GL.GL_LIGHTING);
                     gl.glColor3f(1, 1, 1);
                     gl.glBegin(GL.GL_QUADS);
