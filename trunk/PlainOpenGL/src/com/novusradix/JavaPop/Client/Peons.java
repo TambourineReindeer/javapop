@@ -10,14 +10,17 @@ import javax.media.opengl.GL;
 
 import static java.lang.Math.*;
 
-public class Peons {
+public class Peons implements GLObject {
 
     public Game game;
-    private static Map<Integer, Peon> peons;
+    private Map<Integer, Peon> peons;
+    private GLObject peonModel;
 
     public Peons(Game g) {
         game = g;
         peons = new HashMap<Integer, Peon>();
+        if (g.getClass() == com.novusradix.JavaPop.Client.Game.class)
+            peonModel = new XModel("/com/novusradix/JavaPop/models/peon4.x", "/com/novusradix/JavaPop/textures/peon.png");
     }
 
     public void Update(Detail d) {
@@ -36,15 +39,21 @@ public class Peons {
         }
     }
 
-    public void display(GL gl, double time) {
+    public void display(GL gl, float time) {
         synchronized (peons) {
             for (Peon p : peons.values()) {
+                gl.glUseProgram(0);
+                gl.glDisable(GL.GL_TEXTURE_2D);
                 gl.glPushMatrix();
                 gl.glTranslatef(p.pos.x, p.pos.y, game.heightMap.getHeight(p.pos.x, p.pos.y));
                 p.display(gl, time);
                 gl.glPopMatrix();
             }
         }
+    }
+
+    public void init(GL gl) {
+        peonModel.init(gl);
     }
 
     void step(float seconds) {
@@ -62,7 +71,7 @@ public class Peons {
         private float dx,  dy;
         private State state;
         private Player player;
-        
+
         public Peon(Detail d) {
             pos = d.pos;
             dest = d.dest;
@@ -80,26 +89,19 @@ public class Peons {
             state = d.state;
         }
 
-        private void display(GL gl, double time) {
+        private void display(GL gl, float time) {
             gl.glPushMatrix();
-            time += hashCode();
+            time += hashCode()%10000;
             switch (state) {
                 case DROWNING:
-                    gl.glTranslatef(0.0f, 0.0f, (float) abs(sin(time * 4.0f) / 2.0f + 0.1f));
+                    gl.glTranslatef(0.0f, 0.0f, (float) abs((float)sin(time * 4.0f) / 2.0f + 0.1f));
                 default:
 
             }
             gl.glDisable(GL.GL_LIGHTING);
             gl.glColor3fv(player.colour, 0);
-            
-            gl.glBegin(GL.GL_TRIANGLES);
 
-
-            gl.glVertex3f(0, 0, 0.3f);
-            gl.glVertex3f(0.1f, -0.1f, 0);
-            gl.glVertex3f(-0.1f, +0.1f, 0);
-
-            gl.glEnd();
+            peonModel.display(gl, time);
             gl.glPopMatrix();
         }
 
@@ -107,11 +109,12 @@ public class Peons {
             switch (state) {
                 case WALKING:
                     //if already reached destination, wait there - there'll be another message along shortly!
-                    if(dest.x == (int)pos.x && dest.y == (int)pos.y)
+                    if (dest.x == (int) pos.x && dest.y == (int) pos.y) {
                         break;
+                    }
                     pos.x += seconds * dx;
                     pos.y += seconds * dy;
-                    
+
                     break;
 
             }

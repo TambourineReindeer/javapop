@@ -89,7 +89,7 @@ public class Houses {
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (map[x][y] != EMPTY) {
-                    game.heightMap.setTexture(new Point(x, y), (byte)2);
+                    game.heightMap.setTile(new Point(x, y), HeightMap.TILE_FARM);
                 }
             }
         }
@@ -100,7 +100,7 @@ public class Houses {
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (map[x][y] != EMPTY) {
-                    game.heightMap.setTexture(new Point(x, y), (byte)1);
+                    game.heightMap.setTile(new Point(x, y), HeightMap.TILE_LAND);
                 }
             }
         }

@@ -85,7 +85,7 @@ public class Game extends TimerTask {
     }
 
     public void startGame() {
-        heightMap = new HeightMap(new Dimension(128, 128));
+        heightMap = new HeightMap(new Dimension(64, 64));
         heightMap.randomize(1);
         peons = new Peons(this);
         houses = new Houses(this);

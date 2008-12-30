@@ -6,7 +6,6 @@ package com.novusradix.JavaPop.AI;
 
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Messaging.Lobby.JoinGame;
-import com.novusradix.JavaPop.Messaging.Message;
 import com.novusradix.JavaPop.Server.Player.Info;
 import java.io.IOException;
 import java.io.ObjectInputStream;

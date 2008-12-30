@@ -12,8 +12,17 @@ import java.io.Serializable;
  */
 public class Matrix4 implements Serializable {
 
+    public static final Matrix4 identity;
+    static{
+        identity = new Matrix4();
+        identity.m[0]=1;
+        identity.m[5]=1;
+        identity.m[10]=1;
+        identity.m[15]=1;
+        
+    }
     private float[] m;
-
+    
     public Matrix4() {
         m = new float[16];
     }
@@ -38,6 +47,10 @@ public class Matrix4 implements Serializable {
             float t10, float t11, float t12,
             float t20, float t21, float t22) {
         return t00 * (t11 * t22 - t12 * t21) + t01 * (t12 * t20 - t10 * t22) + t02 * (t10 * t21 - t11 * t20);
+    }
+
+    public float[] getArray() {
+        return m.clone();
     }
 
     /**
@@ -114,7 +127,7 @@ public class Matrix4 implements Serializable {
     }
 
     public void mul(Matrix4 a, Matrix4 b) {
-
+        float[] m = new float[16];
         m[0] = a.m[0] * b.m[0] + a.m[1] * b.m[4] + a.m[2] * b.m[8] + a.m[3] * b.m[12];
         m[1] = a.m[0] * b.m[1] + a.m[1] * b.m[5] + a.m[2] * b.m[9] + a.m[3] * b.m[13];
         m[2] = a.m[0] * b.m[2] + a.m[1] * b.m[6] + a.m[2] * b.m[10] + a.m[3] * b.m[14];
@@ -134,6 +147,8 @@ public class Matrix4 implements Serializable {
         m[13] = a.m[12] * b.m[1] + a.m[13] * b.m[5] + a.m[14] * b.m[9] + a.m[15] * b.m[13];
         m[14] = a.m[12] * b.m[2] + a.m[13] * b.m[6] + a.m[14] * b.m[10] + a.m[15] * b.m[14];
         m[15] = a.m[12] * b.m[3] + a.m[13] * b.m[7] + a.m[14] * b.m[11] + a.m[15] * b.m[15];
+        
+        this.m = m;
     }
 
     public void set(float[] buf) {

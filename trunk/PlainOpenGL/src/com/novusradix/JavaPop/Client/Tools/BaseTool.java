@@ -28,11 +28,9 @@ public abstract class BaseTool implements Tool {
     public static void Initialise(Client c) {
         client = c;
         tools = new HashMap<Class, Tool>();
-        
-        for(Class t :Helpers.getClasses("com.novusradix.JavaPop.Client.Tools",true))
-        {
-            if (t.getSuperclass() == BaseTool.class)
-            {
+
+        for (Class t : Helpers.getClasses("com.novusradix.JavaPop.Client.Tools", true)) {
+            if (t.getSuperclass() == BaseTool.class) {
                 try {
                     tools.put(t, (Tool) t.newInstance());
                 } catch (InstantiationException ex) {
@@ -42,7 +40,7 @@ public abstract class BaseTool implements Tool {
                 }
             }
         }
-        
+
         current = tools.get(RaiseLowerTool.class);
     }
 
@@ -52,7 +50,7 @@ public abstract class BaseTool implements Tool {
 
     public static final void setTool(Class t) {
         if (current != tools.get(t)) {
-            current = tools.get(t);          
+            current = tools.get(t);
         }
     }
 
@@ -63,14 +61,12 @@ public abstract class BaseTool implements Tool {
     public void SecondaryAction(Point p) {
         setToolDefault();
     }
-    
-    public static void SetBehaviour(PeonMode m)
-    {
+
+    public static void SetBehaviour(PeonMode m) {
         client.setBehaviour(m);
     }
-    
-    public static Collection<Tool> getAllTools()
-    {
+
+    public static Collection<Tool> getAllTools() {
         return tools.values();
     }
 
@@ -78,5 +74,4 @@ public abstract class BaseTool implements Tool {
         current = tools.get(RaiseLowerTool.class);
         controlPalette.setDefaultTool();
     }
-    
 }

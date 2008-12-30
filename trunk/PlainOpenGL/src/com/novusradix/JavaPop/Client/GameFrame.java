@@ -21,7 +21,7 @@ public class GameFrame extends JFrame implements WindowListener {
     Game game;
     private Animator a;
     boolean fullscreen;
-MainCanvas mc;
+    MainCanvas mc;
 
     GameFrame(Game g) {
         game = g;
@@ -39,7 +39,7 @@ MainCanvas mc;
         add(mc);
         addWindowListener(this);
 
-        
+
         init(false);
 
         a = new Animator(mc);
@@ -64,6 +64,7 @@ MainCanvas mc;
             init(bFullscreen);
         }
     }
+
     public void close() {
         GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(null);
         game.kill();
