@@ -38,14 +38,16 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         texture = new HashMap<Point, Byte>();
         rowstride = width;
         bounds = new Rectangle(0, 0, width, breadth);
-        tex = new byte[width][breadth];
-        oldTex = new byte[width][breadth];
-        flat = new boolean[width][breadth];
+        tex = new byte[width - 1][breadth - 1];
+        oldTex = new byte[width - 1][breadth - 1];
+        flat = new boolean[width - 1][breadth - 1];
         int x, y;
         for (y = 0; y < breadth; y++) {
             for (x = 0; x < width; x++) {
                 b.put((byte) 0);
-                flat[x][y] = true;
+                if (x < width - 1 && y < breadth - 1) {
+                    flat[x][y] = true;
+                }
             }
         }
         b.flip();
@@ -75,8 +77,8 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
     void randomize(int seed) {
         synchronized (this) {
-            int n, m;
-            int x, y;
+            int n,  m;
+            int x,  y;
             Random r = new Random(seed);
 
             for (n = 0; n < width * breadth / 80; n++) {
@@ -121,8 +123,8 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
     }
 
     private void difTex() {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < breadth; y++) {
+        for (int x = 0; x < width - 1; x++) {
+            for (int y = 0; y < breadth - 1; y++) {
                 if (tex[x][y] != oldTex[x][y]) {
                     texture.put(new Point(x, y), tex[x][y]);
                     oldTex[x][y] = tex[x][y];

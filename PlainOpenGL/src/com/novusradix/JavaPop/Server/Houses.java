@@ -42,7 +42,7 @@ public class Houses {
     }
 
     public boolean canBuild(Point p) {
-        if (game.heightMap.inBounds(p)) {
+        if (game.heightMap.tileInBounds(p)) {
             return (map[p.x][p.y] == EMPTY && game.heightMap.getHeight(p) > 0 && game.heightMap.isFlat(p) && !newHouses.contains(p));
 
         }
@@ -125,7 +125,7 @@ public class Houses {
             for (Point offset : Helpers.rings[radius]) {
                 Point p = new Point(pos.x + offset.x, pos.y + offset.y);
 
-                if (game.heightMap.getHeight(p) == h && game.heightMap.isFlat(p)) {
+                if (game.heightMap.tileInBounds(p) && game.heightMap.getHeight(p) == h && game.heightMap.isFlat(p)) {
                     flat++;
                 }
             }
@@ -173,7 +173,7 @@ public class Houses {
             for (int radius = 1; radius <= radiuslimit; radius++) {
                 for (Point offset : Helpers.rings[radius]) {
                     Point p = new Point(pos.x + offset.x, pos.y + offset.y);
-                    if (game.heightMap.getHeight(p) == h && game.heightMap.isFlat(p)) {
+                    if (game.heightMap.tileInBounds(p) && game.heightMap.getHeight(p) == h && game.heightMap.isFlat(p)) {
                         newmap[p.x][p.y] = FARM;
                     }
                 }
