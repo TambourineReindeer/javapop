@@ -59,4 +59,10 @@ public class Client extends com.novusradix.JavaPop.Client.Client {
         }
         game = new Game(g, this);
     }
+
+    @Override
+    public void quit() {
+        super.quit();
+        game.kill();
+    }
 }
