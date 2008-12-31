@@ -7,30 +7,29 @@ package com.novusradix.JavaPop.Client;
 import java.awt.Dimension;
 
 import javax.media.opengl.GL;
-import javax.media.opengl.GLAutoDrawable;
 
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import java.awt.Point;
 
-public class HeightMap extends com.novusradix.JavaPop.HeightMap {
+public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObject {
 
     HeightMapImpl implementation;
-
+    GLObject renderer;
     public HeightMap(Dimension mapSize) {
         super(mapSize);
 
-        implementation = new HeightMapNoShader();
+        HeightMapNoShader h = new HeightMapNoShader();
+        implementation = h;
+        renderer = h;
         implementation.initialise(mapSize);
     }
 
-    @Override
-    public void display(GL gl, double time) {
-        implementation.display(gl, time);
+    public void display(GL gl, float time) {
+        renderer.display(gl, time);
     }
 
-    @Override
-    public void init(final GLAutoDrawable glDrawable) {
-        implementation.init(glDrawable);
+    public void init(GL gl) {
+        renderer.init(gl);
     }
 
     @Override

@@ -27,7 +27,7 @@ public class GameFrame extends JFrame implements WindowListener {
         game = g;
         GLCapabilities caps = new GLCapabilities();
         caps.setSampleBuffers(true);
-        caps.setNumSamples(4);
+        caps.setNumSamples(8);
 
         cf = new ControlFrame();
         cf.setBounds(1024, 0, cf.getWidth(), cf.getHeight());

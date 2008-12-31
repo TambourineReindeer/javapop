@@ -22,8 +22,7 @@ import static java.lang.Math.*;
  * @author mom
  */
 public class HeightMap extends com.novusradix.JavaPop.HeightMap {
-    
-    
+
     private ByteBuffer b;
     private static int rowstride;
     private Rectangle dirty;
@@ -80,7 +79,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
             int x, y;
             Random r = new Random(seed);
 
-            for (n = 0; n < width*breadth/80; n++) {
+            for (n = 0; n < width * breadth / 80; n++) {
                 x = r.nextInt(width);
                 y = r.nextInt(breadth);
                 for (m = 0; m < r.nextInt(8); m++) {
@@ -217,6 +216,9 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
             dirty.height = p.y - dirty.y;
         }
         dirty = dirty.intersection(bounds);
+        if (dirty.isEmpty()) {
+            dirty = null;
+        }
     }
 
     private void markDirty(Rectangle r) {
@@ -226,6 +228,9 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
             dirty = dirty.union(r);
         }
         dirty = dirty.intersection(bounds);
+        if (dirty.isEmpty()) {
+            dirty = null;
+        }
     }
 
     public HeightMapUpdate GetUpdate() {

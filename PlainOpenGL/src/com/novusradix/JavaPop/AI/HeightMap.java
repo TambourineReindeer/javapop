@@ -25,16 +25,6 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
     }
 
     @Override
-    public void display(GL gl, double time) {
-      throw new UnsupportedOperationException("Not implemented in AI.HeightMap");
-    }
-
-    @Override
-    public void init(final GLAutoDrawable glDrawable) {
-        throw new UnsupportedOperationException("Not implemented in AI.HeightMap");
-    }
-
-    @Override
     public void applyUpdate(HeightMapUpdate u) {
          synchronized (this) {
             if (!u.dirtyRegion.isEmpty()) {

@@ -96,7 +96,7 @@ public class Peons {
 
             Point oldPos = getPoint();
             strength -= seconds;
-            if (strength < 1) {
+            if (strength < 0) {
                 state = State.DEAD;
                 return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
             }
@@ -155,7 +155,7 @@ public class Peons {
                         state = State.ALIVE;
                         return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
                     }
-                    strength -= 10.0f * seconds;
+                    strength -= 100.0f * seconds;
                     return null;
 
                 case MERGING:
@@ -187,11 +187,14 @@ public class Peons {
         private Point findFlatLand(Point start) {
             // TODO Auto-generated method stub
             Point p;
-            for (Collection<Point> ring : Helpers.shuffledRings) {
+            for (Collection<Point> ring : Helpers.shuffledRings.subList(0, 15)) {
                 for (Point offset : ring) {
                     p = new Point(start.x + offset.x, start.y + offset.y);
                     if (game.heightMap.inBounds(p)) {
                         if (game.houses.canBuild(p)) {
+                            double d = start.distance(p);
+                            if (d>5)
+                                p = new Point(start.x + (int)(offset.x*5.0/d), start.y + (int)(offset.y*5.0/d));
                             return p;
                         }
                     }
@@ -201,6 +204,10 @@ public class Peons {
             p = new Point();
             p.x = start.x + r.nextInt(5) - 2;
             p.y = start.y + r.nextInt(5) - 2;
+            p.x = max(0,p.x);
+            p.y = max(0,p.y);
+            p.x = min(p.x, game.heightMap.getWidth());
+            p.y = min(p.y, game.heightMap.getBreadth());
             return p;
         }
     }

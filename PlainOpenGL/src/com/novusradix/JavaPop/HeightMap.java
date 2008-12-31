@@ -158,7 +158,7 @@ public abstract class HeightMap {
     public void applyUpdate(HeightMapUpdate u) {
         throw new UnsupportedOperationException("Not implemented in superclass");
     }
-
+/*
     //Optional
     public void init(GLAutoDrawable glDrawable) {
         throw new UnsupportedOperationException("Not implemented in superclass");
@@ -168,4 +168,5 @@ public abstract class HeightMap {
     public void display(GL gl, double time) {
         throw new UnsupportedOperationException("Not implemented in superclass");
     }
+*/
 }

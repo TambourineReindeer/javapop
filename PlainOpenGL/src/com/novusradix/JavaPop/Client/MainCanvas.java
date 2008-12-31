@@ -110,20 +110,17 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
 
         float time = (System.currentTimeMillis() - startMillis) / 1000.0f;
-
-        game.heightMap.display(gl, time);
-        game.peons.display(gl, time);
-        game.houses.display(gl, time);
-        
-        for (Player p : game.players.values()) {
-            p.display(gl, time);
+  
+        for (GLObject glo: game.objects)
+        {
+            glo.display(gl, time);
         }
         displayCursor(gl);
 
         gl.glPopMatrix();
         flush(gl);
         handleKeys();
-        printFPS();
+       // printFPS();
 
     }
 
@@ -202,8 +199,10 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
-        game.heightMap.init(glDrawable);
-        game.peons.init(gl);
+       for (GLObject glo: game.objects)
+        {
+            glo.init(gl);
+        }
     }
 
     public void reshape(final GLAutoDrawable glDrawable, final int x, final int y, final int w, int h) {

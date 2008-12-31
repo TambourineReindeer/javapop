@@ -13,7 +13,7 @@ import static java.lang.Math.*;
  *
  * @author mom
  */
-public class Player {
+public class Player implements GLObject{
 
     public String name;
     public float[] colour;
@@ -31,7 +31,7 @@ public class Player {
         ankh = i.ankh;
     }
 
-    public void display(GL gl, double time) {
+    public void display(GL gl, float time) {
         gl.glPushMatrix();
         gl.glTranslatef(ankh.x+0.5f, ankh.y+0.5f,(float) (game.heightMap.getHeight(ankh) + abs(sin(time*3.0))));
         gl.glRotated(time*720.0, 0, 0, 1);
@@ -46,5 +46,9 @@ public class Player {
         gl.glEnd();
         gl.glPopMatrix();
 
+    }
+
+    public void init(GL gl) {
+        
     }
 }

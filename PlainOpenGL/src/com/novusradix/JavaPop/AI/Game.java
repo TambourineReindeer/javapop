@@ -4,10 +4,8 @@
  */
 package com.novusradix.JavaPop.AI;
 
-import com.novusradix.JavaPop.Client.HeightMap;
 import com.novusradix.JavaPop.Client.Peons;
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
-import com.novusradix.JavaPop.Client.Houses;
 import com.novusradix.JavaPop.Client.Player;
 import com.novusradix.JavaPop.Server.Player.Info;
 import java.util.HashMap;
@@ -18,11 +16,15 @@ import java.util.HashMap;
  */
 public class Game extends com.novusradix.JavaPop.Client.Game {
 
+    com.novusradix.JavaPop.AI.Houses AIHouses;
+    AI ai;
     public Game(GameStarted g, Client c) {
+      
         heightMap = new HeightMap(g.gi.mapSize);
         client = c;
         peons = new Peons(this);
-        houses = new Houses(this);
+        AIHouses =  new Houses(this);
+        houses = AIHouses;
         players = new HashMap<Integer, Player>();
         for (Info i : g.gi.players.values()) {
             Player p = new Player(i, this);
@@ -31,6 +33,15 @@ public class Game extends com.novusradix.JavaPop.Client.Game {
                 me = p;
             }
         }
+        ai = new AI(this);
+        startTimer();
+    }
+    
+    @Override
+    public void kill()
+    {
+       super.kill();
+       ai.kill();
     }
     
 }
