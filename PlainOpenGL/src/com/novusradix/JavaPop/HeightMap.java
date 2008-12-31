@@ -39,6 +39,12 @@ public abstract class HeightMap {
     public boolean inBounds(Point p) {
         return (p.x >= 0 && p.y >= 0 && p.x < width && p.y < breadth);
     }
+    
+    public boolean tileInBounds(Point p)
+    {
+    return (p.x >= 0 && p.y >= 0 && p.x < width-1 && p.y < breadth-1);
+        
+    }
 
     public abstract byte getHeight(Point p);
 
