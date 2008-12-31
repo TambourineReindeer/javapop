@@ -37,7 +37,7 @@ public class Houses implements AbstractHouses, GLObject{
     }
 
     public boolean canBuild(Point p) {
-        if (game.heightMap.inBounds(p)) {
+        if (game.heightMap.tileInBounds(p)) {
             return (map[p.x][p.y] == EMPTY && game.heightMap.getHeight(p) > 0 && game.heightMap.isFlat(p));
 
         }

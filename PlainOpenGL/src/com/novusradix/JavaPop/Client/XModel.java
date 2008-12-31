@@ -77,8 +77,9 @@ public class XModel implements GLObject {
         gl.glLoadIdentity();
         gl.glMatrixMode(GL_MODELVIEW);
         gl.glPushMatrix();
+        gl.glScalef(1, 1, 2);
         gl.glMultMatrixf(transform.getArray(), 0);
-        gl.glScalef(1, 2, 1);
+
         gl.glUseProgram(shader);
         if (!listCreated) {
             gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
