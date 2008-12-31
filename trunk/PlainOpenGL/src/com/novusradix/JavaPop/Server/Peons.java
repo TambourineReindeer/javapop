@@ -190,7 +190,7 @@ public class Peons {
             for (Collection<Point> ring : Helpers.shuffledRings.subList(0, 15)) {
                 for (Point offset : ring) {
                     p = new Point(start.x + offset.x, start.y + offset.y);
-                    if (game.heightMap.inBounds(p)) {
+                    if (game.heightMap.tileInBounds(p)) {
                         if (game.houses.canBuild(p)) {
                             double d = start.distance(p);
                             if (d>5)
