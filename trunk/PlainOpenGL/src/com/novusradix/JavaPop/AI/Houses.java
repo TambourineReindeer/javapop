@@ -1,16 +1,20 @@
-package com.novusradix.JavaPop.Client;
+package com.novusradix.JavaPop.AI;
 
+import com.novusradix.JavaPop.Client.*;
+import com.novusradix.JavaPop.Math.MultiMap;
 import java.awt.Point;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.media.opengl.GL;
 
-public class Houses implements AbstractHouses, GLObject{
+public class Houses implements AbstractHouses {
 
     private Game game;
     private int[][] map;
     private Map<Integer, House> houses;
+    private MultiMap<Player, House> playerHouses;
     private static final int TEAMS = 4;
     private static final int EMPTY = 0;
     private static final int FARM = EMPTY + 1;
@@ -21,6 +25,11 @@ public class Houses implements AbstractHouses, GLObject{
         game = g;
         map = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
         houses = new HashMap<Integer, House>();
+        playerHouses = new MultiMap<Player, House>();
+    }
+
+    public Collection<House> getHouses(Player p) {
+        return playerHouses.get(p);
     }
 
     public void updateHouse(int id, Point pos, Player p, int level) {
@@ -28,10 +37,18 @@ public class Houses implements AbstractHouses, GLObject{
             if (level < 0) {
                 //remove
                 if (houses.containsKey(id)) {
+                    playerHouses.remove(p, houses.get(id));
                     houses.remove(id);
                 }
+
             } else {
-                houses.put(id, new House(pos, p, level));
+                if (houses.containsKey(id)) {
+                    houses.get(id).level = level;
+                } else {
+                    House h = new House(pos, p, level);
+                    houses.put(id, h);
+                    playerHouses.put(p, h);
+                }
             }
         }
     }
@@ -42,9 +59,9 @@ public class Houses implements AbstractHouses, GLObject{
 
         }
         return false;
-    }    
+    }
 
-    public void display(GL gl, float time) {
+    public void display(GL gl, double time) {
         synchronized (houses) {
             if (houses != null) {
                 for (House h : houses.values()) {
@@ -88,11 +105,11 @@ public class Houses implements AbstractHouses, GLObject{
 
                     gl.glEnd();
                     gl.glDisable(GL.GL_LIGHTING);
-                    gl.glColor3fv(h.player.colour,0);
+                    gl.glColor3fv(h.player.colour, 0);
                     gl.glBegin(GL.GL_TRIANGLES);
-                    gl.glVertex3f(0.3f, -0.3f,1.3f);
-                    gl.glVertex3f(0.3f, -0.3f,1.5f);
-                    gl.glVertex3f(0.4f, -0.4f,1.4f);
+                    gl.glVertex3f(0.3f, -0.3f, 1.3f);
+                    gl.glVertex3f(0.3f, -0.3f, 1.5f);
+                    gl.glVertex3f(0.4f, -0.4f, 1.4f);
                     gl.glEnd();
                     gl.glPopMatrix();
                 }
@@ -102,9 +119,9 @@ public class Houses implements AbstractHouses, GLObject{
 
     public class House {
 
-        private Point pos;
-        private int level;
-        private Player player;
+        public Point pos;
+        public int level;
+        public Player player;
 
         public House(Point p, Player player, int level) {
             map[p.x][p.y] = HOUSE;
@@ -112,9 +129,5 @@ public class Houses implements AbstractHouses, GLObject{
             this.level = level;
             this.player = player;
         }
-    }
-
-    public void init(GL gl) {
-        
     }
 }

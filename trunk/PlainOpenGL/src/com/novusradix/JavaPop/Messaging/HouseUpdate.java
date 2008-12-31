@@ -25,18 +25,19 @@ public class HouseUpdate extends Message {
     @Override
     public void execute() {
         for (Detail d : details) {
-            
-            client.game.houses.updateHouse(d.pos, client.game.players.get(d.playerId), d.level);
+            client.game.houses.updateHouse(d.id, d.pos, client.game.players.get(d.playerId), d.level);
         }
     }
 
     public static class Detail implements Serializable {
 
+        int id;
         Point pos;
         int level;
         int playerId;
 
-        public Detail(Point pos, Player p, int level) {
+        public Detail(int id,Point pos, Player p, int level) {
+            this.id = id;
             this.pos = pos;
             this.playerId = p.getId();
             this.level = level;

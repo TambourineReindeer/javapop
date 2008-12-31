@@ -25,8 +25,9 @@ public class MultiMap<K, V> {
     @SuppressWarnings("unchecked")
     public void put(K key, V value) {
         if (m.containsKey(key)) {
-            if(!m.get(key).add(value))
+            if (!m.get(key).add(value)) {
                 System.out.print("duplicate.\n");
+            }
         } else {
             HashSet l = new HashSet<V>();
             l.add(value);
@@ -35,7 +36,10 @@ public class MultiMap<K, V> {
     }
 
     public List<V> get(K key) {
-        return new ArrayList<V>(m.get(key));
+        if (m.containsKey(key)) {
+            return new ArrayList<V>(m.get(key));
+        }
+        return new ArrayList<V>();
     }
 
     public void remove(K key, V value) {

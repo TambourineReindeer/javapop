@@ -1,5 +1,6 @@
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Client.GLHelper.GLHelperException;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
 import com.sun.opengl.util.BufferUtil;
@@ -35,7 +36,8 @@ public class XModel implements GLObject {
     private int displayList;
     private boolean listCreated;
     private Matrix4 transform;
-
+    private int shader;
+    
     public XModel(String model, String texture) {
         this.textureName = texture;
         vertices = new ArrayList<Vector8>();
@@ -63,7 +65,7 @@ public class XModel implements GLObject {
         tex.enable();
         tex.bind();
         //gl.glDisable(GL_TEXTURE_2D);
-        gl.glColor4f(1, 1, 1, 0.5f);
+        
         Vector3 l = new Vector3(-9, -5, 10);
         l.normalize();
         gl.glEnable(GL_LIGHTING);
@@ -77,7 +79,7 @@ public class XModel implements GLObject {
         gl.glPushMatrix();
         gl.glMultMatrixf(transform.getArray(), 0);
         gl.glScalef(1, 2, 1);
-        gl.glUseProgram(0);
+        gl.glUseProgram(shader);
         if (!listCreated) {
             gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
             gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
@@ -108,15 +110,22 @@ public class XModel implements GLObject {
             tex.bind();
             tex.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
             tex.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+            GLHelper glh = new GLHelper();
+            shader = glh.LoadShaderProgram(gl, null, "/com/novusradix/JavaPop/Client/Shaders/ModelFragment.shader");
+
+        } catch (IOException ex) {
+            Logger.getLogger(XModel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (GLHelperException ex) {
+            Logger.getLogger(XModel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (GLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
+        
         displayList = gl.glGenLists(1);
         listCreated = false;
+
+
     }
 
     private void deduplicate() {
@@ -170,11 +179,10 @@ public class XModel implements GLObject {
             switch (ms.nextToken()) {
                 case StreamTokenizer.TT_WORD:
                      {
-                         if(ms.sval.equals("Frame"))
-                         {
-                             ms.nextToken();
-                             break;
-                         }
+                        if (ms.sval.equals("Frame")) {
+                            ms.nextToken();
+                            break;
+                        }
                         if (ms.sval.equals("Mesh")) {
                             parseVertices(ms);
                             break;
@@ -258,7 +266,7 @@ public class XModel implements GLObject {
             nextNumber(ms);
             v.tx = (float) ms.nval;
             nextNumber(ms);
-            v.ty = 1.0f+(float) ms.nval;
+            v.ty = 1.0f + (float) ms.nval;
         }
     }
 

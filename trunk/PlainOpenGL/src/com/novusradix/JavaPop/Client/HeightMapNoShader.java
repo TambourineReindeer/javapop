@@ -20,7 +20,7 @@ import static javax.media.opengl.GL.*;
  *
  * @author gef
  */
-public class HeightMapNoShader implements HeightMapImpl {
+public class HeightMapNoShader implements HeightMapImpl, GLObject {
     /*
      * b layout: float x,y,z,nx,ny,nz,tx,ty;
      *
@@ -352,10 +352,8 @@ public class HeightMapNoShader implements HeightMapImpl {
         return (p.x >= 0 && p.y >= 0 && p.x < width && p.y < breadth);
     }
 
-    public void init(final GLAutoDrawable glDrawable) {
-        final GL gl = glDrawable.getGL();
-
-
+    public void init(final GL gl) {
+        
         try {
             URL u = getClass().getResource("/com/novusradix/JavaPop/textures/tex.png");
             tex = TextureIO.newTexture(u, false, "png");
@@ -373,7 +371,7 @@ public class HeightMapNoShader implements HeightMapImpl {
         }
     }
 
-    public void display(GL gl, double time) {
+    public void display(GL gl, float time) {
         Vector3 l = new Vector3(-9, -5, 10);
         l.normalize();
         gl.glEnable(GL_LIGHTING);

@@ -8,21 +8,23 @@ import javax.media.opengl.glu.GLU;
 public class GLHelper {
 
     public int LoadShaderProgram(GL gl, String vertexSource, String fragmentSource) throws IOException, GLHelperException {
-        int v = gl.glCreateShader(GL.GL_VERTEX_SHADER);
-        int f = gl.glCreateShader(GL.GL_FRAGMENT_SHADER);   
-        
+        int v, f;
         String[] strings;
-        strings = loadResource(vertexSource);
-        gl.glShaderSource(v, strings.length, strings, (int[]) null, 0);
-        gl.glCompileShader(v);
-        
-        strings = loadResource(fragmentSource);
-        gl.glShaderSource(f, strings.length, strings, (int[]) null, 0);
-        gl.glCompileShader(f);
-
         int shaderprogram = gl.glCreateProgram();
-        gl.glAttachShader(shaderprogram, v);
-        gl.glAttachShader(shaderprogram, f);
+        if (vertexSource != null) {
+            v = gl.glCreateShader(GL.GL_VERTEX_SHADER);
+            strings = loadResource(vertexSource);
+            gl.glShaderSource(v, strings.length, strings, (int[]) null, 0);
+            gl.glCompileShader(v);
+            gl.glAttachShader(shaderprogram, v);
+        }
+        if (fragmentSource != null) {
+            f = gl.glCreateShader(GL.GL_FRAGMENT_SHADER);
+            strings = loadResource(fragmentSource);
+            gl.glShaderSource(f, strings.length, strings, (int[]) null, 0);
+            gl.glCompileShader(f);
+            gl.glAttachShader(shaderprogram, f);
+        }
         gl.glLinkProgram(shaderprogram);
         gl.glValidateProgram(shaderprogram);
         gl.glUseProgram(shaderprogram);
@@ -37,8 +39,7 @@ public class GLHelper {
         }
     }
 
-    private String[] loadResource(String resource) throws IOException
-    {
+    private String[] loadResource(String resource) throws IOException {
         BufferedReader brv;
         ArrayList<String> vsrc = new ArrayList<String>();
         String line;
@@ -50,7 +51,7 @@ public class GLHelper {
         vsrc.toArray(strings);
         return strings;
     }
-    
+
     class GLHelperException extends Exception {
 
         private String message;
