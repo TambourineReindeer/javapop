@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.novusradix.JavaPop.AI;
+package com.novusradix.JavaPop.Client.AI;
 
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Messaging.Lobby.JoinGame;

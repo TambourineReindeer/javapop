@@ -92,7 +92,7 @@ public class Game extends TimerTask {
 
         if (players.size() == 1) {
             //Add an AI player
-            new com.novusradix.JavaPop.AI.Client(server.port, id);
+            new com.novusradix.JavaPop.Client.AI.Client(server.port, id);
         }
 
         try {

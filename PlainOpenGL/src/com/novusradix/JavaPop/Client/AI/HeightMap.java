@@ -2,7 +2,7 @@
  * This class is the client side map. It specifies creation, response to server update messages, and rendering.
  * Other client classes can also query points on the map.
  */
-package com.novusradix.JavaPop.AI;
+package com.novusradix.JavaPop.Client.AI;
 
 import java.awt.Dimension;
 

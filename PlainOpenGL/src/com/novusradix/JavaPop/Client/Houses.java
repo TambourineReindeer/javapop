@@ -6,7 +6,7 @@ import java.util.Map;
 
 import javax.media.opengl.GL;
 
-public class Houses implements AbstractHouses, GLObject{
+public class Houses implements AbstractHouses, GLObject {
 
     private Game game;
     private int[][] map;
@@ -17,10 +17,13 @@ public class Houses implements AbstractHouses, GLObject{
     private static final int HOUSE = FARM + TEAMS;
     private static final int NEXT = HOUSE + TEAMS;
 
+    private XModel house1;
+    
     public Houses(Game g) {
         game = g;
         map = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
         houses = new HashMap<Integer, House>();
+        house1 = new XModel("/com/novusradix/JavaPop/models/house1.x", "/com/novusradix/JavaPop/textures/house1.png");
     }
 
     public void updateHouse(int id, Point pos, Player p, int level) {
@@ -42,13 +45,15 @@ public class Houses implements AbstractHouses, GLObject{
 
         }
         return false;
-    }    
+    }
 
     public void display(GL gl, float time) {
         synchronized (houses) {
             if (houses != null) {
+                gl.glUseProgram(0);
+                gl.glMatrixMode(GL.GL_MODELVIEW);
+
                 for (House h : houses.values()) {
-                    //gl.glEnable(GL.GL_LIGHTING);
                     gl.glPushMatrix();
                     gl.glTranslatef(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos.x, h.pos.y));
                     if (h.level > 9) {
@@ -57,42 +62,17 @@ public class Houses implements AbstractHouses, GLObject{
                     if (h.level == 48) {
                         gl.glScalef(1.0f, 1.0f, 2.0f);
                     }
-                    gl.glUseProgram(0);
-                    gl.glDisable(GL.GL_TEXTURE_2D);
                     gl.glColor3f(1, 1, 1);
-                    gl.glBegin(GL.GL_QUADS);
-
-                    gl.glNormal3f(-1, 0, 0);
-                    gl.glVertex3f(-0.3f, -0.3f, 0.0f);
-                    gl.glVertex3f(-0.3f, 0.3f, 0.0f);
-                    gl.glVertex3f(-0.3f, 0.3f, 1.3f);
-                    gl.glVertex3f(-0.3f, -0.3f, 1.3f);
-
-                    gl.glNormal3f(1, 0, 0);
-                    gl.glVertex3f(0.3f, -0.3f, 0.0f);
-                    gl.glVertex3f(0.3f, 0.3f, 0.0f);
-                    gl.glVertex3f(0.3f, 0.3f, 1.3f);
-                    gl.glVertex3f(0.3f, -0.3f, 1.3f);
-
-                    gl.glNormal3f(0, -1, 0);
-                    gl.glVertex3f(-0.3f, -0.3f, 0.0f);
-                    gl.glVertex3f(0.3f, -0.3f, 0.0f);
-                    gl.glVertex3f(0.3f, -0.3f, 1.3f);
-                    gl.glVertex3f(-0.3f, -0.3f, 1.3f);
-
-                    gl.glNormal3f(0, 1, 0);
-                    gl.glVertex3f(-0.3f, 0.3f, 0.0f);
-                    gl.glVertex3f(0.3f, 0.3f, 0.0f);
-                    gl.glVertex3f(0.3f, 0.3f, 1.3f);
-                    gl.glVertex3f(-0.3f, 0.3f, 1.3f);
-
-                    gl.glEnd();
+                    gl.glEnable(GL.GL_LIGHTING);
+                    house1.display(gl, time);
                     gl.glDisable(GL.GL_LIGHTING);
-                    gl.glColor3fv(h.player.colour,0);
+                    gl.glDisable(GL.GL_TEXTURE_2D);
+                
+                    gl.glColor3fv(h.player.colour, 0);
                     gl.glBegin(GL.GL_TRIANGLES);
-                    gl.glVertex3f(0.3f, -0.3f,1.3f);
-                    gl.glVertex3f(0.3f, -0.3f,1.5f);
-                    gl.glVertex3f(0.4f, -0.4f,1.4f);
+                    gl.glVertex3f(0.3f, -0.3f, 1.3f);
+                    gl.glVertex3f(0.3f, -0.3f, 1.5f);
+                    gl.glVertex3f(0.4f, -0.4f, 1.4f);
                     gl.glEnd();
                     gl.glPopMatrix();
                 }
@@ -115,6 +95,6 @@ public class Houses implements AbstractHouses, GLObject{
     }
 
     public void init(GL gl) {
-        
+        house1.init(gl);
     }
 }
