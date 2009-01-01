@@ -2,12 +2,12 @@ package com.novusradix.JavaPop.AI;
 
 import com.novusradix.JavaPop.Client.*;
 import com.novusradix.JavaPop.Math.MultiMap;
+import com.novusradix.JavaPop.Math.SortedMultiMap;
 import java.awt.Point;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.media.opengl.GL;
+import java.util.Set;
 
 public class Houses implements AbstractHouses {
 
@@ -20,12 +20,15 @@ public class Houses implements AbstractHouses {
     private static final int FARM = EMPTY + 1;
     private static final int HOUSE = FARM + TEAMS;
     private static final int NEXT = HOUSE + TEAMS;
+    private SortedMultiMap<Integer, House> xmap,  ymap;
 
     public Houses(Game g) {
         game = g;
         map = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
         houses = new HashMap<Integer, House>();
         playerHouses = new MultiMap<Player, House>();
+        xmap = new SortedMultiMap<Integer, House>();
+        ymap = new SortedMultiMap<Integer, House>();
     }
 
     public Collection<House> getHouses(Player p) {
@@ -37,7 +40,10 @@ public class Houses implements AbstractHouses {
             if (level < 0) {
                 //remove
                 if (houses.containsKey(id)) {
-                    playerHouses.remove(p, houses.get(id));
+                    House h = houses.get(id);
+                    playerHouses.remove(p, h);
+                    xmap.remove(h.pos.x, h);
+                    ymap.remove(h.pos.y, h);
                     houses.remove(id);
                 }
 
@@ -48,73 +54,20 @@ public class Houses implements AbstractHouses {
                     House h = new House(pos, p, level);
                     houses.put(id, h);
                     playerHouses.put(p, h);
+                    xmap.put(h.pos.x, h);
+                    ymap.put(h.pos.y, h);
                 }
             }
         }
     }
 
+   
     public boolean canBuild(Point p) {
         if (game.heightMap.tileInBounds(p)) {
             return (map[p.x][p.y] == EMPTY && game.heightMap.getHeight(p) > 0 && game.heightMap.isFlat(p));
 
         }
         return false;
-    }
-
-    public void display(GL gl, double time) {
-        synchronized (houses) {
-            if (houses != null) {
-                for (House h : houses.values()) {
-                    gl.glPushMatrix();
-                    gl.glTranslatef(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos.x, h.pos.y));
-                    if (h.level > 9) {
-                        gl.glScalef(3.0f, 3.0f, 1.0f);
-                    }
-                    if (h.level == 48) {
-                        gl.glScalef(1.0f, 1.0f, 2.0f);
-                    }
-                    gl.glUseProgram(0);
-                    gl.glDisable(GL.GL_TEXTURE_2D);
-                    gl.glEnable(GL.GL_LIGHTING);
-                    gl.glColor3f(1, 1, 1);
-                    gl.glBegin(GL.GL_QUADS);
-
-                    gl.glNormal3f(-1, 0, 0);
-                    gl.glVertex3f(-0.3f, -0.3f, 0.0f);
-                    gl.glVertex3f(-0.3f, 0.3f, 0.0f);
-                    gl.glVertex3f(-0.3f, 0.3f, 1.3f);
-                    gl.glVertex3f(-0.3f, -0.3f, 1.3f);
-
-                    gl.glNormal3f(1, 0, 0);
-                    gl.glVertex3f(0.3f, -0.3f, 0.0f);
-                    gl.glVertex3f(0.3f, 0.3f, 0.0f);
-                    gl.glVertex3f(0.3f, 0.3f, 1.3f);
-                    gl.glVertex3f(0.3f, -0.3f, 1.3f);
-
-                    gl.glNormal3f(0, -1, 0);
-                    gl.glVertex3f(-0.3f, -0.3f, 0.0f);
-                    gl.glVertex3f(0.3f, -0.3f, 0.0f);
-                    gl.glVertex3f(0.3f, -0.3f, 1.3f);
-                    gl.glVertex3f(-0.3f, -0.3f, 1.3f);
-
-                    gl.glNormal3f(0, 1, 0);
-                    gl.glVertex3f(-0.3f, 0.3f, 0.0f);
-                    gl.glVertex3f(0.3f, 0.3f, 0.0f);
-                    gl.glVertex3f(0.3f, 0.3f, 1.3f);
-                    gl.glVertex3f(-0.3f, 0.3f, 1.3f);
-
-                    gl.glEnd();
-                    gl.glDisable(GL.GL_LIGHTING);
-                    gl.glColor3fv(h.player.colour, 0);
-                    gl.glBegin(GL.GL_TRIANGLES);
-                    gl.glVertex3f(0.3f, -0.3f, 1.3f);
-                    gl.glVertex3f(0.3f, -0.3f, 1.5f);
-                    gl.glVertex3f(0.4f, -0.4f, 1.4f);
-                    gl.glEnd();
-                    gl.glPopMatrix();
-                }
-            }
-        }
     }
 
     public class House {

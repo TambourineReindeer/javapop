@@ -48,6 +48,7 @@ public class Houses implements AbstractHouses, GLObject{
         synchronized (houses) {
             if (houses != null) {
                 for (House h : houses.values()) {
+                    //gl.glEnable(GL.GL_LIGHTING);
                     gl.glPushMatrix();
                     gl.glTranslatef(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos.x, h.pos.y));
                     if (h.level > 9) {
@@ -58,7 +59,6 @@ public class Houses implements AbstractHouses, GLObject{
                     }
                     gl.glUseProgram(0);
                     gl.glDisable(GL.GL_TEXTURE_2D);
-                    gl.glEnable(GL.GL_LIGHTING);
                     gl.glColor3f(1, 1, 1);
                     gl.glBegin(GL.GL_QUADS);
 

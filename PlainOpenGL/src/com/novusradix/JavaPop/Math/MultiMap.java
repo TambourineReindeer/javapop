@@ -5,9 +5,11 @@
 package com.novusradix.JavaPop.Math;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -16,7 +18,7 @@ import java.util.Set;
  */
 public class MultiMap<K, V> {
 
-    private HashMap<K, HashSet<V>> m;
+    protected Map<K, HashSet<V>> m;
 
     public MultiMap() {
         m = new HashMap<K, HashSet<V>>();
@@ -58,5 +60,10 @@ public class MultiMap<K, V> {
             return m.get(key).size();
         }
         return 0;
+    }
+    
+    public Collection<K> getKeys()
+    {
+        return m.keySet();
     }
 }

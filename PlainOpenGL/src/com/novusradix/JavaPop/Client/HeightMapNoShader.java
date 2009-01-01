@@ -372,16 +372,14 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     }
 
     public void display(GL gl, float time) {
-        Vector3 l = new Vector3(-9, -5, 10);
-        l.normalize();
         gl.glEnable(GL_LIGHTING);
-        gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 0.0f}));
+        gl.glEnable(GL.GL_LIGHT1);
+
         gl.glColor3f(1, 1, 1);
         gl.glMatrixMode(GL.GL_TEXTURE);
         gl.glLoadIdentity();
         gl.glScalef(1.0f / 255.0f, 1.0f / 255.0f, 1.0f);
         gl.glMatrixMode(GL_MODELVIEW);
-
 
         tex.enable();
         tex.bind();
