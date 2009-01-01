@@ -1,4 +1,4 @@
-package com.novusradix.JavaPop.AI;
+package com.novusradix.JavaPop.Client.AI;
 
 import com.novusradix.JavaPop.Client.*;
 import com.novusradix.JavaPop.Math.MultiMap;
@@ -7,7 +7,6 @@ import java.awt.Point;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class Houses implements AbstractHouses {
 
@@ -20,15 +19,12 @@ public class Houses implements AbstractHouses {
     private static final int FARM = EMPTY + 1;
     private static final int HOUSE = FARM + TEAMS;
     private static final int NEXT = HOUSE + TEAMS;
-    private SortedMultiMap<Integer, House> xmap,  ymap;
 
     public Houses(Game g) {
         game = g;
         map = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
         houses = new HashMap<Integer, House>();
         playerHouses = new MultiMap<Player, House>();
-        xmap = new SortedMultiMap<Integer, House>();
-        ymap = new SortedMultiMap<Integer, House>();
     }
 
     public Collection<House> getHouses(Player p) {
@@ -42,9 +38,7 @@ public class Houses implements AbstractHouses {
                 if (houses.containsKey(id)) {
                     House h = houses.get(id);
                     playerHouses.remove(p, h);
-                    xmap.remove(h.pos.x, h);
-                    ymap.remove(h.pos.y, h);
-                    houses.remove(id);
+                   houses.remove(id);
                 }
 
             } else {
@@ -54,8 +48,6 @@ public class Houses implements AbstractHouses {
                     House h = new House(pos, p, level);
                     houses.put(id, h);
                     playerHouses.put(p, h);
-                    xmap.put(h.pos.x, h);
-                    ymap.put(h.pos.y, h);
                 }
             }
         }

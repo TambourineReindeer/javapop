@@ -1,6 +1,6 @@
-package com.novusradix.JavaPop.AI;
+package com.novusradix.JavaPop.Client.AI;
 
-import com.novusradix.JavaPop.AI.Houses.House;
+import com.novusradix.JavaPop.Client.AI.Houses.House;
 import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Messaging.Tools.UpDown;
 import java.awt.Point;

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.novusradix.JavaPop.AI;
+package com.novusradix.JavaPop.Client.AI;
 
 import com.novusradix.JavaPop.Client.Peons;
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
@@ -16,7 +16,7 @@ import java.util.HashMap;
  */
 public class Game extends com.novusradix.JavaPop.Client.Game {
 
-    com.novusradix.JavaPop.AI.Houses AIHouses;
+    com.novusradix.JavaPop.Client.AI.Houses AIHouses;
     AI ai;
     public Game(GameStarted g, Client c) {
       
