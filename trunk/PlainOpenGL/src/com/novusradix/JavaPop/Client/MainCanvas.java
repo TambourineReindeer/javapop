@@ -107,20 +107,23 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         gl.glEnable(GL.GL_BLEND);
         gl.glEnable(GL.GL_MULTISAMPLE);
-
+        Vector3 l = new Vector3(-9,-5,10);
+        l.normalize();
+        gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 0.0f}));
+        gl.glEnable(GL.GL_LIGHT1);
 
         float time = (System.currentTimeMillis() - startMillis) / 1000.0f;
-  
-        for (GLObject glo: game.objects)
-        {
+
+        for (GLObject glo : game.objects) {
             glo.display(gl, time);
         }
         displayCursor(gl);
-
+        
+        gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPopMatrix();
         flush(gl);
         handleKeys();
-       // printFPS();
+    // printFPS();
 
     }
 
@@ -129,7 +132,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     private void displayCursor(final GL gl) {
-        float cW,  cH;
+        float cW,   cH;
         cW = 0.02f;
         cH = 0.1f;
         gl.glDisable(GL.GL_LIGHTING);
@@ -199,8 +202,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
-       for (GLObject glo: game.objects)
-        {
+        for (GLObject glo : game.objects) {
             glo.init(gl);
         }
     }
@@ -319,12 +321,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Point iterateSelection(Point current, Vector3 v0, Vector3 v1) {
         Vector3 p;
 
-        float d,  oldD;
+        float d,   oldD;
         p = new Vector3(current.x, current.y, game.heightMap.getHeight(current));
         d = Helpers.PointLineDistance(v0, v1, p);
         oldD = d;
 
-        int x,  y;
+        int x,   y;
         for (Point offset : Helpers.rings[1]) {
             x = current.x + offset.x;
             y = current.y + offset.y;

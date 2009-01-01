@@ -2,9 +2,13 @@ package com.novusradix.JavaPop.Server;
 
 import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Messaging.HouseUpdate;
+import com.novusradix.JavaPop.Server.Peons.Peon;
 import java.awt.Point;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import static java.lang.Math.*;
@@ -16,7 +20,7 @@ public class Houses {
     private int[][] newmap;
     private Vector<HouseUpdate.Detail> hds;
     private Vector<Point> newHouses;
-    private Collection<House> allHouses;
+    private Map<Point,House> allHouses;
     private static final int TEAMS = 4;
     private static final int EMPTY = 0;
     private static final int FARM = EMPTY + 1;
@@ -28,7 +32,7 @@ public class Houses {
         map = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
         newmap = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
 
-        allHouses = new Vector<House>();
+        allHouses = new HashMap<Point, House>();
         newHouses = new Vector<Point>();
         hds = new Vector<HouseUpdate.Detail>();
     }
@@ -36,7 +40,7 @@ public class Houses {
     public void addHouse(Point p, Player player, float strength) {
         synchronized (allHouses) {
             if (canBuild(p)) {
-                allHouses.add(new House(p, player, strength));
+                allHouses.put(p,new House(p, player, strength));
             }
         }
     }
@@ -57,7 +61,7 @@ public class Houses {
         }
         synchronized (allHouses) {
             newHouses.clear();
-            Iterator<House> i = allHouses.iterator();
+            Iterator<House> i = allHouses.values().iterator();
             House h;
             for (; i.hasNext();) {
                 h = i.next();
@@ -71,7 +75,7 @@ public class Houses {
                     hds.add(new HouseUpdate.Detail(h.id, h.pos, h.player, -1));
                 }
             }
-            i = allHouses.iterator();
+            i = allHouses.values().iterator();
             for (; i.hasNext();) {
                 h = i.next();
                 if (newmap[h.pos.x][h.pos.y] != HOUSE) {
@@ -94,6 +98,10 @@ public class Houses {
             game.sendAllPlayers(new HouseUpdate(hds));
             hds.clear();
         }
+    }
+
+    Houses.House getHouse(Point p) {
+        return allHouses.get(p);
     }
 
     private void paint() {
@@ -135,9 +143,27 @@ public class Houses {
         }
         return flat;
     }
+
+    public Point nearestHouse(Point p, Set<Player> players) {
+        int d2 = game.heightMap.getWidth() * game.heightMap.getBreadth() + 1;
+        House nearest = null;
+        for (House h : allHouses.values()) {
+            int nd2 = (p.x - h.pos.x) * (p.x - h.pos.x) + (p.y - h.pos.y) * (p.y - h.pos.y);
+            if (nd2 < d2) {
+                if (players.contains(h.player)) {
+                    nearest = h;
+                    d2 = nd2;
+                }
+            }
+        }
+        if (nearest != null) {
+            return nearest.pos;
+        }
+        return null;
+    }
     private static int nextId;
 
-    public class House {
+    class House {
 
         private int id;
         private Point pos;
@@ -156,6 +182,22 @@ public class Houses {
             newHouses.add(p);
         }
 
+        void addPeon(Peon p)
+        {
+            if(p.player == player)
+            {
+                strength += p.strength;
+                return;
+            }
+            
+            strength -=p.strength;
+            if(strength<0){
+                player = p.player;
+                strength = -strength;
+                changed = true;
+            }
+        }
+        
         private void paintmap(int[][] newmap) {
             newmap[pos.x][pos.y] = HOUSE;
             int radiuslimit = 0;

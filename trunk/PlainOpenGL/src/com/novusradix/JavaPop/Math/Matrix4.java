@@ -31,6 +31,21 @@ public class Matrix4 implements Serializable {
         this.m = m.m.clone();
     }
 
+    public Matrix4(Vector3 front, Vector3 left, Vector3 up) {
+        m = new float[16];
+        m[0] = front.x;
+        m[1] = front.y;
+        m[2] = front.z;
+        m[4] = left.x;
+        m[5] = left.y;
+        m[6] = left.z;
+        m[8] = up.x;
+        m[9] = up.y;
+        m[10] = up.z;
+        m[15] = 1;
+        
+    }
+
     public float determinant() {
         float f = m[0] * ((m[5] * m[10] * m[15] + m[6] * m[11] * m[13] + m[7] * m[9] * m[14]) - m[7] * m[10] * m[13] - m[5] * m[11] * m[14] - m[6] * m[9] * m[15]);
         f -= m[1] * ((m[4] * m[10] * m[15] + m[6] * m[11] * m[12] + m[7] * m[8] * m[14]) - m[7] * m[10] * m[12] - m[4] * m[11] * m[14] - m[6] * m[8] * m[15]);
