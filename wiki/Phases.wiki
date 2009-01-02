@@ -8,14 +8,15 @@ High level plan
 == To Do ==
   #  add a couple of spells (volcano?) for fun
   #  design some house and better people models
-  #  add more behaviour modes - fight, group
   #  mana
+  #  peon routefinding
   #  AI
   #  Startup menu - single player, multiplayer etc.
-  #  enable fighting for houses
 
 == Done ==
 
+  #  add more behaviour modes - fight, group
+  #  enable fighting for houses
   #  design some people models
   #  add ankh move spell
   #  add behaviour modes - settle, go to ankh
