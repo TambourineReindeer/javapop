@@ -67,8 +67,8 @@ public class HeightMapUpdateTest {
         serverh.up(new Point(112, 125));
         serverh.up(new Point(127, 127));
         serverh.up(new Point(127, 127));
-        serverh.setTexture(new Point(0, 0), 7);
-        serverh.setTexture(new Point(127, 127), 7);
+        serverh.setTile(new Point(0, 0), (byte)7);
+        serverh.setTile(new Point(126, 126), (byte)7);
 
 
         instance = serverh.GetUpdate();
@@ -103,8 +103,8 @@ public class HeightMapUpdateTest {
 
         instance.clientMap = clienth;
         assertTrue(instance.texture.get(new Point(0, 0)) == 7);
-        assertTrue(instance.texture.get(new Point(127, 127)) == 7);
-        instance.texture = new HashMap<Point, Integer>();
+        assertTrue(instance.texture.get(new Point(126, 126)) == 7);
+        instance.texture = new HashMap<Point, Byte>();
         instance.execute();
         assertTrue(clienth.getHeight(new Point(0, 0)) == 2);
         assertTrue(clienth.getHeight(new Point(5, 5)) == 1);
