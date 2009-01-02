@@ -16,9 +16,8 @@ public class Houses implements AbstractHouses, GLObject {
     private static final int FARM = EMPTY + 1;
     private static final int HOUSE = FARM + TEAMS;
     private static final int NEXT = HOUSE + TEAMS;
-
     private XModel house1;
-    
+
     public Houses(Game g) {
         game = g;
         map = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
@@ -65,9 +64,20 @@ public class Houses implements AbstractHouses, GLObject {
                     gl.glColor3f(1, 1, 1);
                     gl.glEnable(GL.GL_LIGHTING);
                     house1.display(gl, time);
-                    gl.glDisable(GL.GL_LIGHTING);
-                    gl.glDisable(GL.GL_TEXTURE_2D);
-                
+                    gl.glPopMatrix();
+                }
+                gl.glDisable(GL.GL_LIGHTING);
+                gl.glDisable(GL.GL_TEXTURE_2D);
+                gl.glUseProgram(0);
+                for (House h : houses.values()) {
+                    gl.glPushMatrix();
+                    gl.glTranslatef(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos.x, h.pos.y));
+                    if (h.level > 9) {
+                        gl.glScalef(3.0f, 3.0f, 1.0f);
+                    }
+                    if (h.level == 48) {
+                        gl.glScalef(1.0f, 1.0f, 2.0f);
+                    }
                     gl.glColor3fv(h.player.colour, 0);
                     gl.glBegin(GL.GL_TRIANGLES);
                     gl.glVertex3f(0.3f, -0.3f, 1.3f);
