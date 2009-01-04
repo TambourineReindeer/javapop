@@ -8,7 +8,6 @@ import com.novusradix.JavaPop.Server.Peons.State;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import javax.media.opengl.GL;
 
 import static java.lang.Math.*;

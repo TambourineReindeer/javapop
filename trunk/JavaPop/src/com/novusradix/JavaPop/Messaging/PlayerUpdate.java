@@ -2,26 +2,34 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.novusradix.JavaPop.Messaging;
 
 import com.novusradix.JavaPop.Server.Player.Info;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *
  * @author mom
  */
-public class PlayerUpdate extends Message{
-    private Info info;
+public class PlayerUpdate extends Message {
 
-    public PlayerUpdate(Info i)
+    private Collection<Info> info;
+
+    public PlayerUpdate(Info i) {
+        this.info = new ArrayList<Info>(1);
+        this.info.add(i);
+    }
+    
+    public PlayerUpdate(Collection<Info> is)
     {
-        this.info = i;
+        this.info = is;
     }
     
     @Override
     public void execute() {
-        clientGame.players.get(info.id).update(info);
+        for (Info i : info) {
+            clientGame.players.get(i.id).update(i);
+        }
     }
-    
 }

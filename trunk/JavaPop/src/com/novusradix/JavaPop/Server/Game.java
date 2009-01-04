@@ -9,7 +9,9 @@ import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.novusradix.JavaPop.Messaging.Lobby.JoinedGame;
 import com.novusradix.JavaPop.Messaging.Message;
+import com.novusradix.JavaPop.Messaging.PlayerUpdate;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -69,9 +71,9 @@ public class Game extends TimerTask {
                     sendAllPlayers(new GameOver());
                 }
             }
-            
+
         }
-        //TODO: send a message?
+    //TODO: send a message?
     }
 
     public void PlayerReady(Player p) {
@@ -104,7 +106,7 @@ public class Game extends TimerTask {
         }
 
         for (Player p : players) {
-            peons.addPeon(2.5f+p.getId(), 2.5f+p.getId()*2, 200, p);
+            peons.addPeon(2.5f + p.getId(), 2.5f + p.getId() * 2, 200, p);
         }
 
         GameStarted go = new GameStarted(this);
@@ -134,6 +136,11 @@ public class Game extends TimerTask {
         if (m != null) {
             sendAllPlayers(m);
         }
+        ArrayList<Player.Info> is = new ArrayList<Player.Info>(players.size());
+        for (Player p : players) {
+            is.add(p.info);
+        }
+        sendAllPlayers(new PlayerUpdate(is));
     }
 
     public void sendAllPlayers(Message m) {

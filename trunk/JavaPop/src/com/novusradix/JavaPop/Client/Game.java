@@ -47,8 +47,9 @@ public class Game extends TimerTask {
         objects.add(h1);
 
         players = new HashMap<Integer, Player>();
+        int index = 0;
         for (Info i : g.gi.players.values()) {
-            Player p = new Player(i, this);
+            Player p = new Player(i, this, index++);
             players.put(i.id, p);
             objects.add(p);
             if (i.id == c.info.id) {

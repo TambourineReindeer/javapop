@@ -183,11 +183,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     public void init(final GLAutoDrawable glDrawable) {
         final GL gl = glDrawable.getGL();
-        /*
-         * final boolean VBOsupported = gl.isFunctionAvailable("glGenBuffersARB") &&
-         * gl.isFunctionAvailable("glBindBufferARB") && gl.isFunctionAvailable("glBufferDataARB") &&
-         * gl.isFunctionAvailable("glDeleteBuffersARB");
-         */
 
         gl.setSwapInterval(1);
         gl.glEnable(GL.GL_LIGHTING);
