@@ -2,7 +2,6 @@ package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Client.GLHelper.GLHelperException;
 import com.novusradix.JavaPop.Math.Matrix4;
-import com.novusradix.JavaPop.Math.Vector3;
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
@@ -53,7 +52,6 @@ public class XModel implements GLObject {
             Logger.getLogger(XModel.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        //transform.transpose();
         deduplicate();
         fillBuffer();
 

@@ -2,7 +2,6 @@ package com.novusradix.JavaPop.Client.AI;
 
 import com.novusradix.JavaPop.Client.*;
 import com.novusradix.JavaPop.Math.MultiMap;
-import com.novusradix.JavaPop.Math.SortedMultiMap;
 import java.awt.Point;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,12 +37,18 @@ public class Houses implements AbstractHouses {
                 if (houses.containsKey(id)) {
                     House h = houses.get(id);
                     playerHouses.remove(p, h);
-                   houses.remove(id);
+                    houses.remove(id);
                 }
-
             } else {
                 if (houses.containsKey(id)) {
-                    houses.get(id).level = level;
+                    House h = houses.get(id);
+                    h.level = level;
+                    if(h.player!=p)
+                    {
+                        playerHouses.remove(h.player, h);
+                        h.player = p;
+                        playerHouses.put(p, h);
+                    }
                 } else {
                     House h = new House(pos, p, level);
                     houses.put(id, h);
@@ -53,11 +58,9 @@ public class Houses implements AbstractHouses {
         }
     }
 
-   
     public boolean canBuild(Point p) {
         if (game.heightMap.tileInBounds(p)) {
             return (map[p.x][p.y] == EMPTY && game.heightMap.getHeight(p) > 0 && game.heightMap.isFlat(p));
-
         }
         return false;
     }

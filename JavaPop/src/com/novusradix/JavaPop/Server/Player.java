@@ -43,7 +43,7 @@ public class Player implements Runnable {
         this.s = s;
         this.socket = sock;
         id = nextId++;
-        info = new Info(id, "Player " + id, new Point(0, 0), defaultColors[id%3]);
+        info = new Info(id, "Player " + id, new Point(0, 0), defaultColors[id%3], 0);
         peonMode = PeonMode.SETTLE;
         try {
             socket.setTcpNoDelay(true);
@@ -118,12 +118,14 @@ public class Player implements Runnable {
         public String name;
         public Point ankh;
         public float[] colour;
-
-        private Info(int id, String name, Point ankh, float[] colour) {
+        public double mana;
+        
+        private Info(int id, String name, Point ankh, float[] colour, double mana) {
             this.id = id;
             this.name = name;
             this.ankh = ankh;
             this.colour = colour;
+            this.mana = mana;
         }
     }
 }

@@ -4,7 +4,6 @@ import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Messaging.HouseUpdate;
 import com.novusradix.JavaPop.Server.Peons.Peon;
 import java.awt.Point;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -191,7 +190,10 @@ public class Houses {
             }
             
             strength -=p.strength;
+            p.player.info.mana -= p.strength;
+            player.info.mana -= p.strength;
             if(strength<0){
+                player.info.mana -=strength;
                 player = p.player;
                 strength = -strength;
                 changed = true;
@@ -237,8 +239,9 @@ public class Houses {
 
         private void step(float seconds) {
             float rate = (level + 1);
-
-            strength += rate * seconds;
+            float newmana = rate*seconds;
+            strength += newmana;
+            player.info.mana += newmana;
             if (strength > rate * 100.0f) {
                 float houseStrength = rate * 100.0f - min(500.0f, rate * 100.0f / 2.0f);
                 game.peons.addPeon(pos.x, pos.y, strength - houseStrength, player);
