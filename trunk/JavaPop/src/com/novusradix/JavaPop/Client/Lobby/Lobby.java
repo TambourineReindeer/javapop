@@ -11,6 +11,7 @@ import javax.swing.ListModel;
 
 import com.novusradix.JavaPop.Client.Client;
 import com.novusradix.JavaPop.Server.GameInfo;
+import java.util.Collection;
 
 /**
  *
@@ -21,6 +22,7 @@ public class Lobby {
     public Game currentGame;
     public Client client;
     private DefaultListModel gameList;
+    public Vector<GameInfo> games;
     private DefaultListModel serverList;
     private LobbyFrame f;
     AnnounceListener a;
@@ -33,7 +35,6 @@ public class Lobby {
         f = new LobbyFrame(this);
         a = new AnnounceListener(this);
         gl = f.getGamePanel();
-        f.setVisible(true);
     }
 
     public void newGame(GameInfo gi) {
@@ -55,6 +56,7 @@ public class Lobby {
     }
 
     public void setGames(Vector<GameInfo> gs) {
+        games = gs;
         gameList.clear();
         for (GameInfo gi : gs) {
             gameList.addElement(gi);

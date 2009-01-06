@@ -28,4 +28,8 @@ public class VolcanoTool extends BaseTool {
     public String getType() {
         return "Fire";
     }
+    
+    public Point getPosition() {
+        return new Point(0,250);
+    }
 }

@@ -19,12 +19,12 @@ public class RaiseLowerTool extends BaseTool {
         client.sendMessage(new UpDown(p, true));
     }
 
-
+    @Override
     public void SecondaryAction(Point p) {
         client.sendMessage(new UpDown(p, false));
     }
     
-public String getIconName() {
+    public String getIconName() {
         return "/com/novusradix/JavaPop/icons/UpDown.png";
     }
 
@@ -34,5 +34,9 @@ public String getIconName() {
 
     public String getType() {
       return "Earth";
+    }
+
+    public Point getPosition() {
+        return new Point(0,-250);
     }
 }

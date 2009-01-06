@@ -25,4 +25,7 @@ public class EarthquakeTool extends BaseTool {
         return "Earth";
     }
  
+    public Point getPosition() {
+        return new Point(200,150);
+    }
 }

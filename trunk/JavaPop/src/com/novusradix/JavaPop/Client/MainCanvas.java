@@ -5,8 +5,10 @@ package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Client.Tools.BaseTool;
+import com.novusradix.JavaPop.Client.Tools.Tool;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
+import java.awt.Cursor;
 import java.awt.Point;
 
 import java.awt.event.KeyEvent;
@@ -25,11 +27,12 @@ import javax.media.opengl.GLEventListener;
 
 
 import java.awt.event.MouseWheelListener;
+import java.util.ArrayList;
 import static java.lang.Math.*;
 import static java.awt.event.KeyEvent.*;
 import static javax.media.opengl.GL.*;
 
-public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener, MouseMotionListener, MouseListener, MouseWheelListener {
+public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener, MouseWheelListener, MouseMotionListener, MouseListener {
 
     /**
      *
@@ -48,6 +51,8 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     float xMouse, yMouse;
     private int frameCount = 0;
     private long frameTime;
+    private ArrayList<GLButton> glButtons;
+    private ClickableHandler clickables;
 
     public MainCanvas(GLCapabilities caps, Game g) {
         super(caps);
@@ -58,16 +63,23 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         mvpInverse = new Matrix4();
 
         selected = new Point();
-
+        clickables = new ClickableHandler(this, this, this);
         addGLEventListener(this);
-        addMouseListener(this);
-        addMouseMotionListener(this);
+        addMouseListener(clickables);
+        addMouseMotionListener(clickables);
         addKeyListener(this);
         addMouseWheelListener(this);
 
         requestFocus();
         xPos = 0;
         yPos = 0;
+
+        glButtons = new ArrayList<GLButton>();
+        for (Tool t : BaseTool.getAllTools()) {
+            GLButton b = new GLButton(t);
+            glButtons.add(b);
+            clickables.addClickable(b);
+        }
     }
 
     public void display(final GLAutoDrawable glAD) {
@@ -107,7 +119,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         gl.glEnable(GL.GL_BLEND);
         gl.glEnable(GL.GL_MULTISAMPLE);
-        Vector3 l = new Vector3(-9,-5,10);
+        Vector3 l = new Vector3(-9, -5, 10);
         l.normalize();
         gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 0.0f}));
         gl.glEnable(GL.GL_LIGHT1);
@@ -118,9 +130,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             glo.display(gl, time);
         }
         displayCursor(gl);
-        
+
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPopMatrix();
+        for (GLButton b : glButtons) {
+            b.display(gl, time);
+        }
         flush(gl);
         handleKeys();
     // printFPS();
@@ -132,7 +147,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     private void displayCursor(final GL gl) {
-        float cW,   cH;
+        float cW, cH;
         cW = 0.02f;
         cH = 0.1f;
         gl.glDisable(GL.GL_LIGHTING);
@@ -200,6 +215,10 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         for (GLObject glo : game.objects) {
             glo.init(gl);
         }
+        for (GLButton b : glButtons) {
+            b.init(gl);
+        }
+
     }
 
     public void reshape(final GLAutoDrawable glDrawable, final int x, final int y, final int w, int h) {
@@ -265,14 +284,14 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private void mousePick() {
         float l;
 
-        Vector3 z0,z1 ,s ;
+        Vector3 z0, z1, s;
         z0 = new Vector3(xMouse, yMouse, 10);
         z1 = new Vector3(xMouse, yMouse, 11);
 
         mvpInverse.transform(z0);
         mvpInverse.transform(z1);
 
-        Vector3 v0n,v1n ;
+        Vector3 v0n, v1n;
         v0n = new Vector3(z0);
         v1n = new Vector3(z1);
 
@@ -316,12 +335,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Point iterateSelection(Point current, Vector3 v0, Vector3 v1) {
         Vector3 p;
 
-        float d,   oldD;
+        float d, oldD;
         p = new Vector3(current.x, current.y, game.heightMap.getHeight(current));
         d = Helpers.PointLineDistance(v0, v1, p);
         oldD = d;
 
-        int x,   y;
+        int x, y;
         for (Point offset : Helpers.rings[1]) {
             x = current.x + offset.x;
             y = current.y + offset.y;
@@ -342,7 +361,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     public void mouseEntered(MouseEvent e) {
-        // TODO Auto-generated method stub
+        setCursor(Cursor.getDefaultCursor());
     }
 
     public void mouseExited(MouseEvent e) {
