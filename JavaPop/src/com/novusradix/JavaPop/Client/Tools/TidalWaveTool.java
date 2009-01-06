@@ -27,4 +27,7 @@ public class TidalWaveTool extends BaseTool {
         return "Water";
     }
  
+    public Point getPosition() {
+        return new Point(0,250);
+    }
 }

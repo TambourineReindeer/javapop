@@ -28,4 +28,8 @@ public class MoveAnkhTool extends BaseTool{
     public String getType() {
         return "Earth";
     }
+    
+    public Point getPosition() {
+        return new Point(100,200);
+    }
 }

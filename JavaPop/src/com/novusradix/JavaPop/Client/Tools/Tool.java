@@ -17,4 +17,5 @@ public interface Tool {
     public String getType();
     public void PrimaryAction(Point p);
     public void SecondaryAction(Point p);
+    public Point getPosition();
 }

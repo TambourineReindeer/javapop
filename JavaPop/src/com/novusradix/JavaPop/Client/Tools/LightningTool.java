@@ -26,4 +26,8 @@ public class LightningTool extends BaseTool {
     public String getType() {
        return "Air";
     }
+    
+    public Point getPosition() {
+        return new Point(0,250);
+    }
 }

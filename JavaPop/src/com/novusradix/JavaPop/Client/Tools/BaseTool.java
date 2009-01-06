@@ -11,6 +11,7 @@ import com.novusradix.JavaPop.Server.Player.PeonMode;
 import java.awt.Point;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,21 +24,26 @@ public abstract class BaseTool implements Tool {
     static Client client;
     static Tool current;
     static HashMap<Class, Tool> tools;
+    static HashMap<String, Tool> types;
     static ControlPalette controlPalette;
 
     public static void Initialise(Client c) {
         client = c;
         tools = new HashMap<Class, Tool>();
+        types = new HashMap<String, Tool>();
 
         for (Class t : Helpers.getClasses("com.novusradix.JavaPop.Client.Tools", true)) {
             if (t.getSuperclass() == BaseTool.class) {
                 try {
-                    tools.put(t, (Tool) t.newInstance());
+                    Tool tool = (Tool) t.newInstance();
+                    tools.put(t, tool);
+                    types.put(tool.getType(), tool);
                 } catch (InstantiationException ex) {
                     Logger.getLogger(BaseTool.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IllegalAccessException ex) {
                     Logger.getLogger(BaseTool.class.getName()).log(Level.SEVERE, null, ex);
                 }
+
             }
         }
 
@@ -68,6 +74,10 @@ public abstract class BaseTool implements Tool {
 
     public static Collection<Tool> getAllTools() {
         return tools.values();
+    }
+
+    public static Map<String, Tool> getToolsByType() {
+        return types;
     }
 
     public void setToolDefault() {

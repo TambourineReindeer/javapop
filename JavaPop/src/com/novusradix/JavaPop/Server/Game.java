@@ -144,8 +144,10 @@ public class Game extends TimerTask {
     }
 
     public void sendAllPlayers(Message m) {
-        for (Player pl : players) {
-            pl.sendMessage(m);
+        synchronized (players) {
+            for (Player pl : players) {
+                pl.sendMessage(m);
+            }
         }
     }
 }

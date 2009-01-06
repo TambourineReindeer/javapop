@@ -74,13 +74,13 @@ public class Server implements Runnable {
         System.out.print("Server quitting.\n");
     }
 
-    public void newGame(Player p) {
+    public void newGame(Player owner) {
 
-        if (p.currentGame != null) {
-            p.currentGame.removePlayer(p);
+        if (owner.currentGame != null) {
+            owner.currentGame.removePlayer(owner);
         }
 
-        Game g = new Game(p);
+        Game g = new Game(owner);
 
         games.put(g.getId(), g);
 

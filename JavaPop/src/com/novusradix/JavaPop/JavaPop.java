@@ -1,13 +1,13 @@
 package com.novusradix.JavaPop;
 
-import com.novusradix.JavaPop.Client.Lobby.Lobby;
+import com.novusradix.JavaPop.Client.Lobby.MainMenu;
 
 
 public class JavaPop {
 
     public static void main(final String[] args) {
 
-        new Lobby();
+        (new MainMenu()).setVisible(true);
     
     }
 }
