@@ -6,14 +6,11 @@ package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
 import com.novusradix.JavaPop.Client.ControlPalette;
-import com.novusradix.JavaPop.Helpers;
 import com.novusradix.JavaPop.Server.Player.PeonMode;
 import java.awt.Point;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -31,22 +28,31 @@ public abstract class BaseTool implements Tool {
         client = c;
         tools = new HashMap<Class, Tool>();
         types = new HashMap<String, Tool>();
-
+        tools.put(RaiseLowerTool.class, new RaiseLowerTool());
+        tools.put(MoveAnkhTool.class, new MoveAnkhTool());
+        tools.put(EarthquakeTool.class, new EarthquakeTool());
+        tools.put(LightningTool.class, new LightningTool());
+        tools.put(TidalWaveTool.class, new TidalWaveTool());
+        tools.put(VolcanoTool.class, new VolcanoTool());
+        for (Tool t : tools.values()) {
+            types.put(t.getType(), t);
+        /* doesn't work with web start :o(
         for (Class t : Helpers.getClasses("com.novusradix.JavaPop.Client.Tools", true)) {
-            if (t.getSuperclass() == BaseTool.class) {
-                try {
-                    Tool tool = (Tool) t.newInstance();
-                    tools.put(t, tool);
-                    types.put(tool.getType(), tool);
-                } catch (InstantiationException ex) {
-                    Logger.getLogger(BaseTool.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(BaseTool.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-            }
+        if (t.getSuperclass() == BaseTool.class) {
+        try {
+        Tool tool = (Tool) t.newInstance();
+        tools.put(t, tool);
+        types.put(tool.getType(), tool);
+        } catch (InstantiationException ex) {
+        Logger.getLogger(BaseTool.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+        Logger.getLogger(BaseTool.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        
+        }
+        }
+         */
+        }
         current = tools.get(RaiseLowerTool.class);
     }
 
@@ -82,6 +88,8 @@ public abstract class BaseTool implements Tool {
 
     public void setToolDefault() {
         current = tools.get(RaiseLowerTool.class);
-        controlPalette.setDefaultTool();
+        if (controlPalette != null) {
+            controlPalette.setDefaultTool();
+        }
     }
 }

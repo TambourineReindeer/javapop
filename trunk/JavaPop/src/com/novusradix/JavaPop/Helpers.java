@@ -10,7 +10,7 @@ import java.util.*;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class Helpers {
 
@@ -21,7 +21,7 @@ public class Helpers {
             throws ClassNotFoundException {
         // Get a File object for the package
         File directory = null;
-        try {
+        
             ClassLoader cld = Thread.currentThread().getContextClassLoader();
             if (cld == null) {
                 throw new ClassNotFoundException("Can't get class loader.");
@@ -33,9 +33,7 @@ public class Helpers {
             }
             directory = new File(resource.getFile());
             return directory;
-        } catch (NullPointerException x) {
-            throw new ClassNotFoundException(pckgname + " (" + directory + ") does not appear to be a valid package");
-        }
+       
     }
 
     public static Class<?>[] getClasses(String pckgname, boolean skipDollarClasses) {
@@ -43,7 +41,7 @@ public class Helpers {
 
         try {
             File directory = getClassesHelper(pckgname);
-
+System.out.println(directory);
             if (directory.exists()) {
                 // Get the list of the files contained in the package
                 String[] files = directory.list();

@@ -30,6 +30,6 @@ public class VolcanoTool extends BaseTool {
     }
     
     public Point getPosition() {
-        return new Point(0,250);
+        return new Point(200,-50);
     }
 }
