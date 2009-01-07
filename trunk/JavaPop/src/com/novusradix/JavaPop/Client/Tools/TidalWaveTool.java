@@ -16,7 +16,7 @@ public class TidalWaveTool extends BaseTool {
     }
 
     public String getIconName() {
-        return "/com/novusradix/JavaPop/icons/TidalWave.png";
+        return "/com/novusradix/JavaPop/icons/Tidalwave.png";
     }
 
     public String getToolTip() {
