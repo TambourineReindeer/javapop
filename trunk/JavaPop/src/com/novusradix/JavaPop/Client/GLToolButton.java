@@ -16,8 +16,14 @@ import java.awt.event.MouseEvent;
  */
 public class GLToolButton extends GLButton {
 
-    Tool tool;
-
+    private Tool tool;
+    private static GLButton selected;
+    
+    public Tool getTool()
+    {
+        return tool;
+    }
+    
     public GLToolButton(Tool t) {
         super();
         tool = t;
@@ -48,8 +54,14 @@ public class GLToolButton extends GLButton {
     }
 
     @Override
-    public void mouseUp(MouseEvent e) {
-        super.mouseUp(e);
+    public void select() {
+        
         BaseTool.setTool(tool.getClass());
+        selected = this;
+    }
+
+    @Override
+    protected boolean isSelected() {
+        return selected==this;
     }
 }

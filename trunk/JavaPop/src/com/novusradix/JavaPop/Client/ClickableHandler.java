@@ -62,6 +62,7 @@ public class ClickableHandler implements MouseMotionListener, MouseListener {
                 }
                 over = b;
                 bOver = true;
+                over.mouseOver(e);
                 win.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 return;
             }

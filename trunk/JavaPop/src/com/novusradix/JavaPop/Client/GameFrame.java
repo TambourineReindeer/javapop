@@ -17,7 +17,6 @@ import javax.swing.JFrame;
  */
 public class GameFrame extends JFrame implements WindowListener {
 
-    ControlFrame cf;
     Game game;
     private Animator a;
     boolean fullscreen;
@@ -70,8 +69,6 @@ public class GameFrame extends JFrame implements WindowListener {
         game.kill();
         a.stop();
         this.dispose();
-        if(cf!=null)
-            cf.dispose();
         game.client.sendMessage(new LeaveGame());
         game.client.lobby.show();
     }
