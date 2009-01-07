@@ -29,10 +29,10 @@ public class GameFrame extends JFrame implements WindowListener {
         caps.setSampleBuffers(true);
         caps.setNumSamples(8);
 
-        cf = new ControlFrame();
+        /*cf = new ControlFrame();
         cf.setBounds(1024, 0, cf.getWidth(), cf.getHeight());
         cf.setVisible(true);
-
+*/
         setTitle("JavaPop");
         //setUndecorated(true);
         mc = new MainCanvas(caps, game);
@@ -70,7 +70,8 @@ public class GameFrame extends JFrame implements WindowListener {
         game.kill();
         a.stop();
         this.dispose();
-        cf.dispose();
+        if(cf!=null)
+            cf.dispose();
         game.client.sendMessage(new LeaveGame());
         game.client.lobby.show();
     }

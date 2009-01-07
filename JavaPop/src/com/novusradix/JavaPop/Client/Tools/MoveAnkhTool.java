@@ -30,6 +30,6 @@ public class MoveAnkhTool extends BaseTool{
     }
     
     public Point getPosition() {
-        return new Point(100,200);
+        return new Point(50,-125);
     }
 }

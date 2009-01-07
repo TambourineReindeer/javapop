@@ -8,6 +8,7 @@ import com.novusradix.JavaPop.Client.Tools.BaseTool;
 import com.novusradix.JavaPop.Client.Tools.Tool;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
+import com.novusradix.JavaPop.Server.Player.PeonMode;
 import java.awt.Cursor;
 import java.awt.Point;
 
@@ -76,7 +77,13 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         glButtons = new ArrayList<GLButton>();
         for (Tool t : BaseTool.getAllTools()) {
-            GLButton b = new GLButton(t);
+            GLButton b = new GLToolButton(t);
+            glButtons.add(b);
+            clickables.addClickable(b);
+        }
+        for (PeonMode m:PeonMode.values())
+        {
+            GLButton b = new GLBehaviourButton(m);
             glButtons.add(b);
             clickables.addClickable(b);
         }

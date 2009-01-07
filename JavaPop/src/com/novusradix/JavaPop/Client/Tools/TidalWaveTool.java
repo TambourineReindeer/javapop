@@ -28,6 +28,6 @@ public class TidalWaveTool extends BaseTool {
     }
  
     public Point getPosition() {
-        return new Point(0,250);
+        return new Point(250,-25);
     }
 }
