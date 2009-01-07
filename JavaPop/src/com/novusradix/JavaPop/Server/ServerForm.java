@@ -34,6 +34,7 @@ public class ServerForm extends javax.swing.JFrame {
         btnQuit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setTitle("Server - JavaPop");
 
         jScrollPane1.setViewportView(output);
 

@@ -5,7 +5,7 @@
 package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
-import com.novusradix.JavaPop.Client.ControlPalette;
+import com.novusradix.JavaPop.Client.GLToolButton;
 import com.novusradix.JavaPop.Server.Player.PeonMode;
 import java.awt.Point;
 import java.util.Collection;
@@ -22,7 +22,7 @@ public abstract class BaseTool implements Tool {
     static Tool current;
     static HashMap<Class, Tool> tools;
     static HashMap<String, Tool> types;
-    static ControlPalette controlPalette;
+    static GLToolButton defaultTool;
 
     public static void Initialise(Client c) {
         client = c;
@@ -56,8 +56,9 @@ public abstract class BaseTool implements Tool {
         current = tools.get(RaiseLowerTool.class);
     }
 
-    public static void InitControlPalette(ControlPalette cp) {
-        controlPalette = cp;
+    public static void InitDefaultTool(GLToolButton b)
+    {
+        defaultTool = b;
     }
 
     public static final void setTool(Class t) {
@@ -87,9 +88,6 @@ public abstract class BaseTool implements Tool {
     }
 
     public void setToolDefault() {
-        current = tools.get(RaiseLowerTool.class);
-        if (controlPalette != null) {
-            controlPalette.setDefaultTool();
-        }
+        defaultTool.select();
     }
 }

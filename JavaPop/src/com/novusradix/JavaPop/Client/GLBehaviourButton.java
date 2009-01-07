@@ -8,7 +8,6 @@ import com.novusradix.JavaPop.Client.Tools.BaseTool;
 import com.novusradix.JavaPop.Server.Player.PeonMode;
 import java.awt.Point;
 import java.awt.Polygon;
-import java.awt.event.MouseEvent;
 
 /**
  *
@@ -17,7 +16,8 @@ import java.awt.event.MouseEvent;
 public class GLBehaviourButton extends GLButton {
 
     PeonMode mode;
-
+    private static GLButton selected;
+    
     GLBehaviourButton(PeonMode m) {
         super();
         mode = m;
@@ -66,10 +66,15 @@ public class GLBehaviourButton extends GLButton {
 
         buttonShape = new Polygon(x, y, 4);
     }
-    
+
     @Override
-    public void mouseUp(MouseEvent e) {
-        super.mouseUp(e);
+    protected boolean isSelected() {
+        return selected==this;
+    }
+
+    @Override
+    public void select() {
         BaseTool.SetBehaviour(mode);
+        selected = this;
     }
 }
