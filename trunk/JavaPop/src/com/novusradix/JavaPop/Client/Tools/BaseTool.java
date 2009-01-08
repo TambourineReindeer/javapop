@@ -70,11 +70,17 @@ public abstract class BaseTool implements Tool {
         return current;
     }
 
+    public void PrimaryAction(Point p) {
+    }
+
     public void SecondaryAction(Point p) {
         setToolDefault();
     }
 
-    public void StopPrimaryAction() {
+    public void ButtonDown(Point p) {
+    }
+
+    public void ButtonUp(Point p) {
     }
 
     public static void SetBehaviour(PeonMode m) {

@@ -144,6 +144,9 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         for (GLObject glo : game.objects) {
             glo.display(gl, time);
         }
+        for (Effect e : game.effects.values()) {
+            e.display(gl, time, game);
+        }
         displayCursor(gl);
 
         gl.glMatrixMode(GL.GL_MODELVIEW);
@@ -151,10 +154,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         for (GLButton b : glButtons) {
             b.display(gl, time);
         }
-        for (Effect e: game.effects.values())
-        {
-            e.display(gl, time, game);
-        }
+
         flush(gl);
         handleKeys();
     // printFPS();
@@ -237,7 +237,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         for (GLButton b : glButtons) {
             b.init(gl);
         }
-        
+
     }
 
     public void reshape(final GLAutoDrawable glDrawable, final int x, final int y, final int w, int h) {
@@ -394,11 +394,16 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             xOrig = xPos;
             yOrig = yPos;
         }
-
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            BaseTool.getCurrentTool().ButtonDown(selected);
+        }
     }
 
     public void mouseReleased(MouseEvent e) {
         // TODO Auto-generated method stub
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            BaseTool.getCurrentTool().ButtonUp(selected);
+        }
         if (abs(e.getX() - dragOrigin.x) < 16 && abs(e.getY() - dragOrigin.y) < 16) {
             boolean primary;
             if (e.getButton() == MouseEvent.BUTTON1) {
