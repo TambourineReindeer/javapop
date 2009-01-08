@@ -33,6 +33,11 @@ public class Peons {
         map = new MultiMap<Point, Peon>();
     }
 
+    public Collection<Peon> getPeons(Point p)
+    {
+        return map.get(p);
+    }
+    
     public void addPeon(float x, float y, float strength, Player player) {
         Peon p = new Peon(x, y, strength, player);
         peons.add(p);
@@ -74,7 +79,7 @@ public class Peons {
         }
     }
 
-    class Peon {
+    public class Peon {
 
         public int id;
         public Vector2 pos;
@@ -95,6 +100,11 @@ public class Peons {
             this.strength = strength;
             state = State.ALIVE;
             player = p;
+        }
+
+        public void hurt(float i) {
+            strength-=i;
+            player.info.mana -= i;
         }
 
         private Point findEnemy() {
@@ -158,6 +168,8 @@ public class Peons {
 
             Point oldPos = getPoint();
             strength -= seconds;
+            player.info.mana -= seconds;
+            
             if (strength < 0) {
                 player.info.mana -= this.strength;
                 return changeState(State.DEAD);
@@ -231,6 +243,7 @@ public class Peons {
 
                     }
                     strength -= 100.0f * seconds;
+                    player.info.mana -= 100.0f * seconds;
                     return null;
 
                 case MERGING:
@@ -255,7 +268,6 @@ public class Peons {
                         other.player.info.mana -= damage;
                         return null;
                     //wait in merging queue until someone dies...
-
                     }
             }
             return null;

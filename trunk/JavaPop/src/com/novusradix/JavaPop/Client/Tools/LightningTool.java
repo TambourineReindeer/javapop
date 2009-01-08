@@ -4,6 +4,8 @@
  */
 package com.novusradix.JavaPop.Client.Tools;
 
+import com.novusradix.JavaPop.Messaging.Tools.StartLightning;
+import com.novusradix.JavaPop.Messaging.Tools.StopLightning;
 import java.awt.Point;
 
 /**
@@ -11,11 +13,17 @@ import java.awt.Point;
  * @author mom
  */
 public class LightningTool extends BaseTool {
-    
+
     public void PrimaryAction(Point p) {
+        client.sendMessage(new StartLightning(p));
     }
 
-   public String getIconName() {
+    @Override
+    public void StopPrimaryAction() {
+        client.sendMessage(new StopLightning());
+    }
+
+    public String getIconName() {
         return "/com/novusradix/JavaPop/icons/Lightning.png";
     }
 
@@ -24,10 +32,10 @@ public class LightningTool extends BaseTool {
     }
 
     public String getType() {
-       return "Air";
+        return "Air";
     }
-    
+
     public Point getPosition() {
-        return new Point(150,-75);
+        return new Point(150, -75);
     }
 }

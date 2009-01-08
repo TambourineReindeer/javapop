@@ -56,8 +56,7 @@ public abstract class BaseTool implements Tool {
         current = tools.get(RaiseLowerTool.class);
     }
 
-    public static void InitDefaultTool(GLToolButton b)
-    {
+    public static void InitDefaultTool(GLToolButton b) {
         defaultTool = b;
     }
 
@@ -73,6 +72,9 @@ public abstract class BaseTool implements Tool {
 
     public void SecondaryAction(Point p) {
         setToolDefault();
+    }
+
+    public void StopPrimaryAction() {
     }
 
     public static void SetBehaviour(PeonMode m) {

@@ -23,7 +23,8 @@ import static java.lang.Math.*;
  */
 public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
-    private ByteBuffer b;
+    //private ByteBuffer b;
+    private byte[] heights;
     private static int rowstride;
     private Rectangle dirty;
     public final Rectangle bounds;
@@ -34,7 +35,8 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
     public HeightMap(Dimension mapSize) {
         super(mapSize);
-        b = BufferUtil.newByteBuffer(width * breadth);
+        //b = BufferUtil.newByteBuffer(width * breadth);
+        heights = new byte[width*breadth];
         texture = new HashMap<Point, Byte>();
         rowstride = width;
         bounds = new Rectangle(0, 0, width, breadth);
@@ -44,24 +46,13 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         int x, y;
         for (y = 0; y < breadth; y++) {
             for (x = 0; x < width; x++) {
-                b.put((byte) 0);
+                //b.put((byte) 0);
                 if (x < width - 1 && y < breadth - 1) {
                     flat[x][y] = true;
                 }
             }
         }
-        b.flip();
-    }
-
-    public byte[] getData() {
-        byte[] buf = new byte[width * breadth];
-        getData(buf);
-        return buf;
-    }
-
-    public void getData(byte[] buf) {
-        b.position(0);
-        b.get(buf);
+        //b.flip();
     }
 
     private static int bufPos(Point p) {
@@ -70,7 +61,8 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
     public byte getHeight(Point p) {
         if (inBounds(p)) {
-            return b.get(bufPos(p));
+            //return b.get(bufPos(p));
+            return heights[bufPos(p)];
         }
         return 0;
     }
@@ -166,7 +158,8 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
     protected void setHeight(Point p, byte height) {
         if (inBounds(p)) {
-            b.put(bufPos(p), height);
+            //b.put(bufPos(p), height);
+            heights[bufPos(p)]=height;
         }
     }
 
@@ -240,7 +233,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         difTex();
         synchronized (this) {
             if (dirty != null || texture.size() > 0) {
-                m = new HeightMapUpdate(dirty, b, width, texture);
+                m = new HeightMapUpdate(dirty, heights, width, texture);
             }
             dirty = null;
             texture.clear();

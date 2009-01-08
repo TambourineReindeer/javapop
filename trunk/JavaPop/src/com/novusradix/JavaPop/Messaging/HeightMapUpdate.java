@@ -32,13 +32,14 @@ public class HeightMapUpdate extends Message implements Externalizable {
     public HeightMapUpdate() {
     }
 
-    public HeightMapUpdate(Rectangle dirty, ByteBuffer b, int stride, Map<Point, Byte> texture) {
+    public HeightMapUpdate(Rectangle dirty, byte[] b, int stride, Map<Point, Byte> texture) {
         dirtyRegion = dirty;
         if (dirtyRegion != null) {
             heightData = new byte[dirty.width * dirty.height];
             for (int n = 0; n < dirty.height; n++) {
-                b.position(dirty.x + (dirty.y + n) * stride);
-                b.get(heightData, n * dirty.width, dirty.width);
+                //b.position(dirty.x + (dirty.y + n) * stride);
+                //b.get(heightData, n * dirty.width, dirty.width);
+                System.arraycopy(b, dirty.x+(dirty.y+n)*stride, heightData, n*dirty.width, dirty.width);
             }
 
         } else {
