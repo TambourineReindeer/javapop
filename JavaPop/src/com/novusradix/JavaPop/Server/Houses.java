@@ -64,6 +64,12 @@ public class Houses {
             House h;
             for (; i.hasNext();) {
                 h = i.next();
+                if(h.strength<0)
+                {
+                    i.remove();
+                    hds.add(new HouseUpdate.Detail(h.id, h.pos, h.player, -1));
+                    continue;
+                }
                 if (game.heightMap.isFlat(h.pos) && newmap[h.pos.x][h.pos.y] == 0) {
                     h.setLevel();
                     h.paintmap(newmap);
@@ -99,7 +105,7 @@ public class Houses {
         }
     }
 
-    Houses.House getHouse(Point p) {
+    public Houses.House getHouse(Point p) {
         return allHouses.get(p);
     }
 
@@ -162,7 +168,7 @@ public class Houses {
     }
     private static int nextId;
 
-    class House {
+    public class House {
 
         private int id;
         private Point pos;
@@ -179,6 +185,11 @@ public class Houses {
             this.player = player;
             this.strength = strength;
             newHouses.add(p);
+        }
+
+        public void damage(float i) {
+            strength -= i;
+            player.info.mana -= i;
         }
 
         void addPeon(Peon p)

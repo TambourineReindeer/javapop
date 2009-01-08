@@ -45,8 +45,6 @@ public class Peons implements GLObject {
     public void display(GL gl, float time) {
         synchronized (peons) {
             for (Peon p : peons.values()) {
-                gl.glUseProgram(0);
-                gl.glDisable(GL.GL_TEXTURE_2D);
                 gl.glPushMatrix();
                 gl.glTranslatef(p.pos.x, p.pos.y, game.heightMap.getHeight(p.pos.x, p.pos.y));
                 p.display(gl, time);

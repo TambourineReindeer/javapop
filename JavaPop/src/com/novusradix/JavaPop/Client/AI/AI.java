@@ -4,6 +4,7 @@ import com.novusradix.JavaPop.Client.AI.Houses.House;
 import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Messaging.Tools.UpDown;
 import java.awt.Point;
+import java.util.Collections;
 
 /**
  *
@@ -19,7 +20,7 @@ public class AI implements Runnable {
 
     AI(Game g) {
         game = g;
-        thread = new Thread(this);
+        thread = new Thread(this, "AI Player");
         killme = false;
         thread.start();
     }
@@ -56,6 +57,7 @@ public class AI implements Runnable {
             }
             //flatten some land
             if (targetHouse != null) {
+                Collections.shuffle(Helpers.shuffledRings.get(currentRadius));
                 for (Point offset : Helpers.shuffledRings.get(currentRadius)) {
                     Point p = new Point(targetHouse.pos.x + offset.x, targetHouse.pos.y + offset.y);
                     if (game.heightMap.inBounds(p)) {

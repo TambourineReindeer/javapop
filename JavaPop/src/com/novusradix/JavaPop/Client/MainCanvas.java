@@ -9,6 +9,7 @@ import com.novusradix.JavaPop.Client.Tools.RaiseLowerTool;
 import com.novusradix.JavaPop.Client.Tools.Tool;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
+import com.novusradix.JavaPop.Server.Effects.Effect;
 import com.novusradix.JavaPop.Server.Player.PeonMode;
 import java.awt.Cursor;
 import java.awt.Point;
@@ -150,6 +151,10 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         for (GLButton b : glButtons) {
             b.display(gl, time);
         }
+        for (Effect e: game.effects.values())
+        {
+            e.display(gl, time, game);
+        }
         flush(gl);
         handleKeys();
     // printFPS();
@@ -232,7 +237,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         for (GLButton b : glButtons) {
             b.init(gl);
         }
-
+        
     }
 
     public void reshape(final GLAutoDrawable glDrawable, final int x, final int y, final int w, int h) {

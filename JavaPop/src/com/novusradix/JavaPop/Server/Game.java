@@ -1,17 +1,20 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Server;
 
+import com.novusradix.JavaPop.Messaging.EffectUpdate;
 import com.novusradix.JavaPop.Messaging.Lobby.GameOver;
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.novusradix.JavaPop.Messaging.Lobby.JoinedGame;
 import com.novusradix.JavaPop.Messaging.Message;
 import com.novusradix.JavaPop.Messaging.PlayerUpdate;
+import com.novusradix.JavaPop.Server.Effects.Effect;
+import com.novusradix.JavaPop.Server.Effects.LightningEffect;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -20,7 +23,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class Game extends TimerTask {
 
@@ -35,6 +38,10 @@ public class Game extends TimerTask {
     public Peons peons;
     public Houses houses;
     private int humancount;
+    private Map<Integer, Effect> effects;
+    private Map<Integer, Effect> newEffects;
+    private Collection<Integer> deletedEffects;
+    public Map<Player, LightningEffect> lightningEffects;
 
     public Game(Player owner) {
         this.owner = owner;
@@ -44,6 +51,10 @@ public class Game extends TimerTask {
         id = nextId++;
         humancount = 0;
         addPlayer(owner);
+        effects = new HashMap<Integer, Effect>();
+        newEffects = new HashMap<Integer, Effect>();
+        deletedEffects = new HashSet<Integer>();
+        lightningEffects = new HashMap<Player, LightningEffect>();
     }
 
     public int getId() {
@@ -136,6 +147,16 @@ public class Game extends TimerTask {
         if (m != null) {
             sendAllPlayers(m);
         }
+        for (Effect e : effects.values()) {
+            e.execute(this);
+        }
+        synchronized(effects){
+        effects.putAll(newEffects);
+        effects.keySet().removeAll(deletedEffects);
+        EffectUpdate eu = new EffectUpdate(newEffects, deletedEffects);
+        sendAllPlayers(eu);
+        newEffects.clear();deletedEffects.clear();
+        }
         ArrayList<Player.Info> is = new ArrayList<Player.Info>(players.size());
         for (Player p : players) {
             is.add(p.info);
@@ -148,6 +169,22 @@ public class Game extends TimerTask {
             for (Player pl : players) {
                 pl.sendMessage(m);
             }
+        }
+    }
+
+    public void addEffect(Effect e) {
+        synchronized(effects)
+        {
+        newEffects.put(e.id, e);
+        }
+    }
+    
+    public void deleteEffect(Effect e)
+    {
+        synchronized(effects)
+        {
+        deletedEffects.add(e.id);
+    
         }
     }
 }

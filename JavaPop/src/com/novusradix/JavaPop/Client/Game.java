@@ -5,6 +5,7 @@
 package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
+import com.novusradix.JavaPop.Server.Effects.Effect;
 import com.novusradix.JavaPop.Server.Player.Info;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +30,8 @@ public class Game extends TimerTask {
     public Player me;
     GameFrame frame;
     Collection<GLObject> objects;
-
+    public Map<Integer, Effect> effects;
+    
     protected Game() {
     }
 
@@ -46,6 +48,7 @@ public class Game extends TimerTask {
         houses = h1;
         objects.add(h1);
 
+        effects = new HashMap<Integer, Effect>();
         players = new HashMap<Integer, Player>();
         int index = 0;
         for (Info i : g.gi.players.values()) {
