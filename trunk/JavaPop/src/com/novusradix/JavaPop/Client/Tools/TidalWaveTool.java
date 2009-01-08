@@ -23,7 +23,7 @@ public class TidalWaveTool extends BaseTool {
         return "TidalWave";
     }
 
-    public String getType() {
+    public String getGroup() {
         return "Water";
     }
  

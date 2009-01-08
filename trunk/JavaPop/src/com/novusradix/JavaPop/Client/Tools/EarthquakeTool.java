@@ -21,7 +21,7 @@ public class EarthquakeTool extends BaseTool {
         return "Earthquake";
     }
 
-    public String getType() {
+    public String getGroup() {
         return "Earth";
     }
  

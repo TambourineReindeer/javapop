@@ -8,11 +8,10 @@ import com.novusradix.JavaPop.Client.Tools.BaseTool;
 import com.novusradix.JavaPop.Client.Tools.Tool;
 import java.awt.Point;
 import java.awt.Polygon;
-import java.awt.event.MouseEvent;
 
 /**
  *
- * @author erinhowie
+ * @author gef
  */
 public class GLToolButton extends GLButton {
 
