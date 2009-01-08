@@ -101,7 +101,7 @@ marble.enable()
 
     public void init(GL gl) {
         URL u = getClass().getResource(texname);
-        URL u2 = getClass().getResource("/com/novusradix/JavaPop/textures/marble2.png");
+        URL u2 = getClass().getResource("/com/novusradix/JavaPop/textures/marble.png");
         try {
             tex = TextureIO.newTexture(u, false, "png");
             if (marble == null) {

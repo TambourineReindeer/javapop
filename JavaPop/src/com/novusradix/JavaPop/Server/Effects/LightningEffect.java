@@ -61,14 +61,15 @@ public class LightningEffect extends Effect {
         gl.glTranslatef(hit.x + 0.5f, hit.y + 0.5f, h);
 
         float c;
-        if (lastTime > 0) {
-            for (int n = 0; n < nextPoisson(5.0*(time - lastTime)); n++) {
-                
-                times[nextStrike] = time;
-                Vector3 v = new Vector3(r.nextFloat() - 0.5f, r.nextFloat() - 0.5f, r.nextFloat() + 0.5f);
-                strikes[nextStrike] = v;
-                nextStrike = (nextStrike + 1) % 5;
-            }
+        int newStrikes = nextPoisson(5.0 * (time - lastTime));
+        if(lastTime==0)
+            newStrikes = 2;
+        for (int n = 0; n < newStrikes; n++) {
+
+            times[nextStrike] = time;
+            Vector3 v = new Vector3(r.nextFloat() - 0.5f, r.nextFloat() - 0.5f, r.nextFloat() + 0.5f);
+            strikes[nextStrike] = v;
+            nextStrike = (nextStrike + 1) % 5;
         }
         lastTime = time;
         gl.glDisable(GL.GL_TEXTURE_2D);
@@ -77,11 +78,10 @@ public class LightningEffect extends Effect {
         gl.glUseProgram(0);
         gl.glBegin(GL.GL_TRIANGLES);
         for (int n = 0; n < 5; n++) {
-
             c = Math.max(0, 1.0f + times[n] - time);
             if (c > 0) {
                 gl.glColor4f(0.9f, 0.9f, 1.0f, c);
-                gl.glVertex3f(0.0f, 0.0f, 0.0f);
+                gl.glVertex3f(strikes[n].x*0.3f, strikes[n].y*0.3f, 0.0f);
                 gl.glVertex3f(strikes[n].x, strikes[n].y, strikes[n].z);
                 gl.glVertex3f(strikes[n].x + 0.1f, strikes[n].y, strikes[n].z);
 

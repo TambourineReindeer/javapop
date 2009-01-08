@@ -25,7 +25,7 @@ public class VolcanoTool extends BaseTool {
         return "Volcano";
     }
 
-    public String getType() {
+    public String getGroup() {
         return "Fire";
     }
     

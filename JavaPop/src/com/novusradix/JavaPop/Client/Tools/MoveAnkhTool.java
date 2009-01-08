@@ -25,7 +25,7 @@ public class MoveAnkhTool extends BaseTool{
         return "MoveAnkh";
     }
 
-    public String getType() {
+    public String getGroup() {
         return "Earth";
     }
     

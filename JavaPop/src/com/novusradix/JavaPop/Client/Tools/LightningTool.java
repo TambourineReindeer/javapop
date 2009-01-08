@@ -32,7 +32,7 @@ public class LightningTool extends BaseTool {
         return "Lightning";
     }
 
-    public String getType() {
+    public String getGroup() {
         return "Air";
     }
 

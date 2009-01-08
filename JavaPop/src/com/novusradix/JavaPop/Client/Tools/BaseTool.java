@@ -35,7 +35,7 @@ public abstract class BaseTool implements Tool {
         tools.put(TidalWaveTool.class, new TidalWaveTool());
         tools.put(VolcanoTool.class, new VolcanoTool());
         for (Tool t : tools.values()) {
-            types.put(t.getType(), t);
+            types.put(t.getGroup(), t);
         /* doesn't work with web start :o(
         for (Class t : Helpers.getClasses("com.novusradix.JavaPop.Client.Tools", true)) {
         if (t.getSuperclass() == BaseTool.class) {

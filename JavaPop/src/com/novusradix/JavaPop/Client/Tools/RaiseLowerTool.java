@@ -32,7 +32,7 @@ public class RaiseLowerTool extends BaseTool {
         return "Raise/Lower land";
     }
 
-    public String getType() {
+    public String getGroup() {
       return "Earth";
     }
 

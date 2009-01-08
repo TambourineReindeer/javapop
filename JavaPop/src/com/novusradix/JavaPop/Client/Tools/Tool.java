@@ -14,7 +14,7 @@ public interface Tool {
    
     public String getIconName();
     public String getToolTip();
-    public String getType();
+    public String getGroup();
     public void PrimaryAction(Point p);
     public void ButtonDown(Point p);
     public void ButtonUp(Point p);
