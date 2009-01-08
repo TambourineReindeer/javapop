@@ -14,12 +14,13 @@ import java.awt.Point;
  */
 public class LightningTool extends BaseTool {
 
-    public void PrimaryAction(Point p) {
+    @Override
+    public void ButtonDown(Point p) {
         client.sendMessage(new StartLightning(p));
     }
 
     @Override
-    public void StopPrimaryAction() {
+    public void ButtonUp(Point p) {
         client.sendMessage(new StopLightning());
     }
 
