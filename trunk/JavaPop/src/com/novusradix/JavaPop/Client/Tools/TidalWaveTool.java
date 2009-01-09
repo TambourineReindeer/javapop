@@ -4,6 +4,7 @@
  */
 package com.novusradix.JavaPop.Client.Tools;
 
+import com.novusradix.JavaPop.Client.Client;
 import java.awt.Point;
 
 /**
@@ -11,7 +12,12 @@ import java.awt.Point;
  * @author gef
  */
 public class TidalWaveTool extends BaseTool {
-    
+
+    public TidalWaveTool(ToolGroup tg, Client c) {
+        super(tg, c);
+    }
+
+    @Override
     public void PrimaryAction(Point p) {
     }
 
@@ -23,11 +29,7 @@ public class TidalWaveTool extends BaseTool {
         return "TidalWave";
     }
 
-    public String getGroup() {
-        return "Water";
-    }
- 
     public Point getPosition() {
-        return new Point(250,-25);
+        return new Point(250, -25);
     }
 }

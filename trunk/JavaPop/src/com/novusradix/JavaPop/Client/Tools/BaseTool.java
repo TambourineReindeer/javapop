@@ -18,63 +18,22 @@ import java.util.Map;
  */
 public abstract class BaseTool implements Tool {
 
-    static Client client;
-    static Tool current;
-    static HashMap<Class, Tool> tools;
-    static HashMap<String, Tool> types;
-    static GLToolButton defaultTool;
+    protected ToolGroup toolGroup;
+    protected Client client;
+    
+    private BaseTool() {
+    }
 
-    public static void Initialise(Client c) {
+    protected BaseTool(ToolGroup tg, Client c) {
+        toolGroup = tg;
         client = c;
-        tools = new HashMap<Class, Tool>();
-        types = new HashMap<String, Tool>();
-        tools.put(RaiseLowerTool.class, new RaiseLowerTool());
-        tools.put(MoveAnkhTool.class, new MoveAnkhTool());
-        tools.put(EarthquakeTool.class, new EarthquakeTool());
-        tools.put(LightningTool.class, new LightningTool());
-        tools.put(TidalWaveTool.class, new TidalWaveTool());
-        tools.put(VolcanoTool.class, new VolcanoTool());
-        for (Tool t : tools.values()) {
-            types.put(t.getGroup(), t);
-        /* doesn't work with web start :o(
-        for (Class t : Helpers.getClasses("com.novusradix.JavaPop.Client.Tools", true)) {
-        if (t.getSuperclass() == BaseTool.class) {
-        try {
-        Tool tool = (Tool) t.newInstance();
-        tools.put(t, tool);
-        types.put(tool.getType(), tool);
-        } catch (InstantiationException ex) {
-        Logger.getLogger(BaseTool.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-        Logger.getLogger(BaseTool.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        }
-        }
-         */
-        }
-        current = tools.get(RaiseLowerTool.class);
-    }
-
-    public static void InitDefaultTool(GLToolButton b) {
-        defaultTool = b;
-    }
-
-    public static final void setTool(Class t) {
-        if (current != tools.get(t)) {
-            current = tools.get(t);
-        }
-    }
-
-    public static final Tool getCurrentTool() {
-        return current;
     }
 
     public void PrimaryAction(Point p) {
     }
 
     public void SecondaryAction(Point p) {
-        setToolDefault();
+        GLToolButton.selectDefault();
     }
 
     public void ButtonDown(Point p) {
@@ -83,19 +42,7 @@ public abstract class BaseTool implements Tool {
     public void ButtonUp(Point p) {
     }
 
-    public static void SetBehaviour(PeonMode m) {
-        client.setBehaviour(m);
-    }
-
-    public static Collection<Tool> getAllTools() {
-        return tools.values();
-    }
-
-    public static Map<String, Tool> getToolsByType() {
-        return types;
-    }
-
-    public void setToolDefault() {
-        defaultTool.select();
+    public ToolGroup getGroup() {
+        return toolGroup;
     }
 }

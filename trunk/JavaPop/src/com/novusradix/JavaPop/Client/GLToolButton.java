@@ -1,13 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Client.Tools.BaseTool;
+import com.novusradix.JavaPop.Client.Tools.RaiseLowerTool;
 import com.novusradix.JavaPop.Client.Tools.Tool;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.util.Collection;
 
 /**
  *
@@ -15,16 +12,19 @@ import java.awt.Polygon;
  */
 public class GLToolButton extends GLButton {
 
+    private static GLToolButton selected;
+    private static GLToolButton defaultToolButton;
+    
     private Tool tool;
-    private static GLButton selected;
+    private GLToolGroupButton groupButton;
     
     public Tool getTool()
     {
         return tool;
     }
     
-    public GLToolButton(Tool t) {
-        super();
+    public GLToolButton(Tool t, GLToolGroupButton parent, ClickableHandler ch, Collection<GLObject> objects) {
+        super(ch, objects);
         tool = t;
         int[] x, y;
         x = new int[4];
@@ -47,20 +47,36 @@ public class GLToolButton extends GLButton {
         y[2] = p.y;
         y[3] = p.y - 25;
         
-        visible = true;
+        visible = false;
         texname = t.getIconName();
         buttonShape = new Polygon(x, y, 4);
+        groupButton = parent;
+        
+        if(t.getClass() == RaiseLowerTool.class)
+            defaultToolButton = this;
     }
 
+    public static void selectDefault()
+    {
+        if(defaultToolButton!=null)
+            defaultToolButton.select();
+    }
+    
+    public static Tool getSelected()
+    {
+        return selected.tool;
+    }
+    
     @Override
     public void select() {
-        
-        BaseTool.setTool(tool.getClass());
         selected = this;
+        groupButton.select();
     }
 
     @Override
     protected boolean isSelected() {
         return selected==this;
     }
+
+    
 }

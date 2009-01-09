@@ -4,9 +4,7 @@
 package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Math.Helpers;
-import com.novusradix.JavaPop.Client.Tools.BaseTool;
-import com.novusradix.JavaPop.Client.Tools.RaiseLowerTool;
-import com.novusradix.JavaPop.Client.Tools.Tool;
+import com.novusradix.JavaPop.Client.Tools.ToolGroup;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Server.Effects.Effect;
@@ -30,7 +28,6 @@ import javax.media.opengl.GLEventListener;
 
 
 import java.awt.event.MouseWheelListener;
-import java.util.ArrayList;
 import static java.lang.Math.*;
 import static java.awt.event.KeyEvent.*;
 import static javax.media.opengl.GL.*;
@@ -54,7 +51,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     float xMouse, yMouse;
     private int frameCount = 0;
     private long frameTime;
-    private ArrayList<GLButton> glButtons;
     private ClickableHandler clickables;
 
     public MainCanvas(GLCapabilities caps, Game g) {
@@ -77,20 +73,13 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         xPos = 0;
         yPos = 0;
 
-        glButtons = new ArrayList<GLButton>();
-        for (Tool t : BaseTool.getAllTools()) {
-            GLToolButton b = new GLToolButton(t);
-            glButtons.add(b);
-            clickables.addClickable(b);
-            if (t.getClass() == RaiseLowerTool.class) {
-                BaseTool.InitDefaultTool(b);
-                b.select();
-            }
+        for (ToolGroup tg : game.toolGroups) {
+            GLToolGroupButton tgb = new GLToolGroupButton(tg, clickables, game.objects);
         }
+        GLToolButton.selectDefault();
+
         for (PeonMode m : PeonMode.values()) {
-            GLBehaviourButton b = new GLBehaviourButton(m);
-            glButtons.add(b);
-            clickables.addClickable(b);
+            GLBehaviourButton b = new GLBehaviourButton(m, clickables, game.objects, game.client);
             if (m == PeonMode.SETTLE) {
                 b.select();
             }
@@ -119,7 +108,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         float[] buf = new float[16];
         gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, buf, 0);
 
-        Matrix4 m_mvn, m_pn;
+        Matrix4 m_mvn,m_pn ;
         m_mvn = new Matrix4();
         m_pn = new Matrix4();
         gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, buf, 0);
@@ -151,9 +140,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPopMatrix();
-        for (GLButton b : glButtons) {
-            b.display(gl, time);
-        }
 
         flush(gl);
         handleKeys();
@@ -166,7 +152,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     private void displayCursor(final GL gl) {
-        float cW, cH;
+        float cW,  cH;
         cW = 0.02f;
         cH = 0.1f;
         gl.glDisable(GL.GL_LIGHTING);
@@ -175,6 +161,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glDisable(GL.GL_DEPTH_TEST);
         gl.glUseProgram(0);
         gl.glDisable(GL_TEXTURE_2D);
+        gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPushMatrix();
         gl.glTranslatef(selected.x, selected.y, game.heightMap.getHeight(selected.x, selected.y));
         gl.glBegin(GL.GL_TRIANGLES);
@@ -234,10 +221,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         for (GLObject glo : game.objects) {
             glo.init(gl);
         }
-        for (GLButton b : glButtons) {
-            b.init(gl);
-        }
-
     }
 
     public void reshape(final GLAutoDrawable glDrawable, final int x, final int y, final int w, int h) {
@@ -303,14 +286,14 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private void mousePick() {
         float l;
 
-        Vector3 z0, z1, s;
+        Vector3 z0,z1 ,s ;
         z0 = new Vector3(xMouse, yMouse, 10);
         z1 = new Vector3(xMouse, yMouse, 11);
 
         mvpInverse.transform(z0);
         mvpInverse.transform(z1);
 
-        Vector3 v0n, v1n;
+        Vector3 v0n,v1n ;
         v0n = new Vector3(z0);
         v1n = new Vector3(z1);
 
@@ -354,12 +337,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Point iterateSelection(Point current, Vector3 v0, Vector3 v1) {
         Vector3 p;
 
-        float d, oldD;
+        float d,  oldD;
         p = new Vector3(current.x, current.y, game.heightMap.getHeight(current));
         d = Helpers.PointLineDistance(v0, v1, p);
         oldD = d;
 
-        int x, y;
+        int x,  y;
         for (Point offset : Helpers.rings[1]) {
             x = current.x + offset.x;
             y = current.y + offset.y;
@@ -395,14 +378,14 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             yOrig = yPos;
         }
         if (e.getButton() == MouseEvent.BUTTON1) {
-            BaseTool.getCurrentTool().ButtonDown(selected);
+            GLToolButton.getSelected().ButtonDown(selected);
         }
     }
 
     public void mouseReleased(MouseEvent e) {
         // TODO Auto-generated method stub
         if (e.getButton() == MouseEvent.BUTTON1) {
-            BaseTool.getCurrentTool().ButtonUp(selected);
+            GLToolButton.getSelected().ButtonUp(selected);
         }
         if (abs(e.getX() - dragOrigin.x) < 16 && abs(e.getY() - dragOrigin.y) < 16) {
             boolean primary;
@@ -419,9 +402,9 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             }
 
             if (primary) {
-                BaseTool.getCurrentTool().PrimaryAction(selected);
+                GLToolButton.getSelected().PrimaryAction(selected);
             } else {
-                BaseTool.getCurrentTool().SecondaryAction(selected);
+                GLToolButton.getSelected().SecondaryAction(selected);
             }
         } else {
             mouseMoved(e);

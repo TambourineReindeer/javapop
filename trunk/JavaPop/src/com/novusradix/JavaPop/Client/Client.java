@@ -41,8 +41,7 @@ public class Client implements Runnable {
     public Client(String host, Lobby l) {
         lobby = l;
         connected = false;
-        BaseTool.Initialise(this);
-
+        
         try {
             socket = new Socket(host, 13579);
             socket.setTcpNoDelay(true);

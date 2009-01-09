@@ -14,10 +14,10 @@ public interface Tool {
    
     public String getIconName();
     public String getToolTip();
-    public String getGroup();
     public void PrimaryAction(Point p);
     public void ButtonDown(Point p);
     public void ButtonUp(Point p);
     public void SecondaryAction(Point p);
     public Point getPosition();
+    public ToolGroup getGroup();
 }
