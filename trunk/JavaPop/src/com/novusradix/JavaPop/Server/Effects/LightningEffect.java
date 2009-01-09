@@ -17,22 +17,38 @@ import javax.media.opengl.GL;
  */
 public class LightningEffect extends Effect {
 
-    Point hit;
+    Point[] hits;
+    Point target;
     transient Vector3[] strikes;
     transient float[] times;
+    // transient int[] strikeIx;
     transient int nextStrike;
     transient float lastTime;
     transient Random r;
+    transient int maxStrikes;
 
     public LightningEffect(Point target) {
-        hit = target;
+        this.target = target;
+        r = new Random();
+        int n = r.nextInt(3) + 1;
+        hits = new Point[n];
+        for (int m = 0; m < n; m++) {
+            hits[m] = new Point(target.x + r.nextInt(3) - 1, target.y + r.nextInt(3) - 1);
+        }
     }
 
     private void readObject(ObjectInputStream in)
             throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        strikes = new Vector3[5];
-        times = new float[5];
+        maxStrikes = 10;
+        strikes = new Vector3[maxStrikes];
+        times = new float[maxStrikes];
+        // strikeIx = new int[maxStrikes];
+        for (Point h : hits) {
+            h.x = h.x - target.x;
+            h.y = h.y - target.y;
+        }
+
         nextStrike = 0;
         r = new Random();
     }
@@ -43,33 +59,37 @@ public class LightningEffect extends Effect {
 
     @Override
     public void execute(Game g) {
-        for (Peon p : g.peons.getPeons(hit)) {
-            p.hurt(500);
-        }
-        House h;
-        h = g.houses.getHouse(hit);
-        if (h != null) {
-            h.damage(500);
+        for (Point hit : hits) {
+            for (Peon p : g.peons.getPeons(hit)) {
+                p.hurt(500);
+            }
+            House h;
+            h = g.houses.getHouse(hit);
+            if (h != null) {
+                h.damage(500);
+            }
         }
     }
 
     @Override
     public void display(GL gl, float time, com.novusradix.JavaPop.Client.Game g) {
-        float h = g.heightMap.getHeight(hit.x + 0.5f, hit.y + 0.5f);
+
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPushMatrix();
-        gl.glTranslatef(hit.x + 0.5f, hit.y + 0.5f, h);
+        gl.glTranslatef(target.x + 0.5f, target.y + 0.5f, 0.0f);
 
         float c;
-        int newStrikes = nextPoisson(5.0 * (time - lastTime));
-        if(lastTime==0)
+        int newStrikes = nextPoisson(5.0 * (time - lastTime) * hits.length);
+        if (lastTime == 0) {
             newStrikes = 2;
+        }
         for (int n = 0; n < newStrikes; n++) {
-
+            int ix = r.nextInt(hits.length);
+            //         strikeIx[nextStrike] = ix;
             times[nextStrike] = time;
-            Vector3 v = new Vector3(r.nextFloat() - 0.5f, r.nextFloat() - 0.5f, r.nextFloat() + 0.5f);
+            Vector3 v = new Vector3(hits[ix].x + r.nextFloat() - 0.5f, hits[ix].y + r.nextFloat() - 0.5f, r.nextFloat() + 1.0f);
             strikes[nextStrike] = v;
-            nextStrike = (nextStrike + 1) % 5;
+            nextStrike = (nextStrike + 1) % maxStrikes;
         }
         lastTime = time;
         gl.glDisable(GL.GL_TEXTURE_2D);
@@ -77,21 +97,23 @@ public class LightningEffect extends Effect {
         gl.glEnable(GL.GL_BLEND);
         gl.glUseProgram(0);
         gl.glBegin(GL.GL_TRIANGLES);
-        for (int n = 0; n < 5; n++) {
+        float h = g.heightMap.getHeight(target.x + 0.5f, target.y + 0.5f);
+        for (int n = 0; n < maxStrikes; n++) {
             c = Math.max(0, 1.0f + times[n] - time);
             if (c > 0) {
+                h = g.heightMap.getHeight(target.x + 0.5f + strikes[n].x, target.y + 0.5f + strikes[n].y);
                 gl.glColor4f(0.9f, 0.9f, 1.0f, c);
-                gl.glVertex3f(strikes[n].x*0.3f, strikes[n].y*0.3f, 0.0f);
-                gl.glVertex3f(strikes[n].x, strikes[n].y, strikes[n].z);
-                gl.glVertex3f(strikes[n].x + 0.1f, strikes[n].y, strikes[n].z);
+                gl.glVertex3f(strikes[n].x, strikes[n].y, h);
+                gl.glVertex3f(strikes[n].x * 0.9f, strikes[n].y * 0.9f, strikes[n].z + h);
+                gl.glVertex3f(strikes[n].x * 0.9f + 0.1f, strikes[n].y * 0.9f, strikes[n].z + h);
 
-                gl.glVertex3f(strikes[n].x, strikes[n].y, strikes[n].z);
-                gl.glVertex3f(strikes[n].x + 0.2f, strikes[n].y, strikes[n].z - 0.2f);
-                gl.glVertex3f(strikes[n].x + 0.25f, strikes[n].y, strikes[n].z - 0.2f);
+                gl.glVertex3f(strikes[n].x * 0.9f, strikes[n].y * 0.9f, strikes[n].z + h);
+                gl.glVertex3f(strikes[n].x + 0.2f, strikes[n].y, strikes[n].z - 0.2f + h);
+                gl.glVertex3f(strikes[n].x + 0.25f, strikes[n].y, strikes[n].z - 0.2f + h);
 
-                gl.glVertex3f(strikes[n].x + 0.2f, strikes[n].y, strikes[n].z - 0.2f);
-                gl.glVertex3f(strikes[n].x + 0.25f, strikes[n].y, strikes[n].z - 0.2f);
-                gl.glVertex3f(strikes[n].x * 2.0f, strikes[n].y * 1.5f, 3.0f);
+                gl.glVertex3f(strikes[n].x + 0.2f, strikes[n].y, strikes[n].z - 0.2f + h);
+                gl.glVertex3f(strikes[n].x + 0.25f, strikes[n].y, strikes[n].z - 0.2f + h);
+                gl.glVertex3f(strikes[n].x * 0.7f, strikes[n].y * 0.5f, 3.0f + h);
             }
         }
         gl.glEnd();
