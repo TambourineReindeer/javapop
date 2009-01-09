@@ -7,6 +7,7 @@ import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.GL;
@@ -25,9 +26,13 @@ public abstract class GLButton implements GLObject, GLClickable {
     Texture tex, marble;
     boolean flipx, flipy;
 
-    public GLButton() {
+    private GLButton(){}
+    
+    protected GLButton(ClickableHandler ch, Collection<GLObject> objects) {
         enabled = true;
         visible = false;
+        ch.addClickable(this);
+        objects.add(this);
     }
 
     protected abstract boolean isSelected();
@@ -35,6 +40,8 @@ public abstract class GLButton implements GLObject, GLClickable {
     public abstract void select();
 
     public void display(GL gl, float time) {
+        if(!visible)
+            return;
         int[] view = new int[4];
         gl.glGetIntegerv(GL.GL_VIEWPORT, view, 0);
         gl.glMatrixMode(GL.GL_PROJECTION);
@@ -63,8 +70,7 @@ public abstract class GLButton implements GLObject, GLClickable {
         } else {
             gl.glColor3f(0.8f, 0.8f, 0.8f);
         }
-marble.enable()
-        ;
+        marble.enable();
         marble.bind();
         gl.glMatrixMode(GL.GL_TEXTURE);
         gl.glPushMatrix();
@@ -72,7 +78,7 @@ marble.enable()
         gl.glLoadIdentity();
         gl.glPushMatrix();
         gl.glScalef(0.1f, 0.2f, 0.1f);
-        
+
         gl.glBegin(GL.GL_POLYGON);
 
         for (int n = 0; n < buttonShape.npoints; n++) {
@@ -91,7 +97,7 @@ marble.enable()
         }
         gl.glEnd();
         gl.glPopMatrix();
-                
+
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPopMatrix();
 
@@ -144,5 +150,13 @@ marble.enable()
 
     public boolean anchorTop() {
         return !flipy;
+    }
+    
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 }

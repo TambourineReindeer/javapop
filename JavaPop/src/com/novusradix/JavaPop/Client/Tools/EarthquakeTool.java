@@ -1,5 +1,6 @@
 package com.novusradix.JavaPop.Client.Tools;
 
+import com.novusradix.JavaPop.Client.Client;
 import com.novusradix.JavaPop.Messaging.Tools.Earthquake;
 import java.awt.Point;
 
@@ -9,6 +10,12 @@ import java.awt.Point;
  */
 public class EarthquakeTool extends BaseTool {
     
+    public EarthquakeTool(ToolGroup tg, Client c)
+    {
+        super(tg, c);
+    }
+    
+    @Override
     public void PrimaryAction(Point p) {
         client.sendMessage(new Earthquake(p));
     }
@@ -19,10 +26,6 @@ public class EarthquakeTool extends BaseTool {
 
     public String getToolTip() {
         return "Earthquake";
-    }
-
-    public String getGroup() {
-        return "Earth";
     }
  
     public Point getPosition() {

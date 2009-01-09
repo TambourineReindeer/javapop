@@ -7,7 +7,6 @@ package com.novusradix.JavaPop.Client;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
-import java.awt.Window;
 import java.awt.event.*;
 import java.util.LinkedList;
 
@@ -30,16 +29,21 @@ public class ClickableHandler implements MouseMotionListener, MouseListener {
         win = w;
     }
 
-    public void addClickable(GLButton b) {
+    public void addClickable(GLClickable b) {
         buttons.addFirst(b);
     }
 
+    private boolean isOver(Point p, GLClickable c)
+    {
+        return c.isVisible() && c.getShape().contains(transformPoint(p, c));
+    }
+    
     public void mouseDragged(MouseEvent e) {
         if (over == null) {
             mml.mouseDragged(e);
         }
         else
-        if (over.getShape().contains(transformPoint(e.getPoint(), over)) != bOver) {
+        if (isOver(e.getPoint(), over) != bOver) {
             if (bOver) {
                 over.mouseOut(e);
             } else {
@@ -51,7 +55,7 @@ public class ClickableHandler implements MouseMotionListener, MouseListener {
 
     public void mouseMoved(MouseEvent e) {
         for (GLClickable b : buttons) {
-            if (b.getShape().contains(transformPoint(e.getPoint(),b))) {
+            if (isOver(e.getPoint(), b)) {
                 if (over == b) {
                     return;
                 }

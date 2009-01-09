@@ -4,6 +4,7 @@
  */
 package com.novusradix.JavaPop.Client.Tools;
 
+import com.novusradix.JavaPop.Client.Client;
 import com.novusradix.JavaPop.Messaging.Tools.StartLightning;
 import com.novusradix.JavaPop.Messaging.Tools.StopLightning;
 import java.awt.Point;
@@ -13,6 +14,10 @@ import java.awt.Point;
  * @author mom
  */
 public class LightningTool extends BaseTool {
+
+    public LightningTool(ToolGroup tg, Client c) {
+        super(tg,c);
+    }
 
     @Override
     public void ButtonDown(Point p) {
@@ -30,10 +35,6 @@ public class LightningTool extends BaseTool {
 
     public String getToolTip() {
         return "Lightning";
-    }
-
-    public String getGroup() {
-        return "Air";
     }
 
     public Point getPosition() {

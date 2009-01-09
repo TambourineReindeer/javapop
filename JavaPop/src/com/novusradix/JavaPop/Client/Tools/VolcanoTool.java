@@ -1,18 +1,20 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Client.Tools;
 
+import com.novusradix.JavaPop.Client.Client;
 import com.novusradix.JavaPop.Messaging.Tools.Volcano;
 import java.awt.Point;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class VolcanoTool extends BaseTool {
 
+    public VolcanoTool(ToolGroup tg, Client c) {
+        super(tg, c);
+    }
+
+    @Override
     public void PrimaryAction(Point p) {
         client.sendMessage(new Volcano(p));
     }
@@ -25,11 +27,7 @@ public class VolcanoTool extends BaseTool {
         return "Volcano";
     }
 
-    public String getGroup() {
-        return "Fire";
-    }
-    
     public Point getPosition() {
-        return new Point(200,-50);
+        return new Point(200, -50);
     }
 }

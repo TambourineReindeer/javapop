@@ -4,10 +4,10 @@
  */
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Client.Tools.BaseTool;
 import com.novusradix.JavaPop.Server.Player.PeonMode;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.util.Collection;
 
 /**
  *
@@ -17,9 +17,11 @@ public class GLBehaviourButton extends GLButton {
 
     PeonMode mode;
     private static GLButton selected;
+    private Client client;
     
-    GLBehaviourButton(PeonMode m) {
-        super();
+    GLBehaviourButton(PeonMode m, ClickableHandler ch, Collection<GLObject> objects, Client c) {
+        super(ch, objects);
+        client = c;
         mode = m;
         int[] x, y;
         x = new int[4];
@@ -74,7 +76,7 @@ public class GLBehaviourButton extends GLButton {
 
     @Override
     public void select() {
-        BaseTool.SetBehaviour(mode);
+        client.setBehaviour(mode);
         selected = this;
     }
 }

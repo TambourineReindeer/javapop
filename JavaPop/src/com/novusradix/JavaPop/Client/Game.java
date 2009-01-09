@@ -4,9 +4,17 @@
  */
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Client.Tools.EarthquakeTool;
+import com.novusradix.JavaPop.Client.Tools.LightningTool;
+import com.novusradix.JavaPop.Client.Tools.MoveAnkhTool;
+import com.novusradix.JavaPop.Client.Tools.RaiseLowerTool;
+import com.novusradix.JavaPop.Client.Tools.TidalWaveTool;
+import com.novusradix.JavaPop.Client.Tools.ToolGroup;
+import com.novusradix.JavaPop.Client.Tools.VolcanoTool;
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Server.Effects.Effect;
 import com.novusradix.JavaPop.Server.Player.Info;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,6 +39,7 @@ public class Game extends TimerTask {
     GameFrame frame;
     Collection<GLObject> objects;
     public Map<Integer, Effect> effects;
+    public Collection<ToolGroup> toolGroups;
     
     protected Game() {
     }
@@ -59,6 +68,31 @@ public class Game extends TimerTask {
                 me = p;
             }
         }
+        toolGroups = new ArrayList<ToolGroup>();
+        ToolGroup people = new ToolGroup("/com/novusradix/JavaPop/icons/People.png", new Point(50, -175));
+        toolGroups.add(people);
+        people.addTool(new RaiseLowerTool(people, client));
+        people.addTool(new MoveAnkhTool(people, client));
+        
+        ToolGroup veg = new ToolGroup("/com/novusradix/JavaPop/icons/Vegetation.png", new Point(100, -150));
+        toolGroups.add(veg);
+        
+        ToolGroup earth = new ToolGroup("/com/novusradix/JavaPop/icons/Earth.png", new Point(150, -125));
+        toolGroups.add(earth);
+        earth.addTool(new EarthquakeTool(earth, client));
+        
+        ToolGroup air = new ToolGroup("/com/novusradix/JavaPop/icons/Air.png", new Point(200, -100));
+        toolGroups.add(air);
+        air.addTool(new LightningTool(air, client));
+        
+        ToolGroup fire = new ToolGroup("/com/novusradix/JavaPop/icons/Fire.png", new Point(250, -75));
+        toolGroups.add(fire);
+        fire.addTool(new VolcanoTool(fire, client));
+        
+        ToolGroup water = new ToolGroup("/com/novusradix/JavaPop/icons/Water.png", new Point(300, -50));
+        toolGroups.add(water);
+        water.addTool(new TidalWaveTool(water, client));
+
         startTimer();
         frame = new GameFrame(this);
     }

@@ -5,6 +5,7 @@
 
 package com.novusradix.JavaPop.Client.Tools;
 
+import com.novusradix.JavaPop.Client.Client;
 import com.novusradix.JavaPop.Messaging.Tools.MoveAnkh;
 import java.awt.Point;
 
@@ -14,19 +15,22 @@ import java.awt.Point;
  */
 public class MoveAnkhTool extends BaseTool{
 
+    public MoveAnkhTool(ToolGroup tg, Client c)
+    {
+        super(tg,c);
+    }
+    
+    @Override
     public void PrimaryAction(Point p) {
         client.sendMessage(new MoveAnkh(p));
     }
+    
     public String getIconName() {
         return "/com/novusradix/JavaPop/icons/GoToAnkh.png";
     }
 
     public String getToolTip() {
         return "MoveAnkh";
-    }
-
-    public String getGroup() {
-        return "Earth";
     }
     
     public Point getPosition() {

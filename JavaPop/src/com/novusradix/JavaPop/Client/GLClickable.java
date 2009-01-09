@@ -16,5 +16,6 @@ public interface GLClickable {
     public void mouseOut(MouseEvent e);
     public boolean anchorLeft();
     public boolean anchorTop();
-    
+    public boolean isVisible();
+    public void setVisible(boolean visible);
 }
