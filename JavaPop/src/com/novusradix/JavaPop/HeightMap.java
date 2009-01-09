@@ -8,19 +8,13 @@ import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import java.awt.Dimension;
 import java.awt.Point;
-import javax.media.opengl.GL;
-import javax.media.opengl.GLAutoDrawable;
 
 /**
  *
  * @author gef
  */
 public abstract class HeightMap {
-    public static final byte TILE_SEA = 0;
-    public static final byte TILE_LAND = 1;
-    public static final byte TILE_FARM = 2;
-    public static final byte TILE_LAVA = 3;
-    
+   
     protected final int width,  breadth;
 
     public HeightMap(Dimension mapSize) {
@@ -134,7 +128,7 @@ public abstract class HeightMap {
         }
     }
 
-    public boolean isSea(Point p) {
+    public boolean isSeaLevel(Point p) {
         if (p.x < 0 || p.y < 0 || p.x + 1 >= width || p.y + 1 >= breadth) {
             return false;
         }
@@ -153,10 +147,10 @@ public abstract class HeightMap {
         hb = getHeight(new Point(p.x, p.y + 1));
         hc = getHeight(new Point(p.x + 1, p.y));
         hd = getHeight(new Point(p.x + 1, p.y + 1));
-        return (ha == hb && hb == hc && hc == hd);
+        return (ha == hb && ha == hc && ha == hd);
     }
 
-    public abstract void setTile(Point p, byte t);
+    //public abstract void setTile(Point p, Tile t);
 
     protected abstract void setHeight(Point point, byte b);
 
@@ -164,15 +158,5 @@ public abstract class HeightMap {
     public void applyUpdate(HeightMapUpdate u) {
         throw new UnsupportedOperationException("Not implemented in superclass");
     }
-/*
-    //Optional
-    public void init(GLAutoDrawable glDrawable) {
-        throw new UnsupportedOperationException("Not implemented in superclass");
-    }
 
-    //Optional
-    public void display(GL gl, double time) {
-        throw new UnsupportedOperationException("Not implemented in superclass");
-    }
-*/
 }

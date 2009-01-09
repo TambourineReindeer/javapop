@@ -8,6 +8,7 @@ import com.novusradix.JavaPop.Client.Tools.EarthquakeTool;
 import com.novusradix.JavaPop.Client.Tools.LightningTool;
 import com.novusradix.JavaPop.Client.Tools.MoveAnkhTool;
 import com.novusradix.JavaPop.Client.Tools.RaiseLowerTool;
+import com.novusradix.JavaPop.Client.Tools.SwampTool;
 import com.novusradix.JavaPop.Client.Tools.TidalWaveTool;
 import com.novusradix.JavaPop.Client.Tools.ToolGroup;
 import com.novusradix.JavaPop.Client.Tools.VolcanoTool;
@@ -76,6 +77,7 @@ public class Game extends TimerTask {
         
         ToolGroup veg = new ToolGroup("/com/novusradix/JavaPop/icons/Vegetation.png", new Point(100, -150));
         toolGroups.add(veg);
+        veg.addTool(new SwampTool(veg, client));
         
         ToolGroup earth = new ToolGroup("/com/novusradix/JavaPop/icons/Earth.png", new Point(150, -125));
         toolGroups.add(earth);

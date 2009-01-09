@@ -1,17 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Server;
 
 import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
+import com.novusradix.JavaPop.Tile;
 import java.util.Random;
-import com.sun.opengl.util.BufferUtil;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +14,7 @@ import static java.lang.Math.*;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
@@ -28,20 +23,22 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
     private static int rowstride;
     private Rectangle dirty;
     public final Rectangle bounds;
-    private Map<Point, Byte> texture;
+    private Map<Point, Byte> textureChanges;
     private byte[][] tex;
     private byte[][] oldTex;
     private boolean[][] flat;
 
+
     public HeightMap(Dimension mapSize) {
         super(mapSize);
         //b = BufferUtil.newByteBuffer(width * breadth);
-        heights = new byte[width*breadth];
-        texture = new HashMap<Point, Byte>();
+        heights = new byte[width * breadth];
+        textureChanges = new HashMap<Point, Byte>();
         rowstride = width;
         bounds = new Rectangle(0, 0, width, breadth);
         tex = new byte[width - 1][breadth - 1];
         oldTex = new byte[width - 1][breadth - 1];
+
         flat = new boolean[width - 1][breadth - 1];
         int x, y;
         for (y = 0; y < breadth; y++) {
@@ -52,7 +49,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
                 }
             }
         }
-        //b.flip();
+    //b.flip();
     }
 
     private static int bufPos(Point p) {
@@ -69,8 +66,8 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
     void randomize(int seed) {
         synchronized (this) {
-            int n,  m;
-            int x,  y;
+            int n, m;
+            int x, y;
             Random r = new Random(seed);
 
             for (n = 0; n < width * breadth / 80; n++) {
@@ -106,19 +103,42 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         }
     }
 
-    public void setTile(Point p, byte i) {
-        tex[p.x][p.y] = i;
+    public void setTile(Point p, Tile t) {
+        boolean bflat = isFlat(p);
+        boolean bseaLevel = isSeaLevel(p);
+        if (!bflat && !t.canExistOnSlope) {
+            return;
+        }
+        if (bseaLevel && !t.canExistAtSeaLevel) {
+            return;
+        }
+        tex[p.x][p.y] = t.id;
     }
 
-    public int getTexture(Point p) {
-        return tex[p.x][p.y];
+    public void clearTile(Point p) {
+        boolean bflat = isFlat(p);
+        boolean bseaLevel = isSeaLevel(p);
+        if (bseaLevel) {
+            tex[p.x][p.y] = Tile.SEA.id;
+
+            return;
+        }
+        if (bflat) {
+            tex[p.x][p.y] = Tile.EMPTY_FLAT.id;
+        } else {
+            tex[p.x][p.y] = Tile.EMPTY_SLOPE.id;
+        }
+    }
+
+    public Tile getTile(Point p) {
+        return Tile.values()[tex[p.x][p.y]];
     }
 
     private void difTex() {
         for (int x = 0; x < width - 1; x++) {
             for (int y = 0; y < breadth - 1; y++) {
                 if (tex[x][y] != oldTex[x][y]) {
-                    texture.put(new Point(x, y), tex[x][y]);
+                    textureChanges.put(new Point(x, y), tex[x][y]);
                     oldTex[x][y] = tex[x][y];
                 }
             }
@@ -146,10 +166,21 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
             for (int wy = p.y - r; wy < p.y + r; wy++) {
                 if (ex >= 0 && wy >= 0 && ex + 1 < width && wy + 1 < breadth) {
                     Point p2 = new Point(ex, wy);
-                    if (isSea(p2)) {
-                        setTile(p2, (byte) 0);
+                    Tile oldTile = getTile(p2);
+                    if (isSeaLevel(p2)) {
+                        if (!oldTile.canExistAtSeaLevel) {
+                            setTile(p2, Tile.SEA);
+                        }
                     } else {
-                        setTile(p2, (byte) 1);
+                        if (isFlat(p2)) {
+                            if (oldTile == Tile.EMPTY_SLOPE || oldTile == Tile.SEA) {
+                                setTile(p2, Tile.EMPTY_FLAT);
+                            }
+                        } else {
+                            if (!oldTile.canExistOnSlope) {
+                                setTile(p2, Tile.EMPTY_SLOPE);
+                            }
+                        }
                     }
                 }
             }
@@ -159,16 +190,19 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
     protected void setHeight(Point p, byte height) {
         if (inBounds(p)) {
             //b.put(bufPos(p), height);
-            heights[bufPos(p)]=height;
+            heights[bufPos(p)] = height;
         }
+
     }
 
     private void conform(Point p) {
         byte height = getHeight(p);
         boolean bChanged = false;
         Point p1;
+
         int r;
-        for (r = 1; r < 64; r++) {
+        for (r = 1; r <
+                64; r++) {
             bChanged = false;
             for (Point offset : Helpers.rings[r]) {
                 p1 = new Point(p.x + offset.x, p.y + offset.y);
@@ -180,39 +214,21 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
                         bChanged = true;
                         setHeight(p1, (byte) (height - r));
                     }
+
                 }
             }
 
             if (!bChanged) {
                 markDirty(new Rectangle(p.x - r + 1, p.y - r + 1, r * 2 - 1, r * 2 - 1));
-                retexture(p, r);
                 reFlat(p, r);
+                retexture(p, r);
                 return;
-            }
-        }
-    }
 
-    private void markDirty(Point p) {
-        if (dirty == null) {
-            dirty = new Rectangle(p);
-        }
-        if (p.x < dirty.x) {
-            dirty.width += dirty.x - p.x;
-            dirty.x = p.x;
-        }
-        if (p.x > dirty.x + dirty.width) {
-            dirty.width = p.x - dirty.x;
-        }
-        if (p.y < dirty.y) {
-            dirty.height += dirty.y - p.y;
-            dirty.y = p.y;
-        }
-        if (p.y > dirty.height) {
-            dirty.height = p.y - dirty.y;
-        }
-        dirty = dirty.intersection(bounds);
-        if (dirty.isEmpty()) {
-            dirty = null;
+            }
+
+
+
+
         }
     }
 
@@ -222,22 +238,27 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         } else {
             dirty = dirty.union(r);
         }
+
         dirty = dirty.intersection(bounds);
         if (dirty.isEmpty()) {
             dirty = null;
         }
+
     }
 
     public HeightMapUpdate GetUpdate() {
         HeightMapUpdate m = null;
         difTex();
+
         synchronized (this) {
-            if (dirty != null || texture.size() > 0) {
-                m = new HeightMapUpdate(dirty, heights, width, texture);
+            if (dirty != null || textureChanges.size() > 0) {
+                m = new HeightMapUpdate(dirty, heights, width, textureChanges);
             }
+
             dirty = null;
-            texture.clear();
+            textureChanges.clear();
         }
+
         return m;
     }
 }
