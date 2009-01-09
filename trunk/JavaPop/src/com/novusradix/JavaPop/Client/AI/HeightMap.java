@@ -10,6 +10,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
+import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 import java.util.Map.Entry;
 
@@ -53,7 +54,6 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         heights[p.x][p.y] = b;
     }
 
-    @Override
     public void setTile(Point p, byte t) {
         tiles[p.x][p.y] = t;
     }

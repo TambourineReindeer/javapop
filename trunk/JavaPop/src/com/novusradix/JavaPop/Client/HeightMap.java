@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import javax.media.opengl.GL;
 
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
+import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 
 public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObject {
@@ -45,10 +46,5 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObj
     @Override
     protected void setHeight(Point point, byte b) {
         implementation.setHeight(point, b);
-    }
-
-    @Override
-    public void setTile(Point p, byte t) {
-        implementation.setTile(p, t);
     }
 }

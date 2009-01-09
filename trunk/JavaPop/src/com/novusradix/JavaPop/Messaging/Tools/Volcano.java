@@ -6,6 +6,7 @@ package com.novusradix.JavaPop.Messaging.Tools;
 
 import com.novusradix.JavaPop.HeightMap;
 import com.novusradix.JavaPop.Messaging.*;
+import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,15 +39,12 @@ public class Volcano extends Message {
                         serverGame.heightMap.up(p);
                         Thread.sleep(200);
                     }
-                        serverGame.heightMap.down(p);
-                        serverGame.heightMap.setTile(p, HeightMap.TILE_LAVA);
-                       
-                        //This point thing isn't really working out...
-                        serverGame.heightMap.setTile(p, HeightMap.TILE_LAVA);
-                        serverGame.heightMap.setTile(p, HeightMap.TILE_LAVA);
-                        serverGame.heightMap.setTile(p, HeightMap.TILE_LAVA);
-                        Thread.sleep(200);
-                    
+                    serverGame.heightMap.down(p);
+                    serverGame.heightMap.setTile(p, Tile.LAVA);
+
+                    //new VolcanoEffect(p)??
+                    Thread.sleep(200);
+
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Volcano.class.getName()).log(Level.SEVERE, null, ex);
                 }

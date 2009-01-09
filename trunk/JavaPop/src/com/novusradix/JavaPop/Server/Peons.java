@@ -177,7 +177,7 @@ public class Peons {
 
             switch (state) {
                 case WALKING:
-                    if (game.heightMap.isSea(oldPos)) {
+                    if (game.heightMap.isSeaLevel(oldPos)) {
                         return changeState(State.DROWNING);
                     }
                     if (map.size(oldPos) > 1) {

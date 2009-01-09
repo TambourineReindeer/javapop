@@ -3,6 +3,7 @@ package com.novusradix.JavaPop.Client;
 import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
+import com.novusradix.JavaPop.Tile;
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.TextureIO;
 import java.awt.Dimension;
@@ -264,17 +265,18 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     public void setTile(Point p, byte t) {
         float left, mid, right;
         int texid;
-        switch (t) {
-            case HeightMap.TILE_SEA:
+        switch (Tile.values()[t]) {
+            case SEA:
                 texid = (new Random()).nextInt(3);
                 break;
-            case HeightMap.TILE_LAND:
+            case EMPTY_FLAT:
+            case EMPTY_SLOPE:
                 texid = 3;
                 break;
-            case HeightMap.TILE_FARM:
+            case FARM:
                 texid = 4;
                 break;
-            case HeightMap.TILE_LAVA:
+            case LAVA:
                 texid = 5;
                 break;
 

@@ -3,6 +3,7 @@ package com.novusradix.JavaPop.Server;
 import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Messaging.HouseUpdate;
 import com.novusradix.JavaPop.Server.Peons.Peon;
+import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,11 +16,11 @@ import static java.lang.Math.*;
 public class Houses {
 
     private Game game;
-    private int[][] map;
-    private int[][] newmap;
+    private byte[][] map;
+    private byte[][] newmap;
     private Vector<HouseUpdate.Detail> hds;
     private Vector<Point> newHouses;
-    private Map<Point,House> allHouses;
+    private Map<Point, House> allHouses;
     private static final int TEAMS = 4;
     private static final int EMPTY = 0;
     private static final int FARM = EMPTY + 1;
@@ -28,8 +29,8 @@ public class Houses {
 
     public Houses(Game g) {
         game = g;
-        map = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
-        newmap = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
+        map = new byte[game.heightMap.getWidth()][game.heightMap.getBreadth()];
+        newmap = new byte[game.heightMap.getWidth()][game.heightMap.getBreadth()];
 
         allHouses = new HashMap<Point, House>();
         newHouses = new Vector<Point>();
@@ -39,14 +40,14 @@ public class Houses {
     public void addHouse(Point p, Player player, float strength) {
         synchronized (allHouses) {
             if (canBuild(p)) {
-                allHouses.put(p,new House(p, player, strength));
+                allHouses.put(p, new House(p, player, strength));
             }
         }
     }
 
     public boolean canBuild(Point p) {
         if (game.heightMap.tileInBounds(p)) {
-            return (map[p.x][p.y] == EMPTY && game.heightMap.getHeight(p) > 0 && game.heightMap.isFlat(p) && !newHouses.contains(p));
+            return (map[p.x][p.y] == EMPTY && game.heightMap.getTile(p).isFertile && !newHouses.contains(p));
 
         }
         return false;
@@ -64,8 +65,7 @@ public class Houses {
             House h;
             for (; i.hasNext();) {
                 h = i.next();
-                if(h.strength<0)
-                {
+                if (h.strength < 0) {
                     i.remove();
                     hds.add(new HouseUpdate.Detail(h.id, h.pos, h.player, -1));
                     continue;
@@ -93,7 +93,7 @@ public class Houses {
 
         synchronized (game.heightMap) {
             unpaint();
-            int[][] t;
+            byte[][] t;
             t = map;
             map = newmap;
             newmap = t;
@@ -114,7 +114,7 @@ public class Houses {
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (map[x][y] != EMPTY) {
-                    game.heightMap.setTile(new Point(x, y), HeightMap.TILE_FARM);
+                    game.heightMap.setTile(new Point(x, y), Tile.FARM);
                 }
             }
         }
@@ -125,7 +125,7 @@ public class Houses {
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (map[x][y] != EMPTY) {
-                    game.heightMap.setTile(new Point(x, y), HeightMap.TILE_LAND);
+                    game.heightMap.clearTile(new Point(x,y));
                 }
             }
         }
@@ -133,13 +133,15 @@ public class Houses {
 
     public int countFlatLand(Point pos) {
         int flat = 0;
-        int h = game.heightMap.getHeight(pos);
         for (int radius = 1; radius <= 3; radius++) {
             for (Point offset : Helpers.rings[radius]) {
                 Point p = new Point(pos.x + offset.x, pos.y + offset.y);
 
-                if (game.heightMap.tileInBounds(p) && game.heightMap.getHeight(p) == h && game.heightMap.isFlat(p)) {
-                    flat++;
+                if (game.heightMap.tileInBounds(p)) {
+                    Tile tile = game.heightMap.getTile(p);
+                    if (tile.isFertile) {
+                        flat++;
+                    }
                 }
             }
             if (flat < (2 * radius + 1) * (2 * radius + 1) - 1) {
@@ -192,26 +194,24 @@ public class Houses {
             player.info.mana -= i;
         }
 
-        void addPeon(Peon p)
-        {
-            if(p.player == player)
-            {
+        void addPeon(Peon p) {
+            if (p.player == player) {
                 strength += p.strength;
                 return;
             }
-            
-            strength -=p.strength;
+
+            strength -= p.strength;
             p.player.info.mana -= p.strength;
             player.info.mana -= p.strength;
-            if(strength<0){
-                player.info.mana -=strength;
+            if (strength < 0) {
+                player.info.mana -= strength;
                 player = p.player;
                 strength = -strength;
                 changed = true;
             }
         }
-        
-        private void paintmap(int[][] newmap) {
+
+        private void paintmap(byte[][] newmap) {
             newmap[pos.x][pos.y] = HOUSE;
             int radiuslimit = 0;
             if (level > 0) {
@@ -224,11 +224,10 @@ public class Houses {
                 radiuslimit = 3;
             }
 
-            int h = game.heightMap.getHeight(pos);
             for (int radius = 1; radius <= radiuslimit; radius++) {
                 for (Point offset : Helpers.rings[radius]) {
                     Point p = new Point(pos.x + offset.x, pos.y + offset.y);
-                    if (game.heightMap.tileInBounds(p) && game.heightMap.getHeight(p) == h && game.heightMap.isFlat(p)) {
+                    if (game.heightMap.tileInBounds(p) && game.heightMap.getTile(p).isFertile) {
                         newmap[p.x][p.y] = FARM;
                     }
                 }
@@ -250,7 +249,7 @@ public class Houses {
 
         private void step(float seconds) {
             float rate = (level + 1);
-            float newmana = rate*seconds;
+            float newmana = rate * seconds;
             strength += newmana;
             player.info.mana += newmana;
             if (strength > rate * 100.0f) {

@@ -25,8 +25,10 @@ public class EffectUpdate extends Message {
     @Override
     public void execute() {
         if (clientGame.effects != null) {
+            synchronized(clientGame.effects){
             clientGame.effects.putAll(newEffects);
             clientGame.effects.keySet().removeAll(deletedEffects);
+            }
         }
     }
 }
