@@ -5,6 +5,7 @@ import com.novusradix.JavaPop.Math.MultiMap;
 import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.PeonUpdate;
 import com.novusradix.JavaPop.Server.Houses.House;
+import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 import java.util.Collection;
 import java.util.HashSet;
@@ -177,8 +178,11 @@ public class Peons {
 
             switch (state) {
                 case WALKING:
-                    if (game.heightMap.isSeaLevel(oldPos)) {
+                    if (game.heightMap.getTile(oldPos) == Tile.SEA) {
                         return changeState(State.DROWNING);
+                    }
+                    if (game.heightMap.getTile(oldPos) == Tile.LAVA) {
+                        return changeState(State.DEAD);
                     }
                     if (map.size(oldPos) > 1) {
                         return changeState(State.MERGING);
@@ -238,9 +242,8 @@ public class Peons {
 
 
                 case DROWNING:
-                    if (!(game.heightMap.getHeight(oldPos) == 0 && game.heightMap.isFlat(oldPos))) {
+                    if (!(game.heightMap.getTile(oldPos)==Tile.SEA)) {
                         return changeState(State.ALIVE);
-
                     }
                     strength -= 100.0f * seconds;
                     player.info.mana -= 100.0f * seconds;
@@ -296,8 +299,8 @@ public class Peons {
             p.y = start.y + r.nextInt(5) - 2;
             p.x = max(0, p.x);
             p.y = max(0, p.y);
-            p.x = min(p.x, game.heightMap.getWidth() - 1);
-            p.y = min(p.y, game.heightMap.getBreadth() - 1);
+            p.x = min(p.x, game.heightMap.getWidth() - 2);
+            p.y = min(p.y, game.heightMap.getBreadth() - 2);
             return p;
         }
     }

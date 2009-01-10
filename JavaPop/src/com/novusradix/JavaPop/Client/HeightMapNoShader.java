@@ -263,7 +263,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     }
 
     public void setTile(Point p, byte t) {
-        float left, mid, right;
+        float left, xmid, right, top, bottom, ymid;
         int texid;
         switch (Tile.values()[t]) {
             case SEA:
@@ -271,6 +271,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 break;
             case EMPTY_FLAT:
             case EMPTY_SLOPE:
+            case ROCK:
+            case TREE:
                 texid = 3;
                 break;
             case FARM:
@@ -279,26 +281,52 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
             case LAVA:
                 texid = 5;
                 break;
-
-            default:
+            case BURNT:
                 texid = 6;
+                break;
+            case SWAMP:
+                texid = 7;
+                break;
+            default:
+                texid = 8;
+                break;
         }
-        left = texid * 32.0f;
+        int x,y;
+        x=texid % 8;
+        y=texid/8;
+        left = x * 32.0f;
         right = left + 31.0f;
-        mid = (left + right) / 2.0f;
-
+        xmid = (left + right) / 2.0f;
+top = y*32.0f;
+bottom = top+31.0f;
+ymid = (top+bottom)/2.0f;
+        
         b.put(bufPos(p, 0, TX), left);
         b.put(bufPos(p, 1, TX), right);
-        b.put(bufPos(p, 2, TX), mid);
+        b.put(bufPos(p, 2, TX), xmid);
         b.put(bufPos(p, 3, TX), right);
         b.put(bufPos(p, 4, TX), right);
-        b.put(bufPos(p, 5, TX), mid);
+        b.put(bufPos(p, 5, TX), xmid);
         b.put(bufPos(p, 6, TX), right);
         b.put(bufPos(p, 7, TX), left);
-        b.put(bufPos(p, 8, TX), mid);
+        b.put(bufPos(p, 8, TX), xmid);
         b.put(bufPos(p, 9, TX), left);
         b.put(bufPos(p, 10, TX), left);
-        b.put(bufPos(p, 11, TX), mid);
+        b.put(bufPos(p, 11, TX), xmid);
+        
+        b.put(bufPos(p, 0, TY), bottom);
+        b.put(bufPos(p, 1, TY), bottom);
+        b.put(bufPos(p, 2, TY), ymid);
+        b.put(bufPos(p, 3, TY), bottom);
+        b.put(bufPos(p, 4, TY), top);
+        b.put(bufPos(p, 5, TY), ymid);
+        b.put(bufPos(p, 6, TY), top);
+        b.put(bufPos(p, 7, TY), top);
+        b.put(bufPos(p, 8, TY), ymid);
+        b.put(bufPos(p, 9, TY), top);
+        b.put(bufPos(p, 10, TY), bottom);
+        b.put(bufPos(p, 11, TY), ymid);
+     
         changed[p.y] = true;
     }
 
@@ -310,7 +338,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     }
 
     private void setNormals(Point p, int vertA, int vertB, int vertC) {
-        Vector3 va, vb, vc, vn;
+        Vector3 va,vb ,vc ,vn ;
         va = new Vector3();
         vb = new Vector3();
         vc = new Vector3();
@@ -355,7 +383,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     }
 
     public void init(final GL gl) {
-        
+
         try {
             URL u = getClass().getResource("/com/novusradix/JavaPop/textures/tex.png");
             tex = TextureIO.newTexture(u, false, "png");
@@ -418,7 +446,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     public void applyUpdate(HeightMapUpdate u) {
         synchronized (this) {
             if (!u.dirtyRegion.isEmpty()) {
-                int x, y;
+                int x,  y;
 
                 for (y = 0; y < u.dirtyRegion.height; y++) {
                     for (x = 0; x < u.dirtyRegion.width; x++) {
