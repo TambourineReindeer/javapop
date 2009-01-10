@@ -125,7 +125,9 @@ public class Houses {
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (map[x][y] != EMPTY) {
-                    game.heightMap.clearTile(new Point(x,y));
+                    if (game.heightMap.getTile(new Point(x, y)).isFertile) {
+                        game.heightMap.clearTile(new Point(x, y));
+                    }
                 }
             }
         }
@@ -133,7 +135,7 @@ public class Houses {
 
     public int countFlatLand(Point pos) {
         int flat = 0;
-        for (int radius = 1; radius <= 3; radius++) {
+        for (int radius = 0; radius <= 3; radius++) {
             for (Point offset : Helpers.rings[radius]) {
                 Point p = new Point(pos.x + offset.x, pos.y + offset.y);
 
@@ -144,7 +146,7 @@ public class Houses {
                     }
                 }
             }
-            if (flat < (2 * radius + 1) * (2 * radius + 1) - 1) {
+            if (flat < (2 * radius + 1) * (2 * radius + 1)) {
                 break;
             }
         }
@@ -212,23 +214,25 @@ public class Houses {
         }
 
         private void paintmap(byte[][] newmap) {
-            newmap[pos.x][pos.y] = HOUSE;
-            int radiuslimit = 0;
-            if (level > 0) {
-                radiuslimit = 1;
-            }
-            if (level > 8) {
-                radiuslimit = 2;
-            }
-            if (level == 48) {
-                radiuslimit = 3;
-            }
+            if (game.heightMap.getTile(pos).isFertile) {
+                newmap[pos.x][pos.y] = HOUSE;
+                int radiuslimit = 0;
+                if (level > 0) {
+                    radiuslimit = 1;
+                }
+                if (level > 9) {
+                    radiuslimit = 2;
+                }
+                if (level == 49) {
+                    radiuslimit = 3;
+                }
 
-            for (int radius = 1; radius <= radiuslimit; radius++) {
-                for (Point offset : Helpers.rings[radius]) {
-                    Point p = new Point(pos.x + offset.x, pos.y + offset.y);
-                    if (game.heightMap.tileInBounds(p) && game.heightMap.getTile(p).isFertile) {
-                        newmap[p.x][p.y] = FARM;
+                for (int radius = 1; radius <= radiuslimit; radius++) {
+                    for (Point offset : Helpers.rings[radius]) {
+                        Point p = new Point(pos.x + offset.x, pos.y + offset.y);
+                        if (game.heightMap.tileInBounds(p) && game.heightMap.getTile(p).isFertile) {
+                            newmap[p.x][p.y] = FARM;
+                        }
                     }
                 }
             }

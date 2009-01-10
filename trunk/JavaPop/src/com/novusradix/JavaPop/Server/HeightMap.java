@@ -28,7 +28,6 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
     private byte[][] oldTex;
     private boolean[][] flat;
 
-
     public HeightMap(Dimension mapSize) {
         super(mapSize);
         //b = BufferUtil.newByteBuffer(width * breadth);
@@ -104,15 +103,17 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
     }
 
     public void setTile(Point p, Tile t) {
-        boolean bflat = isFlat(p);
-        boolean bseaLevel = isSeaLevel(p);
-        if (!bflat && !t.canExistOnSlope) {
-            return;
+        if (tileInBounds(p)) {
+            boolean bflat = isFlat(p);
+            boolean bseaLevel = isSeaLevel(p);
+            if (!bflat && !t.canExistOnSlope) {
+                return;
+            }
+            if (bseaLevel && !t.canExistAtSeaLevel) {
+                return;
+            }
+            tex[p.x][p.y] = t.id;
         }
-        if (bseaLevel && !t.canExistAtSeaLevel) {
-            return;
-        }
-        tex[p.x][p.y] = t.id;
     }
 
     public void clearTile(Point p) {
