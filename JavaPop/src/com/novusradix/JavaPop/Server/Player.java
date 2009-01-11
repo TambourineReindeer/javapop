@@ -109,6 +109,7 @@ public class Player implements Runnable {
             oos.reset();
         } catch (IOException ex) {
             Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
+            currentGame.removePlayer(this);
         }
     }
 

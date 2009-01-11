@@ -45,8 +45,8 @@ public class Peons {
 
     }
 
-    public void addPeon(int x, int y, float strength, Player player) {
-        addPeon(x + 0.5f, y + 0.5f, strength, player);
+    public void addPeon(Point p, float strength, Player player) {
+        addPeon(p.x + 0.5f, p.y + 0.5f, strength, player);
     }
 
     public void step(float seconds) {

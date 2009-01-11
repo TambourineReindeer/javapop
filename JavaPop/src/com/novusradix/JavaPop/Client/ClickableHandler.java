@@ -73,9 +73,9 @@ public class ClickableHandler implements MouseMotionListener, MouseListener {
         }
         if (over != null) {
             over.mouseOut(e);
+        ml.mouseEntered(e);
         }
         over = null;
-        ml.mouseEntered(e);
         mml.mouseMoved(e);
     }
 

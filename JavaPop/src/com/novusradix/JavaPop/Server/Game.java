@@ -1,5 +1,6 @@
 package com.novusradix.JavaPop.Server;
 
+import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Messaging.EffectUpdate;
 import com.novusradix.JavaPop.Messaging.Lobby.GameOver;
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
@@ -10,11 +11,13 @@ import com.novusradix.JavaPop.Messaging.PlayerUpdate;
 import com.novusradix.JavaPop.Server.Effects.Effect;
 import com.novusradix.JavaPop.Server.Effects.LightningEffect;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -98,8 +101,10 @@ public class Game extends TimerTask {
     }
 
     public void startGame() {
-        heightMap = new HeightMap(new Dimension(64, 64));
-        heightMap.randomize(1);
+        heightMap = new HeightMap(new Dimension(128, 128));
+        Random r = new Random();
+
+        heightMap.randomize(r.nextInt());
         peons = new Peons(this);
         houses = new Houses(this);
 
@@ -110,16 +115,34 @@ public class Game extends TimerTask {
 
         try {
             while (players.size() == 1) {
+                //wait for AI Player to join
                 Thread.sleep(500);
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        Map<Player, Point> startingPosition = new HashMap<Player, Point>();
         for (Player p : players) {
-            peons.addPeon(2.5f + p.getId(), 2.5f + p.getId() * 2, 200, p);
+            startingPosition.put(p, new Point(r.nextInt(heightMap.getWidth()), r.nextInt(heightMap.getBreadth())));
         }
-
+        int numPeons = 3;
+        nextPlayer:
+        for (Map.Entry<Player, Point> me : startingPosition.entrySet()) {
+            int placed = 0;
+            for (ArrayList<Point> ring : Helpers.shuffledRings) {
+                for (Point p : ring) {
+                    Point p2 = new Point(p.x + me.getValue().x, p.y + me.getValue().y);
+                    if (heightMap.getHeight(p2) > 0) {
+                        placed++;
+                        peons.addPeon(p2, 400, me.getKey());
+                        if (placed == numPeons) {
+                            continue nextPlayer;
+                        }
+                    }
+                }
+            }
+        }
         GameStarted go = new GameStarted(this);
         server.sendAllPlayers(go);
         HeightMapUpdate m = heightMap.GetUpdate();
@@ -139,7 +162,7 @@ public class Game extends TimerTask {
             timer.cancel();
         }
         HeightMapUpdate m;
-        synchronized (heightMap) {
+        synchronized (heightMap) { //TODO:Does this need to be synchronized at this high a level?
             peons.step(seconds);
             houses.step(seconds);
             m = heightMap.GetUpdate();
