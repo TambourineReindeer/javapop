@@ -76,7 +76,7 @@ public class Houses {
                     h.step(seconds);
                 } else {
                     i.remove();
-                    game.peons.addPeon(h.pos.x, h.pos.y, h.strength, h.player);
+                    game.peons.addPeon(h.pos, h.strength, h.player);
                     hds.add(new HouseUpdate.Detail(h.id, h.pos, h.player, -1));
                 }
             }
@@ -85,7 +85,7 @@ public class Houses {
                 h = i.next();
                 if (newmap[h.pos.x][h.pos.y] != HOUSE) {
                     i.remove();
-                    game.peons.addPeon(h.pos.x, h.pos.y, h.strength, h.player);
+                    game.peons.addPeon(h.pos, h.strength, h.player);
                     hds.add(new HouseUpdate.Detail(h.id, h.pos, h.player, -1));
                 }
             }
@@ -258,7 +258,7 @@ public class Houses {
             player.info.mana += newmana;
             if (strength > rate * 100.0f) {
                 float houseStrength = rate * 100.0f - min(500.0f, rate * 100.0f / 2.0f);
-                game.peons.addPeon(pos.x, pos.y, strength - houseStrength, player);
+                game.peons.addPeon(pos, strength - houseStrength, player);
                 strength = houseStrength;
             }
 

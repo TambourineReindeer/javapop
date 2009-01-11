@@ -27,7 +27,9 @@ public class Houses implements AbstractHouses {
     }
 
     public Collection<House> getHouses(Player p) {
-        return playerHouses.get(p);
+        synchronized (houses) {
+            return playerHouses.get(p);
+        }
     }
 
     public void updateHouse(int id, Point pos, Player p, int level) {
@@ -43,8 +45,7 @@ public class Houses implements AbstractHouses {
                 if (houses.containsKey(id)) {
                     House h = houses.get(id);
                     h.level = level;
-                    if(h.player!=p)
-                    {
+                    if (h.player != p) {
                         playerHouses.remove(h.player, h);
                         h.player = p;
                         playerHouses.put(p, h);

@@ -72,14 +72,15 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
             for (n = 0; n < width * breadth / 80; n++) {
                 x = r.nextInt(width);
                 y = r.nextInt(breadth);
-                for (m = 0; m < r.nextInt(8); m++) {
+               int ups = r.nextInt(8);
+                for (m = 0; m < ups; m++) {
                     up(new Point(x, y));
                 }
                 for (m = 0; m < r.nextInt(8); m++) {
                     up(new Point(x - 5 + r.nextInt(10), y - 5 + r.nextInt(10)));
                 }
-                for (m = 0; m < r.nextInt(8); m++) {
-                    down(new Point(x - 5 + r.nextInt(10), -5 + r.nextInt(10)));
+                for (m = 0; m < r.nextInt(ups*2+1); m++) {
+                    down(new Point(x - ups + r.nextInt(ups*2+1), y-ups + r.nextInt(ups*2+1)));
                 }
                 for (m = 0; m < r.nextInt(2); m++) {
                     down(new Point(x, y));
