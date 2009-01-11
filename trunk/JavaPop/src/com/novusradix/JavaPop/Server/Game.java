@@ -153,10 +153,12 @@ public class Game extends TimerTask {
         synchronized (effects) {
             effects.putAll(newEffects);
             effects.keySet().removeAll(deletedEffects);
-            EffectUpdate eu = new EffectUpdate(newEffects, deletedEffects);
-            sendAllPlayers(eu);
-            newEffects.clear();
-            deletedEffects.clear();
+            if (newEffects.size() + deletedEffects.size() > 0) {
+                EffectUpdate eu = new EffectUpdate(newEffects, deletedEffects);
+                sendAllPlayers(eu);
+                newEffects.clear();
+                deletedEffects.clear();
+            }
         }
         ArrayList<Player.Info> is = new ArrayList<Player.Info>(players.size());
         for (Player p : players) {
