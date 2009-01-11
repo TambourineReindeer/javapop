@@ -34,11 +34,10 @@ public class Peons {
         map = new MultiMap<Point, Peon>();
     }
 
-    public Collection<Peon> getPeons(Point p)
-    {
+    public Collection<Peon> getPeons(Point p) {
         return map.get(p);
     }
-    
+
     public void addPeon(float x, float y, float strength, Player player) {
         Peon p = new Peon(x, y, strength, player);
         peons.add(p);
@@ -104,7 +103,7 @@ public class Peons {
         }
 
         public void hurt(float i) {
-            strength-=i;
+            strength -= i;
             player.info.mana -= i;
         }
 
@@ -170,7 +169,7 @@ public class Peons {
             Point oldPos = getPoint();
             strength -= seconds;
             player.info.mana -= seconds;
-            
+
             if (strength < 0) {
                 player.info.mana -= this.strength;
                 return changeState(State.DEAD);
@@ -182,6 +181,9 @@ public class Peons {
                         return changeState(State.DROWNING);
                     }
                     if (game.heightMap.getTile(oldPos) == Tile.LAVA) {
+                        return changeState(State.DEAD);
+                    }
+                    if (game.heightMap.getTile(oldPos) == Tile.SWAMP) {
                         return changeState(State.DEAD);
                     }
                     if (map.size(oldPos) > 1) {
@@ -242,7 +244,7 @@ public class Peons {
 
 
                 case DROWNING:
-                    if (!(game.heightMap.getTile(oldPos)==Tile.SEA)) {
+                    if (!(game.heightMap.getTile(oldPos) == Tile.SEA)) {
                         return changeState(State.ALIVE);
                     }
                     strength -= 100.0f * seconds;

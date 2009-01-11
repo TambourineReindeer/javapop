@@ -1,7 +1,9 @@
 package com.novusradix.JavaPop.Messaging.Tools;
 
 import com.novusradix.JavaPop.Messaging.Message;
+import com.novusradix.JavaPop.Server.Effects.SwampEffect;
 import java.awt.Point;
+import java.util.Random;
 
 /**
  *
@@ -17,6 +19,6 @@ public class Swamp extends Message {
 
     @Override
     public void execute() {
-        
+        serverGame.addEffect(new SwampEffect(target));
     }
 }

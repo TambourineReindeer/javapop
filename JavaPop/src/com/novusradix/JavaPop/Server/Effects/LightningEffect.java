@@ -81,9 +81,12 @@ public class LightningEffect extends Effect {
         gl.glTranslatef(target.x + 0.5f, target.y + 0.5f, 0.0f);
 
         float c;
-        int newStrikes = nextPoisson(5.0 * (time - lastTime) * hits.length);
+        int newStrikes;
         if (lastTime == 0) {
             newStrikes = 2;
+        }else
+        {
+            newStrikes = nextPoisson(5.0 * (time - lastTime) * hits.length);
         }
         for (int n = 0; n < newStrikes; n++) {
             int ix = r.nextInt(hits.length);
@@ -127,7 +130,7 @@ public class LightningEffect extends Effect {
         double product = 1;
         int count = 0;
         int result = 0;
-        while (product >= elambda) {
+        while (product > elambda) {
             product *= r.nextDouble();
             result = count;
             count++; // keep result one behind
