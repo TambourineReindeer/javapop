@@ -133,7 +133,7 @@ public class Game extends TimerTask {
             for (ArrayList<Point> ring : Helpers.shuffledRings) {
                 for (Point p : ring) {
                     Point p2 = new Point(p.x + me.getValue().x, p.y + me.getValue().y);
-                    if (heightMap.getHeight(p2) > 0) {
+                    if (heightMap.tileInBounds(p2) && heightMap.getHeight(p2) > 0) {
                         placed++;
                         peons.addPeon(p2, 400, me.getKey());
                         if (placed == numPeons) {
@@ -162,11 +162,11 @@ public class Game extends TimerTask {
             timer.cancel();
         }
         HeightMapUpdate m;
-        synchronized (heightMap) { //TODO:Does this need to be synchronized at this high a level?
+        //synchronized (heightMap) { //TODO:Does this need to be synchronized at this high a level?
             peons.step(seconds);
             houses.step(seconds);
             m = heightMap.GetUpdate();
-        }
+        //}
         if (m != null) {
             sendAllPlayers(m);
         }

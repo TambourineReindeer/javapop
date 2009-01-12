@@ -36,7 +36,8 @@ public class XModel implements GLObject {
     private boolean listCreated;
     private Matrix4 transform;
     private int shader;
-    
+    private int[] vbos;
+
     public XModel(String model, String texture) {
         this.textureName = texture;
         vertices = new ArrayList<Vector8>();
@@ -74,29 +75,59 @@ public class XModel implements GLObject {
         gl.glMultMatrixf(transform.getArray(), 0);
 
         gl.glUseProgram(shader);
-        if (!listCreated) {
-            gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
-            gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
-            gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
-
-            b.position(VX);
-            gl.glVertexPointer(3, GL.GL_FLOAT, vertexstride * 4, b);
-            b.position(NX);
-            gl.glNormalPointer(GL.GL_FLOAT, vertexstride * 4, b);
-            b.position(TX);
-            gl.glTexCoordPointer(2, GL.GL_FLOAT, vertexstride * 4, b);
-            gl.glNewList(displayList, GL.GL_COMPILE_AND_EXECUTE);
-            gl.glDrawArrays(GL.GL_TRIANGLES, 0, triangleCount * 3);
-            gl.glEndList();
-            listCreated = true;
+        /*if (!listCreated) {
+        gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
+        gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
+        gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
+        
+        b.position(VX);
+        gl.glVertexPointer(3, GL.GL_FLOAT, vertexstride * 4, b);
+        b.position(NX);
+        gl.glNormalPointer(GL.GL_FLOAT, vertexstride * 4, b);
+        b.position(TX);
+        gl.glTexCoordPointer(2, GL.GL_FLOAT, vertexstride * 4, b);
+        gl.glNewList(displayList, GL.GL_COMPILE_AND_EXECUTE);
+        gl.glDrawArrays(GL.GL_TRIANGLES, 0, triangleCount * 3);
+        gl.glEndList();
+        listCreated = true;
         } else {
-            gl.glCallList(displayList);
-        }
+        gl.glCallList(displayList);
+        }*/
+        gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
+        gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
+        gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
+
+        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbos[0]);
+
+        gl.glVertexPointer(3, GL.GL_FLOAT, vertexstride * 4, VX*4);
+
+        gl.glNormalPointer(GL.GL_FLOAT, vertexstride * 4, NX*4);
+
+        gl.glTexCoordPointer(2, GL.GL_FLOAT, vertexstride * 4, TX*4);
+        
+        gl.glDrawArrays(GL.GL_TRIANGLES, 0, triangleCount * 3);
+
+        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+        gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+
         gl.glPopMatrix();
         tex.disable();
     }
 
     public void init(GL gl) {
+        vbos = new int[1];
+        gl.glGenBuffers(1, vbos, 0);
+
+        // Enable same as for vertex buffers.
+        gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
+
+        // Init VBOs and transfer data.
+        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbos[0]);
+        // Copy data to the server into the VBO.
+        gl.glBufferData(GL.GL_ARRAY_BUFFER,
+                b.capacity() * BufferUtil.SIZEOF_FLOAT, b,
+                GL.GL_STATIC_DRAW);
 
         try {
             URL u = getClass().getResource(textureName);
@@ -115,7 +146,7 @@ public class XModel implements GLObject {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         displayList = gl.glGenLists(1);
         listCreated = false;
 
@@ -157,6 +188,7 @@ public class XModel implements GLObject {
             b.put(v.tx);
             b.put(v.ty);
         }
+        b.flip();
     }
 
     private StreamTokenizer loadResource(String resource) throws IOException {
@@ -285,7 +317,7 @@ public class XModel implements GLObject {
 
     private class Vector8 {
 
-        float x, y, z, nx, ny, nz, tx, ty;
+        float x,  y,  z,  nx,  ny,  nz,  tx,  ty;
 
         public Vector8() {
         }
