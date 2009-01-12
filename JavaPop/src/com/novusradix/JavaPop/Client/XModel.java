@@ -2,6 +2,8 @@ package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Client.GLHelper.GLHelperException;
 import com.novusradix.JavaPop.Math.Matrix4;
+import com.novusradix.JavaPop.Math.Plane3;
+import com.novusradix.JavaPop.Math.Vector3;
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
@@ -22,7 +24,7 @@ import javax.media.opengl.GLException;
  *
  * @author gef
  */
-public class XModel implements GLObject {
+public class XModel {
 
     private ArrayList<Vector8> vertices;
     private ArrayList<Integer> indices;
@@ -37,6 +39,8 @@ public class XModel implements GLObject {
     private Matrix4 transform;
     private int shader;
     private int[] vbos;
+    private static Plane3 left,  right,  top,  bottom;
+    private float radius; //Maximum distance from the origin;
 
     public XModel(String model, String texture) {
         this.textureName = texture;
@@ -60,7 +64,39 @@ public class XModel implements GLObject {
         indices = null;
     }
 
-    public void display(GL gl, float time) {
+    public static void setRenderVolume(Matrix4 inverseMVP) {
+        Vector3 tl, tr, bl, br, ftl, fbr;
+        tl = new Vector3(-1, -1, 0);
+        tr = new Vector3(1, -1, 0);
+        bl = new Vector3(-1, 1, 0);
+        br = new Vector3(1, 1, 0);
+        ftl = new Vector3(-1, -1, 1);
+        fbr = new Vector3(1, 1, 1);
+        inverseMVP.transform(tl);
+        inverseMVP.transform(tr);
+        inverseMVP.transform(bl);
+        inverseMVP.transform(br);
+        inverseMVP.transform(ftl);
+        inverseMVP.transform(fbr);
+        left = new Plane3(tl, ftl, bl);
+        right = new Plane3(br, fbr, tr);
+        top = new Plane3(tl, tr, ftl);
+        bottom = new Plane3(br, bl, fbr);
+    }
+
+    public void display(Vector3 position, Matrix4 basis, GL gl, float time) {
+        if (left != null) {
+            if (left.distance(position) + radius < 0 || right.distance(position) + radius < 0 || top.distance(position) + radius < 0 || bottom.distance(position) + radius < 0) {
+                return;
+            }
+        }
+        gl.glMatrixMode(GL_MODELVIEW);
+
+        gl.glPushMatrix();
+        gl.glTranslatef(position.x, position.y, position.z);
+        gl.glMultMatrixf(basis.getArray(), 0);
+        gl.glScalef(1, 1, 2);
+        gl.glMultMatrixf(transform.getArray(), 0);
         tex.enable();
         tex.bind();
         gl.glEnable(GL_LIGHTING);
@@ -69,10 +105,7 @@ public class XModel implements GLObject {
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glMatrixMode(GL.GL_TEXTURE);
         gl.glLoadIdentity();
-        gl.glMatrixMode(GL_MODELVIEW);
-        gl.glPushMatrix();
-        gl.glScalef(1, 1, 2);
-        gl.glMultMatrixf(transform.getArray(), 0);
+
 
         gl.glUseProgram(shader);
         /*if (!listCreated) {
@@ -99,17 +132,18 @@ public class XModel implements GLObject {
 
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbos[0]);
 
-        gl.glVertexPointer(3, GL.GL_FLOAT, vertexstride * 4, VX*4);
+        gl.glVertexPointer(3, GL.GL_FLOAT, vertexstride * 4, VX * 4);
 
-        gl.glNormalPointer(GL.GL_FLOAT, vertexstride * 4, NX*4);
+        gl.glNormalPointer(GL.GL_FLOAT, vertexstride * 4, NX * 4);
 
-        gl.glTexCoordPointer(2, GL.GL_FLOAT, vertexstride * 4, TX*4);
-        
+        gl.glTexCoordPointer(2, GL.GL_FLOAT, vertexstride * 4, TX * 4);
+
         gl.glDrawArrays(GL.GL_TRIANGLES, 0, triangleCount * 3);
 
         gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
         gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+        gl.glMatrixMode(GL_MODELVIEW);
 
         gl.glPopMatrix();
         tex.disable();
@@ -131,7 +165,7 @@ public class XModel implements GLObject {
 
         try {
             URL u = getClass().getResource(textureName);
-            tex = TextureIO.newTexture(u, false, "png");
+            tex = TextureIO.newTexture(u, true, "png");
             tex.bind();
             tex.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
             tex.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -149,8 +183,6 @@ public class XModel implements GLObject {
 
         displayList = gl.glGenLists(1);
         listCreated = false;
-
-
     }
 
     private void deduplicate() {
@@ -179,6 +211,7 @@ public class XModel implements GLObject {
         for (int i = 0; i < indices.size(); i++) {
             index = indices.get(i);
             v = vertices.get(index);
+            radius = (float) Math.max(radius, Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z));
             b.put(v.x);
             b.put(v.y);
             b.put(v.z);
@@ -317,7 +350,7 @@ public class XModel implements GLObject {
 
     private class Vector8 {
 
-        float x,  y,  z,  nx,  ny,  nz,  tx,  ty;
+        float x, y, z, nx, ny, nz, tx, ty;
 
         public Vector8() {
         }

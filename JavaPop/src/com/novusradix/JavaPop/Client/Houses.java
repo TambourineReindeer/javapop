@@ -1,5 +1,7 @@
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Math.Matrix4;
+import com.novusradix.JavaPop.Math.Vector3;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,26 +52,31 @@ public class Houses implements AbstractHouses, GLObject {
         synchronized (houses) {
             if (houses != null) {
                 gl.glUseProgram(0);
-                gl.glMatrixMode(GL.GL_MODELVIEW);
 
                 for (House h : houses.values()) {
-                    gl.glPushMatrix();
-                    gl.glTranslatef(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos));
+                    Vector3 p;
+                    Matrix4 basis;
+                    p = new Vector3(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos));
+
+                    basis = new Matrix4(Matrix4.identity);
+
                     if (h.level > 9) {
-                        gl.glScalef(3.0f, 3.0f, 1.0f);
+                        basis.scale(3.0f, 3.0f, 1.0f);
                     }
                     if (h.level == 49) {
-                        gl.glScalef(1.0f, 1.0f, 2.0f);
+                        basis.scale(1.0f, 1.0f, 2.0f);
                     }
                     gl.glColor3f(1, 1, 1);
                     gl.glEnable(GL.GL_LIGHTING);
-                    houseModel.display(gl, time);
-                    gl.glPopMatrix();
+                    houseModel.display(p, basis, gl, time);
+
                 }
                 gl.glDisable(GL.GL_LIGHTING);
                 gl.glDisable(GL.GL_TEXTURE_2D);
                 gl.glUseProgram(0);
                 for (House h : houses.values()) {
+                    gl.glMatrixMode(GL.GL_MODELVIEW);
+
                     gl.glPushMatrix();
                     gl.glTranslatef(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos));
                     if (h.level > 9) {
