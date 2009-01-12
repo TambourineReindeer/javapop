@@ -7,9 +7,14 @@ import java.util.Random;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import static java.lang.Math.*;
 
 /**
@@ -27,10 +32,17 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
     private byte[][] tex;
     private byte[][] oldTex;
     private boolean[][] flat;
+    private SortedSet<Point> houseChanges;
 
     public HeightMap(Dimension mapSize) {
         super(mapSize);
         //b = BufferUtil.newByteBuffer(width * breadth);
+        houseChanges = new TreeSet<Point>(new Comparator<Point>() {
+
+            public int compare(Point o1, Point o2) {
+                return (o1.x == o2.x ? o1.y - o2.y : o1.x - o2.x);
+            }
+        });
         heights = new byte[width * breadth];
         textureChanges = new HashMap<Point, Byte>();
         rowstride = width;
@@ -72,15 +84,15 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
             for (n = 0; n < width * breadth / 80; n++) {
                 x = r.nextInt(width);
                 y = r.nextInt(breadth);
-               int ups = r.nextInt(8);
+                int ups = r.nextInt(8);
                 for (m = 0; m < ups; m++) {
                     up(new Point(x, y));
                 }
                 for (m = 0; m < r.nextInt(8); m++) {
                     up(new Point(x - 5 + r.nextInt(10), y - 5 + r.nextInt(10)));
                 }
-                for (m = 0; m < r.nextInt(ups*2+1); m++) {
-                    down(new Point(x - ups + r.nextInt(ups*2+1), y-ups + r.nextInt(ups*2+1)));
+                for (m = 0; m < r.nextInt(ups * 2 + 1); m++) {
+                    down(new Point(x - ups + r.nextInt(ups * 2 + 1), y - ups + r.nextInt(ups * 2 + 1)));
                 }
                 for (m = 0; m < r.nextInt(2); m++) {
                     down(new Point(x, y));
@@ -102,7 +114,18 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
             conform(p);
         }
     }
+ public SortedSet<Point> takeHouseChanges() {
+        synchronized (houseChanges) {
+            SortedSet<Point> temp = houseChanges;
+            houseChanges = new TreeSet<Point>(new Comparator<Point>() {
 
+                public int compare(Point o1, Point o2) {
+                   return (o1.x == o2.x ? o1.y - o2.y : o1.x - o2.x);
+                }
+            });
+            return temp;
+        }
+    }
     public void setTile(Point p, Tile t) {
         if (tileInBounds(p)) {
             boolean bflat = isFlat(p);
@@ -113,9 +136,19 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
             if (bseaLevel && !t.canExistAtSeaLevel) {
                 return;
             }
+           
+            //if (oldt == Tile.FARM.id || t.isFertile != Tile.values()[oldt].isFertile) {
+              if (t.isFertile != Tile.values()[tex[p.x][p.y]].isFertile) {
+                synchronized (houseChanges) {
+                    houseChanges.add(p);
+                }
+            }
             tex[p.x][p.y] = t.id;
+
         }
     }
+
+   
 
     public void clearTile(Point p) {
         boolean bflat = isFlat(p);
@@ -126,6 +159,11 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
             return;
         }
         if (bflat) {
+            if (! Tile.values()[tex[p.x][p.y]].isFertile) {
+                synchronized (houseChanges) {
+                    houseChanges.add(p);
+                }
+            }
             tex[p.x][p.y] = Tile.EMPTY_FLAT.id;
         } else {
             tex[p.x][p.y] = Tile.EMPTY_SLOPE.id;

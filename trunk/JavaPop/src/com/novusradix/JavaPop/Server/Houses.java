@@ -5,10 +5,14 @@ import com.novusradix.JavaPop.Messaging.HouseUpdate;
 import com.novusradix.JavaPop.Server.Peons.Peon;
 import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import static java.lang.Math.*;
@@ -20,7 +24,7 @@ public class Houses {
     private byte[][] newmap;
     private Vector<HouseUpdate.Detail> hds;
     private Vector<Point> newHouses;
-    private Map<Point, House> allHouses;
+    private SortedMap<Point, House> allHouses;
     private static final int TEAMS = 4;
     private static final int EMPTY = 0;
     private static final int FARM = EMPTY + 1;
@@ -32,7 +36,12 @@ public class Houses {
         map = new byte[game.heightMap.getWidth()][game.heightMap.getBreadth()];
         newmap = new byte[game.heightMap.getWidth()][game.heightMap.getBreadth()];
 
-        allHouses = new HashMap<Point, House>();
+        allHouses = new TreeMap<Point, House>(new Comparator<Point>() {
+
+            public int compare(Point o1, Point o2) {
+                return (o1.x == o2.x ? o1.y - o2.y : o1.x - o2.x);
+            }
+        });
         newHouses = new Vector<Point>();
         hds = new Vector<HouseUpdate.Detail>();
     }
@@ -53,7 +62,28 @@ public class Houses {
         return false;
     }
 
+    private Collection<House> affectedHouses(SortedSet<Point> mapChanges) {
+        Collection<House> hs = new ArrayList<House>();
+        for (House h : allHouses.values()) {
+            Point max, min;
+            min = new Point(h.pos.x - 3, h.pos.y - 3);
+            max = new Point(h.pos.x + 3, h.pos.y + 3);
+            for (Point p : mapChanges.subSet(min, max)) {
+                if ((p.y <= h.pos.y + 3) && (p.y >= h.pos.y - 3)) {
+                    hs.add(h);
+                    break;
+                }
+            }
+        }
+        return hs;
+    }
+
     public void step(float seconds) {
+        SortedSet<Point> mapChanges = game.heightMap.takeHouseChanges();
+        Collection<House> hs = affectedHouses(mapChanges);
+        for (House h : hs) {
+            h.setLevel();
+        }
         for (int y = 0; y < game.heightMap.getBreadth(); y++) {
             for (int x = 0; x < game.heightMap.getWidth(); x++) {
                 newmap[y][x] = 0;
@@ -71,7 +101,6 @@ public class Houses {
                     continue;
                 }
                 if (game.heightMap.isFlat(h.pos) && newmap[h.pos.x][h.pos.y] == 0) {
-                    h.setLevel();
                     h.paintmap(newmap);
                     h.step(seconds);
                 } else {
@@ -91,14 +120,15 @@ public class Houses {
             }
         }
 
-        synchronized (game.heightMap) {
-            unpaint();
+        //synchronized (game.heightMap) {
+         //   unpaint();
+            repaint();
             byte[][] t;
             t = map;
             map = newmap;
             newmap = t;
-            paint();
-        }
+        //    paint();
+        //}
         if (!hds.isEmpty()) {
             game.sendAllPlayers(new HouseUpdate(hds));
             hds.clear();
@@ -133,9 +163,27 @@ public class Houses {
         }
     }
 
+    private void repaint() {
+           int x,  y;
+        for (y = 0; y < game.heightMap.getBreadth(); y++) {
+            for (x = 0; x < game.heightMap.getWidth(); x++) {
+                if (newmap[x][y] != map[x][y]) {
+                    if (newmap[x][y] == EMPTY) {
+                        if (game.heightMap.getTile(new Point(x, y)).isFertile) {
+                            game.heightMap.clearTile(new Point(x, y));
+                        }
+                    } else {
+                        game.heightMap.setTile(new Point(x, y), Tile.FARM);
+                    }
+                }
+            }
+        }
+    }
+
     public int countFlatLand(Point pos) {
         int flat = 0;
-        for (int radius = 0; radius <= 3; radius++) {
+        for (int radius = 0; radius <=
+                3; radius++) {
             for (Point offset : Helpers.rings[radius]) {
                 Point p = new Point(pos.x + offset.x, pos.y + offset.y);
 
@@ -144,16 +192,19 @@ public class Houses {
                     if (tile.isFertile) {
                         flat++;
                     }
+
                 }
             }
             if (flat < (2 * radius + 1) * (2 * radius + 1)) {
                 break;
             }
+
         }
         return flat;
     }
 
-    public Point nearestHouse(Point p, Set<Player> players) {
+    public Point nearestHouse(
+            Point p, Set<Player> players) {
         int d2 = game.heightMap.getWidth() * game.heightMap.getBreadth() + 1;
         House nearest = null;
         for (House h : allHouses.values()) {
@@ -161,13 +212,16 @@ public class Houses {
             if (nd2 < d2) {
                 if (players.contains(h.player)) {
                     nearest = h;
-                    d2 = nd2;
+                    d2 =
+                            nd2;
                 }
+
             }
         }
         if (nearest != null) {
             return nearest.pos;
         }
+
         return null;
     }
     private static int nextId;
@@ -188,6 +242,7 @@ public class Houses {
             level = 1;
             this.player = player;
             this.strength = strength;
+            setLevel();
             newHouses.add(p);
         }
 

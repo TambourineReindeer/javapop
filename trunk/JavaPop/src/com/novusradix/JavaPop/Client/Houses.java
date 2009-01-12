@@ -16,13 +16,13 @@ public class Houses implements AbstractHouses, GLObject {
     private static final int FARM = EMPTY + 1;
     private static final int HOUSE = FARM + TEAMS;
     private static final int NEXT = HOUSE + TEAMS;
-    private XModel house1;
+    private XModel houseModel;
 
     public Houses(Game g) {
         game = g;
         map = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
         houses = new HashMap<Integer, House>();
-        house1 = new XModel("/com/novusradix/JavaPop/models/house1.x", "/com/novusradix/JavaPop/textures/house1.png");
+        houseModel = new XModel("/com/novusradix/JavaPop/models/house1.x", "/com/novusradix/JavaPop/textures/house1.png");
     }
 
     public void updateHouse(int id, Point pos, Player p, int level) {
@@ -54,16 +54,16 @@ public class Houses implements AbstractHouses, GLObject {
 
                 for (House h : houses.values()) {
                     gl.glPushMatrix();
-                    gl.glTranslatef(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos.x, h.pos.y));
+                    gl.glTranslatef(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos));
                     if (h.level > 9) {
                         gl.glScalef(3.0f, 3.0f, 1.0f);
                     }
-                    if (h.level == 48) {
+                    if (h.level == 49) {
                         gl.glScalef(1.0f, 1.0f, 2.0f);
                     }
                     gl.glColor3f(1, 1, 1);
                     gl.glEnable(GL.GL_LIGHTING);
-                    house1.display(gl, time);
+                    houseModel.display(gl, time);
                     gl.glPopMatrix();
                 }
                 gl.glDisable(GL.GL_LIGHTING);
@@ -71,11 +71,11 @@ public class Houses implements AbstractHouses, GLObject {
                 gl.glUseProgram(0);
                 for (House h : houses.values()) {
                     gl.glPushMatrix();
-                    gl.glTranslatef(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos.x, h.pos.y));
+                    gl.glTranslatef(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos));
                     if (h.level > 9) {
                         gl.glScalef(3.0f, 3.0f, 1.0f);
                     }
-                    if (h.level == 48) {
+                    if (h.level == 49) {
                         gl.glScalef(1.0f, 1.0f, 2.0f);
                     }
                     gl.glColor3fv(h.player.colour, 0);
@@ -105,6 +105,6 @@ public class Houses implements AbstractHouses, GLObject {
     }
 
     public void init(GL gl) {
-        house1.init(gl);
+        houseModel.init(gl);
     }
 }

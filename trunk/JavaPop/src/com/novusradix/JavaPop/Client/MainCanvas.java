@@ -145,7 +145,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         flush(gl);
         handleKeys();
-    // printFPS();
+     printFPS();
 
     }
 

@@ -338,6 +338,7 @@ ymid = (top+bottom)/2.0f;
     }
 
     private void setNormals(Point p, int vertA, int vertB, int vertC) {
+        //TODO: profiled:candidate for optimisation
         Vector3 va,vb ,vc ,vn ;
         va = new Vector3();
         vb = new Vector3();
@@ -420,7 +421,7 @@ ymid = (top+bottom)/2.0f;
                     gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
                     gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
                     gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
-
+gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
                     b.position(VX);
                     gl.glVertexPointer(3, GL.GL_FLOAT, vertexstride * 4, b);
                     b.position(NX);
