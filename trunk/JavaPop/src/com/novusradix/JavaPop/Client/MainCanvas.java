@@ -129,7 +129,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glEnable(GL.GL_LIGHT1);
 
         float time = (System.currentTimeMillis() - startMillis) / 1000.0f;
-
+XModel.setRenderVolume(mvpInverse);
         for (GLObject glo : game.objects) {
             glo.display(gl, time);
         }

@@ -166,6 +166,12 @@ public class Matrix4 implements Serializable {
         this.m = m;
     }
 
+    public void scale(float x, float y, float z) {
+        m[0]*=x;
+        m[5]*=y;
+        m[10]*=z;
+    }
+
     public void set(float[] buf) {
         m = buf.clone();
     }

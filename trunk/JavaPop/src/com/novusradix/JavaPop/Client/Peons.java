@@ -16,13 +16,13 @@ public class Peons implements GLObject {
 
     public Game game;
     private Map<Integer, Peon> peons;
-    private GLObject peonModel;
+    private XModel peonModel;
 
     public Peons(Game g) {
         game = g;
         peons = new HashMap<Integer, Peon>();
         if (g.getClass() == com.novusradix.JavaPop.Client.Game.class) {
-            peonModel = new XModel("/com/novusradix/JavaPop/models/peon4.x", "/com/novusradix/JavaPop/textures/peon.png");
+            peonModel = new XModel("/com/novusradix/JavaPop/models/peon5.x", "/com/novusradix/JavaPop/textures/peon.png");
         }
     }
 
@@ -40,15 +40,14 @@ public class Peons implements GLObject {
                 }
             }
         }
-    }
-
+    } 
+    
     public void display(GL gl, float time) {
+        
         synchronized (peons) {
             for (Peon p : peons.values()) {
-                gl.glPushMatrix();
-                gl.glTranslatef(p.pos.x, p.pos.y, game.heightMap.getHeight(p.pos.x, p.pos.y));
                 p.display(gl, time);
-                gl.glPopMatrix();
+                
             }
         }
     }
@@ -96,19 +95,20 @@ public class Peons implements GLObject {
         }
 
         private void display(GL gl, float time) {
-            gl.glMatrixMode(gl.GL_MODELVIEW);
-            gl.glPushMatrix();
+           
             time += hashCode() % 10000;
+            Vector3 p = new Vector3(pos.x, pos.y, game.heightMap.getHeight(pos.x, pos.y));
             switch (state) {
                 case DROWNING:
-                    gl.glTranslatef(0.0f, 0.0f, (float) abs((float) sin(time * 4.0f) / 2.0f + 0.1f));
+                    p.z+= (float) abs((float) sin(time * 4.0f) / 2.0f + 0.1f);
                 default:
             }
-            gl.glMultMatrixf(basis.getArray(), 0);
+           
             gl.glDisable(GL.GL_LIGHTING);
             gl.glColor3fv(player.colour, 0);
-            peonModel.display(gl, time);
-            gl.glPopMatrix();
+               
+            peonModel.display(p, basis, gl, time);
+            
         }
 
         public void step(float seconds) {
