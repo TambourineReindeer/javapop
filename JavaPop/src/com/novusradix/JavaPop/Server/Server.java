@@ -70,7 +70,8 @@ public class Server implements Runnable {
             }
         } catch (IOException ioe) {
         }
-
+           form.dispose();
+           a.kill();
         System.out.print("Server quitting.\n");
     }
 

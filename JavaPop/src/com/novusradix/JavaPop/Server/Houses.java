@@ -66,8 +66,8 @@ public class Houses {
         Collection<House> hs = new ArrayList<House>();
         for (House h : allHouses.values()) {
             Point max, min;
-            min = new Point(h.pos.x - 3, h.pos.y - 3);
-            max = new Point(h.pos.x + 3, h.pos.y + 3);
+            min = new Point(h.pos.x - 3, h.pos.y - 3); //subset from here (inclusive)
+            max = new Point(h.pos.x + 3, h.pos.y + 4); //to here (exclusive)
             for (Point p : mapChanges.subSet(min, max)) {
                 if ((p.y <= h.pos.y + 3) && (p.y >= h.pos.y - 3)) {
                     hs.add(h);
@@ -121,12 +121,12 @@ public class Houses {
         }
 
         //synchronized (game.heightMap) {
-         //   unpaint();
-            repaint();
-            byte[][] t;
-            t = map;
-            map = newmap;
-            newmap = t;
+        //   unpaint();
+        repaint();
+        byte[][] t;
+        t = map;
+        map = newmap;
+        newmap = t;
         //    paint();
         //}
         if (!hds.isEmpty()) {
@@ -164,7 +164,7 @@ public class Houses {
     }
 
     private void repaint() {
-           int x,  y;
+        int x, y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (newmap[x][y] != map[x][y]) {
@@ -281,10 +281,11 @@ public class Houses {
                 if (level == 49) {
                     radiuslimit = 3;
                 }
-
+                Point p = new Point();
                 for (int radius = 1; radius <= radiuslimit; radius++) {
                     for (Point offset : Helpers.rings[radius]) {
-                        Point p = new Point(pos.x + offset.x, pos.y + offset.y);
+                        p.x = pos.x + offset.x;
+                        p.y = pos.y + offset.y;
                         if (game.heightMap.tileInBounds(p) && game.heightMap.getTile(p).isFertile) {
                             newmap[p.x][p.y] = FARM;
                         }
