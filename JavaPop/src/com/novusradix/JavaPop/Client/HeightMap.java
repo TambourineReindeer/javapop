@@ -9,7 +9,6 @@ import java.awt.Dimension;
 import javax.media.opengl.GL;
 
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
-import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 
 public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObject {
