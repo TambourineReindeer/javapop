@@ -4,6 +4,7 @@
  */
 package com.novusradix.JavaPop.Messaging;
 
+import java.io.Externalizable;
 import java.io.Serializable;
 
 /**
