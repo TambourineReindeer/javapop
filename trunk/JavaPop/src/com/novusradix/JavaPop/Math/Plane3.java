@@ -29,8 +29,10 @@ public class Plane3 {
     
     public float distance(Vector3 point)
     {
-        Vector3 pp = new Vector3(point);
+        /*Vector3 pp = new Vector3(point);
         pp.sub(p);
         return pp.dot(n);
+        */
+        return (point.x-p.x)*n.x + (point.y-p.y)*n.y + (point.z-p.z)*n.z;
     }
 }
