@@ -19,6 +19,7 @@ import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Messaging.Message;
 import com.novusradix.JavaPop.Messaging.Tools.SetBehaviour;
 import com.novusradix.JavaPop.Server.Player.Info;
+import java.net.SocketException;
 
 /**
  *
@@ -41,7 +42,7 @@ public class Client implements Runnable {
     public Client(String host, Lobby l) {
         lobby = l;
         connected = false;
-        
+
         try {
             socket = new Socket(host, 13579);
             socket.setTcpNoDelay(true);
@@ -83,10 +84,12 @@ public class Client implements Runnable {
 
                 message.execute();
             }
+        } catch (SocketException ex) {//disconnected
         } catch (IOException ioe) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ioe);
         } catch (ClassNotFoundException cnfe) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, cnfe);
         }
-    //disconnected
 
     }
 
@@ -94,7 +97,7 @@ public class Client implements Runnable {
     {
         return (Message) ois.readObject();
     }
-    
+
     public synchronized void sendMessage(Message m) {
         try {
             oos.writeObject(m);
@@ -111,7 +114,7 @@ public class Client implements Runnable {
             lobby.hide();
         }
         game = new Game(g, this);
-        
+
 
     }
 

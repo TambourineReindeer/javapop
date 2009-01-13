@@ -22,10 +22,11 @@ import java.util.logging.Logger;
  */
 public class Player implements Runnable {
 
-    private static float[][] defaultColors={{0,0,1},{1,0,0},{0,1,0}};
+    private static float[][] defaultColors = {{0, 0, 1}, {1, 0, 0}, {0, 1, 0}};
     boolean human;
-    
+
     public enum PeonMode {
+
         SETTLE, ANKH, FIGHT, GROUP
     }
     public Server s;
@@ -43,7 +44,7 @@ public class Player implements Runnable {
         this.s = s;
         this.socket = sock;
         id = nextId++;
-        info = new Info(id, "Player " + id, new Point(0, 0), defaultColors[id%3], 0);
+        info = new Info(id, "Player " + id, new Point(0, 0), defaultColors[id % 3], 0);
         peonMode = PeonMode.SETTLE;
         try {
             socket.setTcpNoDelay(true);
@@ -73,7 +74,7 @@ public class Player implements Runnable {
     {
         return (Message) ois.readObject();
     }
-    
+
     public void run() {
         //Message loop
         try {
@@ -107,6 +108,17 @@ public class Player implements Runnable {
             oos.writeObject(m);
             oos.flush();
             oos.reset();
+            System.out.println("Server sent " + m.getClass().getName());
+        } catch (IOException ex) {
+            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public synchronized void sendMessage(byte[] bytes) {
+        try {
+            socket.getOutputStream().write(bytes);
+            socket.getOutputStream().flush();
+            oos.reset();
         } catch (IOException ex) {
             Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -119,7 +131,11 @@ public class Player implements Runnable {
         public Point ankh;
         public float[] colour;
         public double mana;
-        
+
+        public Info() {//todo move externalization into this class and privatise this constructor.
+            
+        }
+
         private Info(int id, String name, Point ankh, float[] colour, double mana) {
             this.id = id;
             this.name = name;

@@ -12,6 +12,10 @@ import com.novusradix.JavaPop.Server.Effects.Effect;
 import com.novusradix.JavaPop.Server.Effects.LightningEffect;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -150,7 +154,7 @@ public class Game extends TimerTask {
             sendAllPlayers(m);
         }
         timer = new Timer("Game " + id);
-        seconds = 1.0f / 20.0f;
+        seconds = 1.0f / 10.0f;
         timer.scheduleAtFixedRate(this, 0, (int) (seconds * 1000.0f));
     }
 
@@ -191,9 +195,32 @@ public class Game extends TimerTask {
     }
 
     public void sendAllPlayers(Message m) {
-        synchronized (players) {
-            for (Player pl : players) {
-                pl.sendMessage(m);
+        ObjectOutputStream o = null;
+        try {
+            ByteArrayOutputStream bs = new ByteArrayOutputStream();
+            o = new ObjectOutputStream(bs);
+            o.flush();
+            int start = bs.size();
+            //bs.reset();
+            
+            o.writeObject(m);
+            byte[] bytes = new byte[bs.size()-start];
+            
+            System.arraycopy(bs.toByteArray(), start,bytes, 0, bytes.length);          
+            synchronized (players) {
+                for (Player pl : players) {
+                    pl.sendMessage(bytes);
+                }
+            }
+            System.out.println(System.currentTimeMillis() + ", " + m.getClass().getName() + ", " + bytes.length );
+        
+        } catch (IOException ex) {
+            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                o.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
