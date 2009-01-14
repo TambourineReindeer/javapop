@@ -63,13 +63,8 @@ public class LightningEffect extends Effect {
         for (Point hit : hits) {
             g.heightMap.setTile(hit, Tile.BURNT);
             for (Peon p : g.peons.getPeons(hit)) {
-                p.hurt(500);
-            }
-            House h;
-            h = g.houses.getHouse(hit);
-            if (h != null) {
-                h.damage(500);
-            }
+                p.hurt(50);
+            }            
         }
     }
 
