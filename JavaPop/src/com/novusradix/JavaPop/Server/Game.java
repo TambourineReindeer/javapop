@@ -15,7 +15,6 @@ import java.awt.Point;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -49,6 +48,7 @@ public class Game extends TimerTask {
     private Map<Integer, Effect> newEffects;
     private Collection<Integer> deletedEffects;
     public Map<Player, LightningEffect> lightningEffects;
+    private long frame;
 
     public Game(Player owner) {
         this.owner = owner;
@@ -167,9 +167,9 @@ public class Game extends TimerTask {
         }
         HeightMapUpdate m;
         //synchronized (heightMap) { //TODO:Does this need to be synchronized at this high a level?
-            peons.step(seconds);
-            houses.step(seconds);
-            m = heightMap.GetUpdate();
+        peons.step(seconds);
+        houses.step(seconds);
+        m = heightMap.GetUpdate();
         //}
         if (m != null) {
             sendAllPlayers(m);
@@ -187,11 +187,14 @@ public class Game extends TimerTask {
                 deletedEffects.clear();
             }
         }
-        ArrayList<Player.Info> is = new ArrayList<Player.Info>(players.size());
-        for (Player p : players) {
-            is.add(p.info);
+        if (frame % 8 == 0) {
+            ArrayList<Player.Info> is = new ArrayList<Player.Info>(players.size());
+            for (Player p : players) {
+                is.add(p.info);
+            }
+            sendAllPlayers(new PlayerUpdate(is));
         }
-        sendAllPlayers(new PlayerUpdate(is));
+        frame++;
     }
 
     public void sendAllPlayers(Message m) {
@@ -202,18 +205,18 @@ public class Game extends TimerTask {
             o.flush();
             int start = bs.size();
             //bs.reset();
-            
+
             o.writeObject(m);
-            byte[] bytes = new byte[bs.size()-start];
-            
-            System.arraycopy(bs.toByteArray(), start,bytes, 0, bytes.length);          
+            byte[] bytes = new byte[bs.size() - start];
+
+            System.arraycopy(bs.toByteArray(), start, bytes, 0, bytes.length);
             synchronized (players) {
                 for (Player pl : players) {
                     pl.sendMessage(bytes);
                 }
             }
-            System.out.println(System.currentTimeMillis() + ", " + m.getClass().getName() + ", " + bytes.length );
-        
+            //System.out.println(System.currentTimeMillis() + ", " + m.getClass().getName() + ", " + bytes.length);
+
         } catch (IOException ex) {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         } finally {

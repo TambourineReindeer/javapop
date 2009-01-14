@@ -52,6 +52,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private int frameCount = 0;
     private long frameTime;
     private ClickableHandler clickables;
+    private boolean mouseIsOver;
 
     public MainCanvas(GLCapabilities caps, Game g) {
         super(caps);
@@ -84,6 +85,8 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
                 b.select();
             }
         }
+
+        mouseIsOver = false;
     }
 
     public void display(final GLAutoDrawable glAD) {
@@ -99,9 +102,10 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPushMatrix();
 
+        gl.glTranslatef(0,0,-50);
         gl.glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
         gl.glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
-        gl.glTranslatef((0.70711f * xPos - yPos / 0.70711f), -(yPos / 0.70711f) - xPos * 0.70711f, -25);
+        gl.glTranslatef((0.70711f * xPos - yPos / 0.70711f), -(yPos / 0.70711f) - xPos * 0.70711f,0);
 
         gl.glScalef(1.0f, 1.0f, fHeightScale);
 
@@ -129,7 +133,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glEnable(GL.GL_LIGHT1);
 
         float time = (System.currentTimeMillis() - startMillis) / 1000.0f;
-XModel.setRenderVolume(mvpInverse);
+        XModel.setRenderVolume(mvpInverse);
         for (GLObject glo : game.objects) {
             glo.display(gl, time);
         }
@@ -145,8 +149,13 @@ XModel.setRenderVolume(mvpInverse);
 
         flush(gl);
         handleKeys();
-     printFPS();
+        printFPS();
+    }
 
+    void lookAt(Point p) {
+       xPos = (p.y-p.x)/1.4f;
+       yPos = (p.x+p.y)/2.8f;
+       //rough and ready
     }
 
     private void flush(GL gl) { //separate method helps when profiling
@@ -154,50 +163,52 @@ XModel.setRenderVolume(mvpInverse);
     }
 
     private void displayCursor(final GL gl) {
-        float cW, cH;
-        cW = 0.02f;
-        cH = 0.1f;
-        gl.glDisable(GL.GL_LIGHTING);
-        gl.glEnable(GL.GL_BLEND);
-        gl.glShadeModel(GL.GL_SMOOTH);
-        gl.glDisable(GL.GL_DEPTH_TEST);
-        gl.glUseProgram(0);
-        gl.glDisable(GL_TEXTURE_2D);
-        gl.glMatrixMode(GL.GL_MODELVIEW);
-        gl.glPushMatrix();
-        gl.glTranslatef(selected.x, selected.y, game.heightMap.getHeight(selected.x, selected.y));
-        gl.glBegin(GL.GL_TRIANGLES);
+        if (mouseIsOver) {
+            float cW, cH;
+            cW = 0.02f;
+            cH = 0.1f;
+            gl.glDisable(GL.GL_LIGHTING);
+            gl.glEnable(GL.GL_BLEND);
+            gl.glShadeModel(GL.GL_SMOOTH);
+            gl.glDisable(GL.GL_DEPTH_TEST);
+            gl.glUseProgram(0);
+            gl.glDisable(GL_TEXTURE_2D);
+            gl.glMatrixMode(GL.GL_MODELVIEW);
+            gl.glPushMatrix();
+            gl.glTranslatef(selected.x, selected.y, game.heightMap.getHeight(selected.x, selected.y));
+            gl.glBegin(GL.GL_TRIANGLES);
 
-        gl.glColor4f(1.0f, 1, 1, 1);
-        gl.glVertex3f(cW, -cW, 0);
-        gl.glVertex3f(-cW, cW, 0);
+            gl.glColor4f(1.0f, 1, 1, 1);
+            gl.glVertex3f(cW, -cW, 0);
+            gl.glVertex3f(-cW, cW, 0);
 
-        gl.glColor4f(1.0f, 1, 1, 0.0f);
-        gl.glVertex3f(0, 0, 2.0f * cH / fHeightScale);
+            gl.glColor4f(1.0f, 1, 1, 0.0f);
+            gl.glVertex3f(0, 0, 2.0f * cH / fHeightScale);
 
-        gl.glColor4f(1.0f, 1, 1, 1);
-        gl.glVertex3f(cW, -cW, 0);
-        gl.glVertex3f(-cW, cW, 0);
+            gl.glColor4f(1.0f, 1, 1, 1);
+            gl.glVertex3f(cW, -cW, 0);
+            gl.glVertex3f(-cW, cW, 0);
 
-        gl.glColor4f(1.0f, 1, 1, 0);
-        gl.glVertex3f(0, 0, -2.0f * cH / fHeightScale);
+            gl.glColor4f(1.0f, 1, 1, 0);
+            gl.glVertex3f(0, 0, -2.0f * cH / fHeightScale);
 
-        gl.glColor4f(1.0f, 1, 1, 1);
-        gl.glVertex3f(0, 0, 2.0f * cW / fHeightScale);
-        gl.glVertex3f(0, 0, -2.0f * cW / fHeightScale);
+            gl.glColor4f(1.0f, 1, 1, 1);
+            gl.glVertex3f(0, 0, 2.0f * cW / fHeightScale);
+            gl.glVertex3f(0, 0, -2.0f * cW / fHeightScale);
 
-        gl.glColor4f(1.0f, 1, 1, 0);
-        gl.glVertex3f(-cH, +cH, 0);
+            gl.glColor4f(1.0f, 1, 1, 0);
+            gl.glVertex3f(-cH, +cH, 0);
 
-        gl.glColor4f(1.0f, 1, 1, 1);
-        gl.glVertex3f(0, 0, 2.0f * cW / fHeightScale);
-        gl.glVertex3f(0, 0, -2.0f * cW / fHeightScale);
+            gl.glColor4f(1.0f, 1, 1, 1);
+            gl.glVertex3f(0, 0, 2.0f * cW / fHeightScale);
+            gl.glVertex3f(0, 0, -2.0f * cW / fHeightScale);
 
-        gl.glColor4f(1.0f, 1, 1, 0);
-        gl.glVertex3f(cH, -cH, 0);
+            gl.glColor4f(1.0f, 1, 1, 0);
+            gl.glVertex3f(cH, -cH, 0);
 
-        gl.glEnd();
-        gl.glPopMatrix();
+            gl.glEnd();
+            gl.glPopMatrix();
+        }
     }
 
     public void displayChanged(final GLAutoDrawable arg0, final boolean arg1, final boolean arg2) {
@@ -366,10 +377,11 @@ XModel.setRenderVolume(mvpInverse);
 
     public void mouseEntered(MouseEvent e) {
         setCursor(Cursor.getDefaultCursor());
+        mouseIsOver = true;
     }
 
     public void mouseExited(MouseEvent e) {
-        // TODO Auto-generated method stub
+        mouseIsOver = false;
     }
 
     public void mousePressed(MouseEvent e) {

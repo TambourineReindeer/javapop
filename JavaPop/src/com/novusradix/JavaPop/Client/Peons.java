@@ -17,7 +17,7 @@ public class Peons implements GLObject {
     public Game game;
     private Map<Integer, Peon> peons;
     private XModel peonModel;
-
+    private boolean firstPeon=true;
     public Peons(Game g) {
         game = g;
         peons = new HashMap<Integer, Peon>();
@@ -37,13 +37,17 @@ public class Peons implements GLObject {
             } else {
                 if (!(d.state == State.DEAD || d.state == State.SETTLED)) {
                     peons.put(d.id, new Peon(d));
+                    if(firstPeon && game.players.get(d.playerId) == game.me)
+                    {
+                        firstPeon = false;
+                        game.lookAt(new Point((int)d.pos.x, (int)d.pos.y));
+                    }
                 }
             }
         }
     } 
     
     public void display(GL gl, float time) {
-        
         synchronized (peons) {
             for (Peon p : peons.values()) {
                 p.display(gl, time);
@@ -64,10 +68,7 @@ public class Peons implements GLObject {
         }
     }
 
-
-
     private class Peon {
-
         private Vector2 pos;
         private Point dest;
         private float dx,  dy;
@@ -95,7 +96,6 @@ public class Peons implements GLObject {
         }
 
         private void display(GL gl, float time) {
-           
             time += hashCode() % 10000;
             Vector3 p = new Vector3(pos.x, pos.y, game.heightMap.getHeight(pos.x, pos.y));
             switch (state) {
@@ -103,12 +103,10 @@ public class Peons implements GLObject {
                     p.z+= (float) abs((float) sin(time * 4.0f) / 2.0f + 0.1f);
                 default:
             }
-           
             gl.glDisable(GL.GL_LIGHTING);
             gl.glColor3fv(player.colour, 0);
                
-            peonModel.display(p, basis, gl, time);
-            
+            peonModel.display(p, basis, gl, time);           
         }
 
         public void step(float seconds) {

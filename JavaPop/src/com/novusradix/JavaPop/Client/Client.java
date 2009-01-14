@@ -13,7 +13,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.novusradix.JavaPop.Client.Lobby.Lobby;
-import com.novusradix.JavaPop.Client.Tools.BaseTool;
 import com.novusradix.JavaPop.Messaging.Lobby.Bye;
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Messaging.Message;
@@ -23,7 +22,7 @@ import java.net.SocketException;
 
 /**
  *
- * @author erinhowie
+ * @author gef
  */
 public class Client implements Runnable {
 
@@ -68,7 +67,6 @@ public class Client implements Runnable {
         } catch (IOException ioe) {
             return;
         }
-
     }
 
     public boolean isConnected() {
@@ -93,7 +91,7 @@ public class Client implements Runnable {
 
     }
 
-    private Message getMessage() throws IOException, ClassNotFoundException //method only exists to sepearate out blocking call for profiling purposes
+    private Message getMessage() throws IOException, ClassNotFoundException //method only exists to separate out blocking call for profiling purposes
     {
         return (Message) ois.readObject();
     }
@@ -114,8 +112,6 @@ public class Client implements Runnable {
             lobby.hide();
         }
         game = new Game(g, this);
-
-
     }
 
     public void quit() {
@@ -125,7 +121,6 @@ public class Client implements Runnable {
         } catch (IOException ex) {
             //probably already quit...
         }
-
     }
 
     public void setBehaviour(PeonMode m) {
