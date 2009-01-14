@@ -1,7 +1,7 @@
 package com.novusradix.JavaPop.Messaging.Tools;
 
 import com.novusradix.JavaPop.Messaging.Message;
-import com.novusradix.JavaPop.Server.Effects.LightningEffect;
+import com.novusradix.JavaPop.Effects.LightningEffect;
 import java.awt.Point;
 
 /**
