@@ -15,7 +15,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import javax.print.DocFlavor.STRING;
 import static java.lang.Math.*;
 
 public class Houses {
