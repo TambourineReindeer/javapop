@@ -116,4 +116,10 @@ public class Game extends TimerTask {
         peons.step(seconds);
     //houses.step(seconds);
     }
+    
+    public void lookAt(Point p)
+    {
+        if(frame!=null)
+            frame.mc.lookAt(p);
+    }
 }
