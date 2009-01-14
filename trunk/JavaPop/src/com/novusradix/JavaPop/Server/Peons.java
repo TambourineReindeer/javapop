@@ -22,7 +22,7 @@ public class Peons {
 
     public enum State {
 
-        ALIVE, DEAD, SETTLED, WALKING, DROWNING, MERGING
+        ALIVE, DEAD, SETTLED, WALKING, DROWNING, MERGING, WANDER
     };
     private Vector<Peon> peons;
     private MultiMap<Point, Peon> map;
@@ -89,6 +89,7 @@ public class Peons {
         private float dx,  dy;
         Player player;
         private float walkingTime;
+        private int wanderCount;
 
         public Point getPoint() {
             return new Point((int) floor(pos.x), (int) floor(pos.y));
@@ -165,7 +166,7 @@ public class Peons {
         }
 
         private PeonUpdate.Detail step(float seconds) {
-
+            float dist;
             Point oldPos = getPoint();
             strength -= seconds;
             player.info.mana -= seconds;
@@ -174,30 +175,38 @@ public class Peons {
                 player.info.mana -= this.strength;
                 return changeState(State.DEAD);
             }
-
+            if (game.heightMap.getTile(oldPos) == Tile.SEA) {
+                return changeState(State.DROWNING);
+            }
+            if (game.heightMap.getTile(oldPos) == Tile.LAVA) {
+                return changeState(State.DEAD);
+            }
+            if (game.heightMap.getTile(oldPos) == Tile.SWAMP) {
+                return changeState(State.DEAD);
+            }
+            if (state != state.MERGING) {
+                if (map.size(oldPos) > 1) {
+                    return changeState(State.MERGING);
+                }
+            }
             switch (state) {
                 case WALKING:
-                    if (game.heightMap.getTile(oldPos) == Tile.SEA) {
-                        return changeState(State.DROWNING);
-                    }
-                    if (game.heightMap.getTile(oldPos) == Tile.LAVA) {
-                        return changeState(State.DEAD);
-                    }
-                    if (game.heightMap.getTile(oldPos) == Tile.SWAMP) {
-                        return changeState(State.DEAD);
-                    }
-                    if (map.size(oldPos) > 1) {
-                        return changeState(State.MERGING);
-                    }
-
-                    if (oldPos.equals(dest) || walkingTime > 2.0f) {
+                    if (reachedDest() || walkingTime > 2.0f) {
                         //Yay we're here! Or we're taking a breather.
                         return changeState(State.ALIVE);
                     }
-
-                    pos.x += seconds * dx;
-                    pos.y += seconds * dy;
-                    Point newPos = new Point((int) floor(pos.x), (int) floor(pos.y));
+                    float newx,
+                     newy;
+                    newx = pos.x + seconds * dx;
+                    newy = pos.y + seconds * dy;
+                    Point newPos = new Point((int) floor(newx), (int) floor(newy));
+                    if (game.heightMap.getTile(newPos).isObstruction) {
+                        setDest(oldPos);
+                        wanderCount = 3;
+                        return changeState(State.WANDER);
+                    }
+                    pos.x = newx;
+                    pos.y = newy;
                     if (!oldPos.equals(newPos)) {
                         map.remove(oldPos, this);
                         map.put(newPos, this);
@@ -207,6 +216,7 @@ public class Peons {
                             return changeState(State.DEAD);
                         }
                     }
+
                     walkingTime += seconds;
                     return null;
 
@@ -217,28 +227,30 @@ public class Peons {
                                 game.houses.addHouse(oldPos, player, strength);
                                 return changeState(State.SETTLED);
                             }
-                            dest = findFlatLand(oldPos);
+                            setDest(findFlatLand(oldPos));
                             break;
                         case ANKH:
-                            dest = player.info.ankh;
+                            setDest(player.info.ankh);
                             break;
                         case FIGHT:
-                            dest = findEnemy();
+                            setDest(findEnemy());
                             break;
                         case GROUP:
                             if (game.houses.canBuild(oldPos)) {
                                 game.houses.addHouse(oldPos, player, strength);
                                 return changeState(State.SETTLED);
                             }
-                            dest = findFriend();
+                            setDest(findFriend());
                             break;
                         default:
                     }
-                    dx = dest.x + 0.5f - pos.x;
-                    dy = dest.y + 0.5f - pos.y;
-                    float dist = (float) sqrt(dx * dx + dy * dy);
-                    dx = dx / dist;
-                    dy = dy / dist;
+
+                    if (dest == null) {
+                        wanderCount = 3;
+                        setDest(oldPos);
+                        return changeState(State.WANDER);
+                    }
+
                     walkingTime = 0;
                     return changeState(State.WALKING);
 
@@ -256,8 +268,7 @@ public class Peons {
                         return changeState(State.ALIVE);
 
                     }
-                    Peon other =
-                            map.get(oldPos).get(0);
+                    Peon other = map.get(oldPos).get(0);
                     if (other.player == this.player) {
                         //merge
                         other.strength += strength;
@@ -274,8 +285,47 @@ public class Peons {
                         return null;
                     //wait in merging queue until someone dies...
                     }
+
+                case WANDER:
+                    if (dest == null) {
+                        for (Point p : Helpers.shuffledRings.get(1)) {
+                            Point p2 = new Point(oldPos.x + p.x, oldPos.y + p.y);
+                            if (game.heightMap.tileInBounds(p2) && !game.heightMap.getTile(p2).isObstruction) {
+                                setDest(p2);
+                                dx = dest.x + 0.5f - pos.x;
+                                dy = dest.y + 0.5f - pos.y;
+                                dist = (float) sqrt(dx * dx + dy * dy);
+                                dx = dx / dist;
+                                dy = dy / dist;
+                                return changeState(State.WANDER);
+                            }
+                        }
+                        //Every surrounding tile is blocking
+                        strength -= 20;
+
+                        return null;
+                    } else {
+                        pos.x += seconds * dx;
+                        pos.y += seconds * dy;
+                        newPos = getPoint();
+
+                        if (!oldPos.equals(newPos)) {
+                            map.remove(oldPos, this);
+                            map.put(newPos, this);
+
+                        }
+                        if (reachedDest()) {
+                            setDest(null);
+                            wanderCount--;
+                            if (wanderCount <= 0) {
+                                return changeState(State.ALIVE);
+                            }
+                        }
+                        return null;
+                    }
+                default:
+                    throw new UnsupportedOperationException("Unsupported state" + state);
             }
-            return null;
         }
 
         private Point findFlatLand(Point start) {
@@ -295,15 +345,29 @@ public class Peons {
                     }
                 }
             }
-            Random r = new Random();
-            p = new Point();
-            p.x = start.x + r.nextInt(5) - 2;
-            p.y = start.y + r.nextInt(5) - 2;
-            p.x = max(0, p.x);
-            p.y = max(0, p.y);
-            p.x = min(p.x, game.heightMap.getWidth() - 2);
-            p.y = min(p.y, game.heightMap.getBreadth() - 2);
-            return p;
+
+            return null;
+        }
+
+        private void setDest(Point p) {
+            dest = p;
+            if (dest != null) {
+                dx = dest.x + 0.5f - pos.x;
+                dy = dest.y + 0.5f - pos.y;
+                float dist = (float) sqrt(dx * dx + dy * dy);
+                dx = dx / dist;
+                dy = dy / dist;
+            } else {
+                dx = dy = 0;
+            }
+        }
+
+        private boolean reachedDest() {
+            float ex = pos.x - (dest.x + 0.5f);
+            float ey = pos.y - (dest.y + 0.5f);
+            return
+             ((abs(ex) < 0.1 && abs(ey)<0.1));
+        
         }
     }
 }

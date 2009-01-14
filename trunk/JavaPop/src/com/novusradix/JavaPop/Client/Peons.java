@@ -112,8 +112,9 @@ public class Peons implements GLObject {
         public void step(float seconds) {
             switch (state) {
                 case WALKING:
+                case WANDER:
                     //if already reached destination, wait there - there'll be another message along shortly!
-                    if (dest.x == (int) pos.x && dest.y == (int) pos.y) {
+                    if (signum(pos.x - (dest.x+0.5f)) == signum(dx) || signum(pos.y - (dest.y+0.5f)) == signum(dy)) {
                         break;
                     }
                     pos.x += seconds * dx;

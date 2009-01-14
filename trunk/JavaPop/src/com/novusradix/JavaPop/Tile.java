@@ -23,11 +23,11 @@ public enum Tile {
     public final boolean isFertile;
     public final boolean isObstruction;
 
-    private Tile(byte id, boolean sealevel, boolean slope, boolean fertile, boolean walkable) {
+    private Tile(byte id, boolean sealevel, boolean slope, boolean fertile, boolean obstruction) {
         this.id = id;
         canExistAtSeaLevel = sealevel;
         canExistOnSlope = slope;
         isFertile = fertile;
-        isObstruction = walkable;
+        isObstruction = obstruction;
     }
 }
