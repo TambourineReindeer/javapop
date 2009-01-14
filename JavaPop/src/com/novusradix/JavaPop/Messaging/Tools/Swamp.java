@@ -1,7 +1,7 @@
 package com.novusradix.JavaPop.Messaging.Tools;
 
 import com.novusradix.JavaPop.Messaging.Message;
-import com.novusradix.JavaPop.Server.Effects.SwampEffect;
+import com.novusradix.JavaPop.Effects.SwampEffect;
 import java.awt.Point;
 import java.util.Random;
 

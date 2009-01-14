@@ -7,7 +7,7 @@ import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Client.Tools.ToolGroup;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
-import com.novusradix.JavaPop.Server.Effects.Effect;
+import com.novusradix.JavaPop.Effects.Effect;
 import com.novusradix.JavaPop.Server.Player.PeonMode;
 import java.awt.Cursor;
 import java.awt.Point;

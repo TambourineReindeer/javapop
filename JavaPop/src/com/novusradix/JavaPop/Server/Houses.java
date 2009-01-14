@@ -15,6 +15,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import javax.print.DocFlavor.STRING;
 import static java.lang.Math.*;
 
 public class Houses {
@@ -114,7 +115,9 @@ public class Houses {
                 h = i.next();
                 if (newmap[h.pos.x][h.pos.y] != HOUSE) {
                     i.remove();
-                    game.peons.addPeon(h.pos, h.strength, h.player);
+                    if (h.strength > 0) {
+                        game.peons.addPeon(h.pos, h.strength, h.player);
+                    }
                     hds.add(new HouseUpdate.Detail(h.id, h.pos, h.player, -1));
                 }
             }

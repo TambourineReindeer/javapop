@@ -4,7 +4,7 @@
  */
 package com.novusradix.JavaPop.Messaging.Tools;
 
-import com.novusradix.JavaPop.Server.Effects.VolcanoEffect;
+import com.novusradix.JavaPop.Effects.VolcanoEffect;
 import com.novusradix.JavaPop.Messaging.*;
 import java.awt.Point;
 

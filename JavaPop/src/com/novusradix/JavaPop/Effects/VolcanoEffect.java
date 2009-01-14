@@ -1,4 +1,4 @@
-package com.novusradix.JavaPop.Server.Effects;
+package com.novusradix.JavaPop.Effects;
 
 import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Server.Game;

@@ -4,7 +4,7 @@
  */
 package com.novusradix.JavaPop.Messaging;
 
-import com.novusradix.JavaPop.Server.Effects.Effect;
+import com.novusradix.JavaPop.Effects.Effect;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;

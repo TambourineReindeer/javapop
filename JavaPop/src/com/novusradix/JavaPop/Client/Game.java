@@ -13,7 +13,7 @@ import com.novusradix.JavaPop.Client.Tools.TidalWaveTool;
 import com.novusradix.JavaPop.Client.Tools.ToolGroup;
 import com.novusradix.JavaPop.Client.Tools.VolcanoTool;
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
-import com.novusradix.JavaPop.Server.Effects.Effect;
+import com.novusradix.JavaPop.Effects.Effect;
 import com.novusradix.JavaPop.Server.Player.Info;
 import java.awt.Point;
 import java.util.ArrayList;
