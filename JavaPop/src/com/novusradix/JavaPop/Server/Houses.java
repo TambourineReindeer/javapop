@@ -7,7 +7,6 @@ import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,8 +24,8 @@ public class Houses {
     private byte[][] map;
     private byte[][] newmap;
     private Vector<HouseUpdate.Detail> hds;
-    private Vector<Point> newHouses;
-    private SortedMap<Point, House> allHouses;
+    private Vector<Integer> newHouses;
+    private SortedMap<Integer, House> allHouses;
     private static final int TEAMS = 4;
     private static final int EMPTY = 0;
     private static final int FARM = EMPTY + 1;
@@ -39,22 +38,17 @@ public class Houses {
         map = new byte[game.heightMap.getWidth()][game.heightMap.getBreadth()];
         newmap = new byte[game.heightMap.getWidth()][game.heightMap.getBreadth()];
 
-        allHouses = new TreeMap<Point, House>(new Comparator<Point>() {
-
-            public int compare(Point o1, Point o2) {
-                return (o1.x == o2.x ? o1.y - o2.y : o1.x - o2.x);
-            }
-        });
-        newHouses = new Vector<Point>();
+        allHouses = new TreeMap<Integer, House>();
+        newHouses = new Vector<Integer>();
         hds = new Vector<HouseUpdate.Detail>();
         leaderHouses = new HashMap<Player, House>();
     }
 
-    public void addHouse(Point p, Player player, float strength, boolean leader) {
+    public void addHouse(int x, int y, Player player, float strength, boolean leader) {
         synchronized (allHouses) {
-            if (canBuild(p)) {
-                House h = new House(p, player, strength);
-                allHouses.put(p, h);
+            if (canBuild(x, y)) {
+                House h = new House(x, y, player, strength);
+                allHouses.put(x + y * game.heightMap.width, h);
                 if (leader) {
                     leaderHouses.put(player, h);
                 }
@@ -62,22 +56,23 @@ public class Houses {
         }
     }
 
-    public boolean canBuild(Point p) {
-        if (game.heightMap.tileInBounds(p)) {
-            return (map[p.x][p.y] == EMPTY && game.heightMap.getTile(p).isFertile && !newHouses.contains(p));
+    public boolean canBuild(int x, int y) {
+        if (game.heightMap.tileInBounds(x, y)) {
+            return (map[x][y] == EMPTY && game.heightMap.getTile(x, y).isFertile && !newHouses.contains(x + y * game.heightMap.width));
 
         }
         return false;
     }
 
-    private Collection<House> affectedHouses(SortedSet<Point> mapChanges) {
+    private Collection<House> affectedHouses(SortedSet<Integer> mapChanges) {
         Collection<House> hs = new ArrayList<House>();
         for (House h : allHouses.values()) {
-            Point max, min;
-            min = new Point(h.pos.x - 3, h.pos.y - 3); //subset from here (inclusive)
-            max = new Point(h.pos.x + 3, h.pos.y + 4); //to here (exclusive)
-            for (Point p : mapChanges.subSet(min, max)) {
-                if ((p.y <= h.pos.y + 3) && (p.y >= h.pos.y - 3)) {
+            int max, min, y;
+            min = h.pos.x - 3 + (h.pos.y - 3) * game.heightMap.width; //subset from here (inclusive)
+            max = h.pos.x + 3 + (h.pos.y + 4) * game.heightMap.width; //to here (exclusive)
+            for (int p : mapChanges.subSet(min, max)) {
+                y = p / game.heightMap.width;
+                if ((y <= h.pos.y + 3) && (y >= h.pos.y - 3)) {
                     hs.add(h);
                     break;
                 }
@@ -87,7 +82,7 @@ public class Houses {
     }
 
     public void step(float seconds) {
-        SortedSet<Point> mapChanges = game.heightMap.takeHouseChanges();
+        SortedSet<Integer> mapChanges = game.heightMap.takeHouseChanges();
         Collection<House> hs = affectedHouses(mapChanges);
         for (House h : hs) {
             h.setLevel();
@@ -105,10 +100,10 @@ public class Houses {
                 h = i.next();
                 if (h.strength < 0) {
                     i.remove();
-                    hds.add(new HouseUpdate.Detail(h.id, h.pos, h.player, -1));
+                    hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.player, -1));
                     continue;
                 }
-                if (game.heightMap.isFlat(h.pos) && newmap[h.pos.x][h.pos.y] == 0) {
+                if (game.heightMap.isFlat(h.pos.x, h.pos.y) && newmap[h.pos.x][h.pos.y] == 0) {
                     h.paintmap(newmap);
                     h.step(seconds);
                 } else {
@@ -117,7 +112,7 @@ public class Houses {
                     if (leaderHouses.containsValue(h)) {
                         leaderHouses.remove(h.player);
                     }
-                    hds.add(new HouseUpdate.Detail(h.id, h.pos, h.player, -1));
+                    hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.player, -1));
                 }
             }
             i = allHouses.values().iterator();
@@ -131,7 +126,7 @@ public class Houses {
                     if (leaderHouses.containsValue(h)) {
                         leaderHouses.remove(h.player);
                     }
-                    hds.add(new HouseUpdate.Detail(h.id, h.pos, h.player, -1));
+                    hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.player, -1));
                 }
             }
         }
@@ -151,36 +146,37 @@ public class Houses {
         }
     }
 
-    public Houses.House getHouse(Point p) {
-        return allHouses.get(p);
+    public Houses.House getHouse(int x, int y) {
+        return allHouses.get(x + y * game.heightMap.width);
     }
 
     private void repaint() {
-        int x,  y;
+        int x, y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (newmap[x][y] != map[x][y]) {
                     if (newmap[x][y] == EMPTY) {
-                        if (game.heightMap.getTile(new Point(x, y)).isFertile) {
-                            game.heightMap.clearTile(new Point(x, y));
+                        if (game.heightMap.getTile(x, y).isFertile) {
+                            game.heightMap.clearTile(x, y);
                         }
                     } else {
-                        game.heightMap.setTile(new Point(x, y), Tile.FARM);
+                        game.heightMap.setTile(x, y, Tile.FARM);
                     }
                 }
             }
         }
     }
 
-    public int countFlatLand(Point pos) {
+    public int countFlatLand(int x, int y) {
         int flat = 0;
-        for (int radius = 0; radius <=
-                3; radius++) {
+        int px, py;
+        for (int radius = 0; radius <= 3; radius++) {
             for (Point offset : Helpers.rings[radius]) {
-                Point p = new Point(pos.x + offset.x, pos.y + offset.y);
+                px = x + offset.x;
+                py = y + offset.y;
 
-                if (game.heightMap.tileInBounds(p)) {
-                    Tile tile = game.heightMap.getTile(p);
+                if (game.heightMap.tileInBounds(px, py)) {
+                    Tile tile = game.heightMap.getTile(px, py);
                     if (tile.isFertile) {
                         flat++;
                     }
@@ -204,10 +200,8 @@ public class Houses {
             if (nd2 < d2) {
                 if (players.contains(h.player)) {
                     nearest = h;
-                    d2 =
-                            nd2;
+                    d2 = nd2;
                 }
-
             }
         }
         if (nearest != null) {
@@ -227,15 +221,15 @@ public class Houses {
         private float strength;
         private boolean changed;
 
-        public House(Point p, Player player, float strength) {
+        public House(int x, int y, Player player, float strength) {
             id = nextId++;
             changed = true;
-            pos = p;
+            pos = new Point(x, y);
             level = 1;
             this.player = player;
             this.strength = strength;
             setLevel();
-            newHouses.add(p);
+            newHouses.add(x + y * game.heightMap.width);
         }
 
         public void damage(float i) {
@@ -246,8 +240,9 @@ public class Houses {
         Peons.State addPeon(Peon p, boolean leader) {
             if (p.player == player) {
                 strength += p.strength;
-                if(leader)
+                if (leader) {
                     leaderHouses.put(player, this);
+                }
                 return Peons.State.SETTLED;
             }
 
@@ -255,8 +250,7 @@ public class Houses {
             p.player.info.mana -= p.strength;
             player.info.mana -= p.strength;
             if (strength < 0) {
-                if(leaderHouses.containsValue(this))
-                {
+                if (leaderHouses.containsValue(this)) {
                     leaderHouses.remove(this);
                     player.info.ankh = this.pos;
                 }
@@ -264,8 +258,9 @@ public class Houses {
                 player = p.player;
                 strength = -strength;
                 changed = true;
-                if(leader)
+                if (leader) {
                     leaderHouses.put(player, this);
+                }
                 return Peons.State.SETTLED;
             }
             return Peons.State.DEAD;
@@ -276,7 +271,7 @@ public class Houses {
         }
 
         private void paintmap(byte[][] newmap) {
-            if (game.heightMap.getTile(pos).isFertile) {
+            if (game.heightMap.getTile(pos.x, pos.y).isFertile) {
                 newmap[pos.x][pos.y] = HOUSE;
                 int radiuslimit = 0;
                 if (level > 0) {
@@ -288,13 +283,13 @@ public class Houses {
                 if (level == 49) {
                     radiuslimit = 3;
                 }
-                Point p = new Point();
+                int px, py;
                 for (int radius = 1; radius <= radiuslimit; radius++) {
                     for (Point offset : Helpers.rings[radius]) {
-                        p.x = pos.x + offset.x;
-                        p.y = pos.y + offset.y;
-                        if (game.heightMap.tileInBounds(p) && game.heightMap.getTile(p).isFertile) {
-                            newmap[p.x][p.y] = FARM;
+                        px = pos.x + offset.x;
+                        py = pos.y + offset.y;
+                        if (game.heightMap.tileInBounds(px, py) && game.heightMap.getTile(px, py).isFertile) {
+                            newmap[px][py] = FARM;
                         }
                     }
                 }
@@ -310,7 +305,7 @@ public class Houses {
         }
 
         private int calcLevel() {
-            int l = countFlatLand(pos);
+            int l = countFlatLand(pos.x, pos.y);
             return l;
         }
 
@@ -331,7 +326,7 @@ public class Houses {
 
             if (changed) {
                 changed = false;
-                hds.add(new HouseUpdate.Detail(id, pos, player, level));
+                hds.add(new HouseUpdate.Detail(id, pos.x, pos.y, player, level));
             }
         }
     }

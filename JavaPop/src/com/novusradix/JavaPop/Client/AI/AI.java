@@ -58,10 +58,12 @@ public class AI implements Runnable {
             //flatten some land
             if (targetHouse != null) {
                 Collections.shuffle(Helpers.shuffledRings.get(currentRadius));
+                Point p=new Point();
                 for (Point offset : Helpers.shuffledRings.get(currentRadius)) {
-                    Point p = new Point(targetHouse.pos.x + offset.x, targetHouse.pos.y + offset.y);
-                    if (game.heightMap.inBounds(p)) {
-                        int diff = game.heightMap.getHeight(p) - game.heightMap.getHeight(targetHouse.pos);
+                    p.x = targetHouse.x + offset.x;
+                    p.y = targetHouse.y + offset.y;
+                    if (game.heightMap.inBounds(p.x, p.y)) {
+                        int diff = game.heightMap.getHeight(p.x,p.y) - game.heightMap.getHeight(targetHouse.x, targetHouse.y);
                         if (diff != 0) {
                             game.client.sendMessage(new UpDown(p, diff < 0));
                             continue ailoop;

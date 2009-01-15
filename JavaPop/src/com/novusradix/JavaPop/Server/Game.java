@@ -137,7 +137,7 @@ public class Game extends TimerTask {
             for (ArrayList<Point> ring : Helpers.shuffledRings) {
                 for (Point p : ring) {
                     Point p2 = new Point(p.x + me.getValue().x, p.y + me.getValue().y);
-                    if (heightMap.tileInBounds(p2) && heightMap.getHeight(p2) > 0) {
+                    if (heightMap.tileInBounds(p2.x, p2.y) && heightMap.getHeight(p2.x,p2.y) > 0) {
                         placed++;
                         peons.addPeon(p2, 400, me.getKey(), true);
                         if (placed == numPeons) {

@@ -9,19 +9,19 @@ import java.awt.Dimension;
 import javax.media.opengl.GL;
 
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
-import java.awt.Point;
 
 public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObject {
 
     HeightMapImpl implementation;
     GLObject renderer;
+
     public HeightMap(Dimension mapSize) {
         super(mapSize);
 
         HeightMapNoShader h = new HeightMapNoShader();
         implementation = h;
         renderer = h;
-        implementation.initialise(mapSize);
+        implementation.initialise(this);
     }
 
     public void display(GL gl, float time) {
@@ -38,12 +38,12 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObj
     }
 
     @Override
-    public byte getHeight(Point p) {
-        return implementation.getHeight(p);
+    public byte getHeight(int x, int y) {
+        return implementation.getHeight(x, y);
     }
 
     @Override
-    protected void setHeight(Point point, byte b) {
-        implementation.setHeight(point, b);
+    protected void setHeight(int x, int y, byte b) {
+        implementation.setHeight(x, y, b);
     }
 }

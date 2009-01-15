@@ -6,7 +6,6 @@ package com.novusradix.JavaPop.Messaging;
 
 import com.novusradix.JavaPop.Server.Houses.House;
 import com.novusradix.JavaPop.Server.Player;
-import java.awt.Point;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -40,7 +39,7 @@ public class HouseUpdate extends Message implements Externalizable {
     @Override
     public void execute() {
         for (Detail d : details) {
-            client.game.houses.updateHouse(d.id, d.pos, client.game.players.get(d.playerId), d.level);
+            client.game.houses.updateHouse(d.id, d.x, d.y, client.game.players.get(d.playerId), d.level);
         }
         client.game.houses.setLeaders(leaderHouses);
     }
@@ -48,13 +47,14 @@ public class HouseUpdate extends Message implements Externalizable {
     public static class Detail implements Serializable {
 
         int id;
-        Point pos;
+        int x, y;
         int level;
         int playerId;
 
-        public Detail(int id, Point pos, Player p, int level) {
+        public Detail(int id, int x, int y, Player p, int level) {
             this.id = id;
-            this.pos = pos;
+            this.x = x;
+            this.y = y;
             this.playerId = p.getId();
             this.level = level;
         }
@@ -70,8 +70,8 @@ public class HouseUpdate extends Message implements Externalizable {
         out.writeInt(details.size());
         for (Detail d : details) {
             out.writeInt(d.id);
-            out.writeInt(d.pos.x);
-            out.writeInt(d.pos.y);
+            out.writeInt(d.x);
+            out.writeInt(d.y);
             out.writeInt(d.playerId);
             out.writeInt(d.level);
         }
@@ -88,9 +88,8 @@ public class HouseUpdate extends Message implements Externalizable {
         for (; i > 0; i--) {
             Detail d = new Detail();
             d.id = in.readInt();
-            d.pos = new Point();
-            d.pos.x = in.readInt();
-            d.pos.y = in.readInt();
+            d.x = in.readInt();
+            d.y = in.readInt();
             d.playerId = in.readInt();
             d.level = in.readInt();
 

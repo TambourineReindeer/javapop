@@ -41,34 +41,35 @@ public class LavaTrailEffect extends Effect {
     @Override
     public void execute(Game g) {
         age++;
-        if (g.heightMap.isFlat(origin)) {
+        if (g.heightMap.isFlat(origin.x, origin.y)) {
             boolean blocked = false;
             int newLength = 0;
             for (int n = 0; n < length; n++) {
-                Point p = new Point(origin.x + direction.x * n, origin.y + direction.y * n);
-                if (g.heightMap.tileInBounds(p)) {
+                int px = origin.x + direction.x * n;
+                int py = origin.y + direction.y * n;
+                if (g.heightMap.tileInBounds(px, py)) {
                     if (blocked) {
-                        if (g.heightMap.getTile(p) == Tile.LAVA) {
-                            g.heightMap.setTile(p, Tile.BASALT);
+                        if (g.heightMap.getTile(px, py) == Tile.LAVA) {
+                            g.heightMap.setTile(px, py, Tile.BASALT);
                         }
                     } else {
                         int ha, hb;
-                        if (g.heightMap.isSeaLevel(p)) {
+                        if (g.heightMap.isSeaLevel(px, py)) {
                             blocked = true;
                             newLength = n;
                         //Start a basalt effect
                         } else {
-                            ha = g.heightMap.getHeight(new Point(p.x + direction.fx1, p.y + direction.fy1));
-                            hb = g.heightMap.getHeight(new Point(p.x + direction.fx2, p.y + direction.fy2));
+                            ha = g.heightMap.getHeight(px + direction.fx1, py + direction.fy1);
+                            hb = g.heightMap.getHeight(px + direction.fx2, py + direction.fy2);
 
                             if (ha != hb) {
                                 blocked = true;
                                 newLength = n;
-                                if (g.heightMap.getTile(p) == Tile.LAVA) {
-                                    g.heightMap.setTile(p, Tile.BASALT);
+                                if (g.heightMap.getTile(px, py) == Tile.LAVA) {
+                                    g.heightMap.setTile(px, py, Tile.BASALT);
                                 }
                             } else {
-                                g.heightMap.setTile(p, Tile.LAVA);
+                                g.heightMap.setTile(px, py, Tile.LAVA);
                             }
                         }
                     }
@@ -82,11 +83,13 @@ public class LavaTrailEffect extends Effect {
                 length = newLength;
             }
         } else {
+            int px, py;
             for (int n = 0; n < length; n++) {
-                Point p = new Point(origin.x + direction.x * n, origin.y + direction.y * n);
-                if (g.heightMap.tileInBounds(p)) {
-                    if (g.heightMap.getTile(p) == Tile.LAVA) {
-                        g.heightMap.setTile(p, Tile.BASALT);
+                px = origin.x + direction.x * n;
+                py = origin.y + direction.y * n;
+                if (g.heightMap.tileInBounds(px, py)) {
+                    if (g.heightMap.getTile(px, py) == Tile.LAVA) {
+                        g.heightMap.setTile(px, py, Tile.BASALT);
                     }
                 }
                 g.deleteEffect(this);

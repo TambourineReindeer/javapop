@@ -5,7 +5,6 @@ import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.TextureIO;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.IOException;
 import java.net.URL;
@@ -50,9 +49,9 @@ public class HeightMapGLSL implements HeightMapImpl {
     private Rectangle dirtyHeights,  dirtyTiles;
     private int shader;
 
-    public void initialise(Dimension mapSize) {
-        width = mapSize.width;
-        breadth = mapSize.height;
+    public void initialise(HeightMap h) {
+        width = h.width;
+        breadth = h.breadth;
         vertexstride = 2;
         tilestride = 12 * vertexstride;
         rowstride = tilestride * (width - 1);
@@ -194,37 +193,39 @@ public class HeightMapGLSL implements HeightMapImpl {
     }
 
     public void applyUpdate(HeightMapUpdate u) {
+                int x,  y;
         synchronized (this) {
             if (!u.dirtyRegion.isEmpty()) {
-                int x,  y;
                 for (y = 0; y < u.dirtyRegion.height; y++) {
                     for (x = 0; x < u.dirtyRegion.width; x++) {
-                        setHeight(new Point(u.dirtyRegion.x + x, u.dirtyRegion.y + y), u.heightData[x + y * u.dirtyRegion.width]);
+                        setHeight(u.dirtyRegion.x + x, u.dirtyRegion.y + y, u.heightData[x + y * u.dirtyRegion.width]);
                         markHeightsDirty(u.dirtyRegion);
                     }
                 }
             }
-            for (Entry<Point, Byte> e : u.texture.entrySet()) {
-                setTile(e.getKey(), e.getValue());
+            for (Entry<Integer, Byte> e : u.texture.entrySet()) {
+                x=e.getKey()%width;
+                y = e.getKey()/width;
+                setTile(x,y, e.getValue());
             }
         }
     }
 
-    public void setTile(Point p, byte t) {
+    public void setTile(int x,int y, byte t) {
         try {
-            tiles.put(p.x + width * p.y, t);
-            markTilesDirty(p);
+            tiles.put(x + width * y, t);
+            markTilesDirty(x,y);
         } catch (Exception e) {
             e.getMessage();
         }
     }
 
-    public void setHeight(Point p, byte height) {
-        heights.put(p.x + width * p.y, height);
+    public void setHeight(int x, int y, byte height) {
+        heights.put(x + width * y, height);
     }
 
-    public byte getHeight(Point p) {
-        return heights.get(p.x + width * p.y);
+    public byte getHeight(int x, int y) {
+        return heights.get(x + width * y);
     }
 
     private void markHeightsDirty(Rectangle r) {
@@ -235,23 +236,23 @@ public class HeightMapGLSL implements HeightMapImpl {
         }
     }
 
-    private void markTilesDirty(Point p) {
+    private void markTilesDirty(int x, int y) {
         if (dirtyTiles == null) {
-            dirtyTiles = new Rectangle(p);
+            dirtyTiles = new Rectangle(x,y);
         }
-        if (p.x < dirtyTiles.x) {
-            dirtyTiles.width += dirtyTiles.x - p.x;
-            dirtyTiles.x = p.x;
+        if (x < dirtyTiles.x) {
+            dirtyTiles.width += dirtyTiles.x - x;
+            dirtyTiles.x = x;
         }
-        if (p.x > dirtyTiles.x + dirtyTiles.width) {
-            dirtyTiles.width = p.x - dirtyTiles.x;
+        if (x > dirtyTiles.x + dirtyTiles.width) {
+            dirtyTiles.width = x - dirtyTiles.x;
         }
-        if (p.y < dirtyTiles.y) {
-            dirtyTiles.height += dirtyTiles.y - p.y;
-            dirtyTiles.y = p.y;
+        if (y < dirtyTiles.y) {
+            dirtyTiles.height += dirtyTiles.y - y;
+            dirtyTiles.y = y;
         }
-        if (p.y > dirtyTiles.height) {
-            dirtyTiles.height = p.y - dirtyTiles.y;
+        if (y > dirtyTiles.height) {
+            dirtyTiles.height = y - dirtyTiles.y;
         }
 
     }

@@ -24,28 +24,31 @@ public class VolcanoEffect extends Effect {
     public void execute(Game g) {
         if (age < 15) {
             if (age % 2 == 0) {
-                g.heightMap.up(target);
-                byte h = g.heightMap.getHeight(target);
+                g.heightMap.up(target.x, target.y);
+                byte h = g.heightMap.getHeight(target.x, target.y);
                 byte radius = (byte) (age / 2);
+                int px, py;
                 for (Point p : Helpers.smallRings[radius]) {
-                    Point p2 = new Point(p.x + target.x, p.y + target.y);
-                    g.heightMap.setTile(p2, Tile.BASALT);
+                    px = p.x + target.x;
+                    py = p.y + target.y;
+                    g.heightMap.setTile(px, py, Tile.BASALT);
                 }
             }
         }
         if (age == 20) {
-            g.heightMap.down(target);
+            g.heightMap.down(target.x, target.y);
+            int px, py;
             for (Point p : Helpers.smallRings[0]) {
-                Point p2 = new Point(p.x + target.x, p.y + target.y);
-                g.heightMap.setTile(p2, Tile.LAVA);
+                px = p.x + target.x;
+                py = p.y + target.y;
+                g.heightMap.setTile(px, py, Tile.LAVA);
             }
             g.addEffect(new LavaTrailEffect(target, LavaTrailEffect.Direction.NORTH));
-            g.addEffect(new LavaTrailEffect(new Point(target.x-1, target.y), LavaTrailEffect.Direction.WEST));
-            g.addEffect(new LavaTrailEffect(new Point(target.x, target.y-1), LavaTrailEffect.Direction.EAST));
-            g.addEffect(new LavaTrailEffect(new Point(target.x-1, target.y-1), LavaTrailEffect.Direction.SOUTH));
+            g.addEffect(new LavaTrailEffect(new Point(target.x - 1, target.y), LavaTrailEffect.Direction.WEST));
+            g.addEffect(new LavaTrailEffect(new Point(target.x, target.y - 1), LavaTrailEffect.Direction.EAST));
+            g.addEffect(new LavaTrailEffect(new Point(target.x - 1, target.y - 1), LavaTrailEffect.Direction.SOUTH));
             g.deleteEffect(this);
         }
-
         age++;
     }
 

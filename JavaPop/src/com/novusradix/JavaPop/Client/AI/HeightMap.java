@@ -6,11 +6,8 @@ package com.novusradix.JavaPop.Client.AI;
 
 import java.awt.Dimension;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GLAutoDrawable;
 
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
-import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 import java.util.Map.Entry;
 
@@ -27,34 +24,34 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
     @Override
     public void applyUpdate(HeightMapUpdate u) {
-         synchronized (this) {
+        int x, y;
+        synchronized (this) {
             if (!u.dirtyRegion.isEmpty()) {
-                int x,    y;
 
                 for (y = 0; y < u.dirtyRegion.height; y++) {
                     for (x = 0; x < u.dirtyRegion.width; x++) {
-                        setHeight(new Point(u.dirtyRegion.x + x, u.dirtyRegion.y + y), u.heightData[x + y * u.dirtyRegion.width]);
+                        setHeight(u.dirtyRegion.x + x, u.dirtyRegion.y + y, u.heightData[x + y * u.dirtyRegion.width]);
                     }
                 }
-                
+
             }
-            for (Entry<Point, Byte> e : u.texture.entrySet()) {
-                setTile(e.getKey(), e.getValue());
+            for (Entry<Integer, Byte> e : u.texture.entrySet()) {
+                setTile(e.getKey() % width, e.getKey() / width, e.getValue());
             }
         }
     }
 
     @Override
-    public byte getHeight(Point p) {
-        return heights[p.x][p.y];
+    public byte getHeight(int x, int y) {
+        return heights[x][y];
     }
 
     @Override
-    protected void setHeight(Point p, byte b) {
-        heights[p.x][p.y] = b;
+    protected void setHeight(int x, int y, byte b) {
+        heights[x][y] = b;
     }
 
-    public void setTile(Point p, byte t) {
-        tiles[p.x][p.y] = t;
+    public void setTile(int x, int y, byte t) {
+        tiles[x][y] = t;
     }
 }

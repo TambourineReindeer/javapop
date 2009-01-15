@@ -4,13 +4,11 @@
  */
 package com.novusradix.JavaPop.Messaging;
 
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,12 +25,12 @@ public class HeightMapUpdate extends Message implements Externalizable {
     private static final long serialVersionUID = 1L;
     public Rectangle dirtyRegion;
     public byte[] heightData;
-    public Map<Point, Byte> texture;
+    public Map<Integer, Byte> texture;
 
     public HeightMapUpdate() {
     }
 
-    public HeightMapUpdate(Rectangle dirty, byte[] b, int stride, Map<Point, Byte> texture) {
+    public HeightMapUpdate(Rectangle dirty, byte[] b, int stride, Map<Integer, Byte> texture) {
         dirtyRegion = dirty;
         if (dirtyRegion != null) {
             heightData = new byte[dirty.width * dirty.height];
@@ -45,7 +43,7 @@ public class HeightMapUpdate extends Message implements Externalizable {
         } else {
             dirtyRegion = new Rectangle();
         }
-        this.texture = new HashMap<Point, Byte>(texture);
+        this.texture = new HashMap<Integer, Byte>(texture);
     }
 
     public void execute() {
@@ -64,12 +62,10 @@ public class HeightMapUpdate extends Message implements Externalizable {
             o.writeInt(0);
         }
         o.writeInt(texture.size());
-        for (Entry<Point, Byte> e : texture.entrySet()) {
-            o.writeInt(e.getKey().x);
-            o.writeInt(e.getKey().y);
+        for (Entry<Integer, Byte> e : texture.entrySet()) {
+            o.writeInt(e.getKey());
             o.writeByte(e.getValue());
         }
-
     }
 
     public void readExternal(ObjectInput i) throws IOException, ClassNotFoundException {
@@ -88,16 +84,14 @@ public class HeightMapUpdate extends Message implements Externalizable {
         } while (heightBytes > 0);
 
         int texcount = i.readInt();
-        texture = new HashMap<Point, Byte>();
+        texture = new HashMap<Integer, Byte>();
 
-        int x, y;
+        int x;
         byte n;
         for (; texcount > 0; texcount--) {
             x = i.readInt();
-            y = i.readInt();
             n = i.readByte();
-            texture.put(new Point(x, y), n);
+            texture.put(x, n);
         }
-
     }
 }
