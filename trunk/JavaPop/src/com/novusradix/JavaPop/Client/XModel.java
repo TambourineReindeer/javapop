@@ -164,12 +164,9 @@ public class XModel {
                 GL.GL_STATIC_DRAW);
 
         try {
-            URL u = getClass().getResource(textureName);
-            tex = TextureIO.newTexture(u, true, "png");
-            tex.bind();
-            tex.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
-            tex.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
-            GLHelper glh = new GLHelper();
+            
+            GLHelper glh = MainCanvas.glHelper;
+            tex = glh.getTexture(gl, textureName);
             shader = glh.LoadShaderProgram(gl, null, "/com/novusradix/JavaPop/Client/Shaders/ModelFragment.shader");
 
         } catch (IOException ex) {

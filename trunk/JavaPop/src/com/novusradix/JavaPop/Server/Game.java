@@ -130,7 +130,7 @@ public class Game extends TimerTask {
         for (Player p : players) {
             startingPosition.put(p, new Point(r.nextInt(heightMap.getWidth()), r.nextInt(heightMap.getBreadth())));
         }
-        int numPeons = 3;
+        int numPeons = 1;
         nextPlayer:
         for (Map.Entry<Player, Point> me : startingPosition.entrySet()) {
             int placed = 0;
@@ -139,7 +139,7 @@ public class Game extends TimerTask {
                     Point p2 = new Point(p.x + me.getValue().x, p.y + me.getValue().y);
                     if (heightMap.tileInBounds(p2) && heightMap.getHeight(p2) > 0) {
                         placed++;
-                        peons.addPeon(p2, 400, me.getKey());
+                        peons.addPeon(p2, 400, me.getKey(), true);
                         if (placed == numPeons) {
                             continue nextPlayer;
                         }

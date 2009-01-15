@@ -79,4 +79,8 @@ public class Houses implements AbstractHouses {
             this.player = player;
         }
     }
+
+    public void setLeaders(Map<Integer, Integer> leaderHouses) {
+       //Todo
+    }
 }

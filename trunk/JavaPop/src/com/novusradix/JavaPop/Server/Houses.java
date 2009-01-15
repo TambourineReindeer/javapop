@@ -8,7 +8,9 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -30,6 +32,7 @@ public class Houses {
     private static final int FARM = EMPTY + 1;
     private static final int HOUSE = FARM + TEAMS;
     private static final int NEXT = HOUSE + TEAMS;
+    private Map<Player, House> leaderHouses;
 
     public Houses(Game g) {
         game = g;
@@ -44,12 +47,17 @@ public class Houses {
         });
         newHouses = new Vector<Point>();
         hds = new Vector<HouseUpdate.Detail>();
+        leaderHouses = new HashMap<Player, House>();
     }
 
-    public void addHouse(Point p, Player player, float strength) {
+    public void addHouse(Point p, Player player, float strength, boolean leader) {
         synchronized (allHouses) {
             if (canBuild(p)) {
-                allHouses.put(p, new House(p, player, strength));
+                House h = new House(p, player, strength);
+                allHouses.put(p, h);
+                if (leader) {
+                    leaderHouses.put(player, h);
+                }
             }
         }
     }
@@ -105,7 +113,10 @@ public class Houses {
                     h.step(seconds);
                 } else {
                     i.remove();
-                    game.peons.addPeon(h.pos, h.strength, h.player);
+                    game.peons.addPeon(h.pos, h.strength, h.player, leaderHouses.containsValue(h));
+                    if (leaderHouses.containsValue(h)) {
+                        leaderHouses.remove(h.player);
+                    }
                     hds.add(new HouseUpdate.Detail(h.id, h.pos, h.player, -1));
                 }
             }
@@ -115,7 +126,10 @@ public class Houses {
                 if (newmap[h.pos.x][h.pos.y] != HOUSE) {
                     i.remove();
                     if (h.strength > 0) {
-                        game.peons.addPeon(h.pos, h.strength, h.player);
+                        game.peons.addPeon(h.pos, h.strength, h.player, leaderHouses.containsValue(h));
+                    }
+                    if (leaderHouses.containsValue(h)) {
+                        leaderHouses.remove(h.player);
                     }
                     hds.add(new HouseUpdate.Detail(h.id, h.pos, h.player, -1));
                 }
@@ -132,7 +146,7 @@ public class Houses {
         //    paint();
         //}
         if (!hds.isEmpty()) {
-            game.sendAllPlayers(new HouseUpdate(hds));
+            game.sendAllPlayers(new HouseUpdate(hds, leaderHouses));
             hds.clear();
         }
     }
@@ -141,32 +155,8 @@ public class Houses {
         return allHouses.get(p);
     }
 
-    private void paint() {
-        int x, y;
-        for (y = 0; y < game.heightMap.getBreadth(); y++) {
-            for (x = 0; x < game.heightMap.getWidth(); x++) {
-                if (map[x][y] != EMPTY) {
-                    game.heightMap.setTile(new Point(x, y), Tile.FARM);
-                }
-            }
-        }
-    }
-
-    private void unpaint() {
-        int x, y;
-        for (y = 0; y < game.heightMap.getBreadth(); y++) {
-            for (x = 0; x < game.heightMap.getWidth(); x++) {
-                if (map[x][y] != EMPTY) {
-                    if (game.heightMap.getTile(new Point(x, y)).isFertile) {
-                        game.heightMap.clearTile(new Point(x, y));
-                    }
-                }
-            }
-        }
-    }
-
     private void repaint() {
-        int x, y;
+        int x,  y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (newmap[x][y] != map[x][y]) {
@@ -226,11 +216,11 @@ public class Houses {
 
         return null;
     }
-    private static int nextId;
+    private static int nextId = 1;
 
     public class House {
 
-        private int id;
+        public int id;
         private Point pos;
         private int level;
         private Player player;
@@ -253,21 +243,36 @@ public class Houses {
             player.info.mana -= i;
         }
 
-        void addPeon(Peon p) {
+        Peons.State addPeon(Peon p, boolean leader) {
             if (p.player == player) {
                 strength += p.strength;
-                return;
+                if(leader)
+                    leaderHouses.put(player, this);
+                return Peons.State.SETTLED;
             }
 
             strength -= p.strength;
             p.player.info.mana -= p.strength;
             player.info.mana -= p.strength;
             if (strength < 0) {
+                if(leaderHouses.containsValue(this))
+                {
+                    leaderHouses.remove(this);
+                    player.info.ankh = this.pos;
+                }
                 player.info.mana -= strength;
                 player = p.player;
                 strength = -strength;
                 changed = true;
+                if(leader)
+                    leaderHouses.put(player, this);
+                return Peons.State.SETTLED;
             }
+            return Peons.State.DEAD;
+        }
+
+        void makeLeader() {
+            leaderHouses.put(this.player, this);
         }
 
         private void paintmap(byte[][] newmap) {
@@ -316,7 +321,11 @@ public class Houses {
             player.info.mana += newmana;
             if (strength > rate * 100.0f) {
                 float houseStrength = rate * 100.0f - min(500.0f, rate * 100.0f / 2.0f);
-                game.peons.addPeon(pos, strength - houseStrength, player);
+                game.peons.addPeon(pos, strength - houseStrength, player, leaderHouses.containsValue(this));
+                if (leaderHouses.containsValue(this)) {
+                    leaderHouses.remove(player);
+                    changed = true;
+                }
                 strength = houseStrength;
             }
 

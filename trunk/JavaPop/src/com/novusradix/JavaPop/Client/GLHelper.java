@@ -1,11 +1,22 @@
 package com.novusradix.JavaPop.Client;
 
+import com.sun.opengl.util.texture.*;
 import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
+import static javax.media.opengl.GL.*;
 
 public class GLHelper {
+
+    private Map<String, Texture> textures;
+
+    public GLHelper() {
+        textures = new HashMap<String, Texture>();
+    }
 
     public int LoadShaderProgram(GL gl, String vertexSource, String fragmentSource) throws IOException, GLHelperException {
         int v, f;
@@ -30,6 +41,21 @@ public class GLHelper {
         gl.glUseProgram(shaderprogram);
         checkGL(gl);
         return shaderprogram;
+    }
+
+    public Texture getTexture(GL gl, String textureName) throws IOException {
+        if (textures.containsKey(textureName)) {
+            return textures.get(textureName);
+        }
+
+        Texture tex;
+        URL u = getClass().getResource(textureName);
+        tex = TextureIO.newTexture(u, true, "png");
+        tex.bind();
+        tex.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+        tex.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+        textures.put(textureName, tex);
+        return tex;
     }
 
     public void checkGL(GL gl) throws GLHelperException {
