@@ -7,14 +7,12 @@ import com.novusradix.JavaPop.Tile;
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.TextureIO;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.FloatBuffer;
 import java.util.Map.Entry;
 import java.util.Random;
 import javax.media.opengl.*;
-import static java.lang.Math.*;
 import static javax.media.opengl.GL.*;
 
 /**
@@ -45,23 +43,21 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     private FloatBuffer b;
     private int rowstride,  tilestride,  vertexstride;
     private static final int VX = 0,  VY = 1,  VZ = 2,  NX = 3,  NY = 4,  NZ = 5,  TX = 6,  TY = 7;
-    private HeightMap heightMap;
-    private int width,  breadth;
+    private HeightMap heightMap;  
     private boolean[] changed;
     private int displaylist;
 
-    public void initialise(Dimension mapSize) {
-        width = mapSize.width;
-        breadth = mapSize.height;
+    public void initialise(HeightMap h) {
+        heightMap = h;       
         vertexstride = 8;
         tilestride = 12 * vertexstride;
-        rowstride = tilestride * (width - 1);
-        changed = new boolean[breadth - 1];
-        b = BufferUtil.newFloatBuffer((width - 1) * (breadth - 1) * tilestride);
+        rowstride = tilestride * (heightMap.width - 1);
+        changed = new boolean[heightMap.breadth - 1];
+        b = BufferUtil.newFloatBuffer((heightMap.width - 1) * (heightMap.breadth - 1) * tilestride);
 
         int x, y;
-        for (y = 0; y < (breadth - 1); y++) {
-            for (x = 0; x < (width - 1); x++) {
+        for (y = 0; y < (heightMap.breadth - 1); y++) {
+            for (x = 0; x < (heightMap.width - 1); x++) {
 
                 // 0
                 b.put(x);
@@ -180,24 +176,17 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
         return y * rowstride + x * tilestride + vertex * vertexstride + index;
     }
 
-    private int bufPos(Point p, int vertex, int index) {
-        return p.y * rowstride + p.x * tilestride + vertex * vertexstride + index;
-    }
-
-    public byte getHeight(Point p) {
-        int x, y;
-        x = p.x;
-        y = p.y;
-        if (x == width - 1 && y == breadth - 1) {
+    public byte getHeight(int x, int y) {
+        if (x == heightMap.width - 1 && y == heightMap.breadth - 1) {
             return (byte) b.get(bufPos(x - 1, y - 1, 4, VZ));
         }
-        if (x == width - 1) {
+        if (x == heightMap.width - 1) {
             return (byte) b.get(bufPos(x - 1, y, 3, VZ));
         }
-        if (y == breadth - 1) {
+        if (y == heightMap.breadth - 1) {
             return (byte) b.get(bufPos(x, y - 1, 7, VZ));
         }
-        if (inBounds(x, y)) {
+        if (heightMap.inBounds(x, y)) {
             return (byte) b.get(bufPos(x, y, 0, VZ));
         }
         return 0;
@@ -213,56 +202,53 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
         return 0;
     }
 
-    public void setHeight(Point p, byte height) {
+    public void setHeight(int x, int y, byte height) {
         try {
-            if (inBounds(p)) {
-                if (p.x < width - 1 && p.y < width - 1) {
-                    b.put(bufPos(p.x, p.y, 0, VZ), height);
-                    b.put(bufPos(p.x, p.y, 10, VZ), height);
+            if (heightMap.inBounds(x, y)) {
+                if (x < heightMap.width - 1 && y < heightMap.width - 1) {
+                    b.put(bufPos(x, y, 0, VZ), height);
+                    b.put(bufPos(x, y, 10, VZ), height);
                 }
-                if (p.x >= 1 && p.y >= 1) {
-                    b.put(bufPos(p.x - 1, p.y - 1, 4, VZ), height);
-                    b.put(bufPos(p.x - 1, p.y - 1, 6, VZ), height);
+                if (x >= 1 && y >= 1) {
+                    b.put(bufPos(x - 1, y - 1, 4, VZ), height);
+                    b.put(bufPos(x - 1, y - 1, 6, VZ), height);
                 }
-                if (p.y >= 1 && p.x < width - 1) {
-                    b.put(bufPos(p.x, p.y - 1, 7, VZ), height);
-                    b.put(bufPos(p.x, p.y - 1, 9, VZ), height);
+                if (y >= 1 && x < heightMap.width - 1) {
+                    b.put(bufPos(x, y - 1, 7, VZ), height);
+                    b.put(bufPos(x, y - 1, 9, VZ), height);
                 }
-                if (p.x >= 1 && p.y < width - 1) {
-                    b.put(bufPos(p.x - 1, p.y, 1, VZ), height);
-                    b.put(bufPos(p.x - 1, p.y, 3, VZ), height);
+                if (x >= 1 && y < heightMap.width - 1) {
+                    b.put(bufPos(x - 1, y, 1, VZ), height);
+                    b.put(bufPos(x - 1, y, 3, VZ), height);
                 }
             }
         } catch (IndexOutOfBoundsException e) {
-            System.out.print(p.x + ", " + p.y + ": out of bounds in SetHeight()");
+            System.out.print(x + ", " + y + ": out of bounds in SetHeight()");
         }
     }
 
-    protected void setMidTile(Point p) {
+    protected void setMidTile(int x, int y) {
 
-        if (p.x < 0 || p.y < 0 || p.x >= width - 1 || p.y >= breadth - 1) {
+        if (x < 0 || y < 0 || x >= heightMap.width - 1 || y >= heightMap.breadth - 1) {
             return;
         }
         float m;
-        Point pb, pc, pd;
-        pb = new Point(p.x, p.y + 1);
-        pc = new Point(p.x + 1, p.y);
-        pd = new Point(p.x + 1, p.y + 1);
-        m = max(max(getHeight(p), getHeight(pb)), max(getHeight(pc), getHeight(pd))) + min(min(getHeight(p), getHeight(pb)), min(getHeight(pc), getHeight(pd)));
+
+        m = heightMap.getHeight(x+0.5f, y+0.5f);
 
         try {
-            b.put(bufPos(p, 2, VZ), m * 0.5f);
-            b.put(bufPos(p, 5, VZ), m * 0.5f);
-            b.put(bufPos(p, 8, VZ), m * 0.5f);
-            b.put(bufPos(p, 11, VZ), m * 0.5f);
+            b.put(bufPos(x, y, 2, VZ), m);
+            b.put(bufPos(x, y, 5, VZ), m);
+            b.put(bufPos(x, y, 8, VZ), m);
+            b.put(bufPos(x, y, 11, VZ), m);
         } catch (IndexOutOfBoundsException e) {
-            System.out.println("Array out of bounds in Client setMidTile:" + p.x + ", " + p.y);
+            System.out.println("Array out of bounds in Client setMidTile:" + x + ", " + y);
         }
-        setNormals(p);
-        changed[p.y] = true;
+        setNormals(x, y);
+        changed[y] = true;
     }
 
-    public void setTile(Point p, byte t) {
+    public void setTile(int x, int y, byte t) {
         float left, xmid, right, top, bottom, ymid;
         int texid;
         switch (Tile.values()[t]) {
@@ -291,96 +277,92 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 texid = 8;
                 break;
         }
-        int x,y;
-        x=texid % 8;
-        y=texid/8;
-        left = x * 32.0f;
+
+
+        int tx, ty;
+        tx = texid % 8;
+        ty = texid / 8;
+        left = tx * 32.0f;
         right = left + 31.0f;
         xmid = (left + right) / 2.0f;
-top = y*32.0f;
-bottom = top+31.0f;
-ymid = (top+bottom)/2.0f;
-        
-        b.put(bufPos(p, 0, TX), left);
-        b.put(bufPos(p, 1, TX), right);
-        b.put(bufPos(p, 2, TX), xmid);
-        b.put(bufPos(p, 3, TX), right);
-        b.put(bufPos(p, 4, TX), right);
-        b.put(bufPos(p, 5, TX), xmid);
-        b.put(bufPos(p, 6, TX), right);
-        b.put(bufPos(p, 7, TX), left);
-        b.put(bufPos(p, 8, TX), xmid);
-        b.put(bufPos(p, 9, TX), left);
-        b.put(bufPos(p, 10, TX), left);
-        b.put(bufPos(p, 11, TX), xmid);
-        
-        b.put(bufPos(p, 0, TY), bottom);
-        b.put(bufPos(p, 1, TY), bottom);
-        b.put(bufPos(p, 2, TY), ymid);
-        b.put(bufPos(p, 3, TY), bottom);
-        b.put(bufPos(p, 4, TY), top);
-        b.put(bufPos(p, 5, TY), ymid);
-        b.put(bufPos(p, 6, TY), top);
-        b.put(bufPos(p, 7, TY), top);
-        b.put(bufPos(p, 8, TY), ymid);
-        b.put(bufPos(p, 9, TY), top);
-        b.put(bufPos(p, 10, TY), bottom);
-        b.put(bufPos(p, 11, TY), ymid);
-     
-        changed[p.y] = true;
+        top = ty * 32.0f;
+        bottom = top + 31.0f;
+        ymid = (top + bottom) / 2.0f;
+
+        b.put(bufPos(x, y, 0, TX), left);
+        b.put(bufPos(x, y, 1, TX), right);
+        b.put(bufPos(x, y, 2, TX), xmid);
+        b.put(bufPos(x, y, 3, TX), right);
+        b.put(bufPos(x, y, 4, TX), right);
+        b.put(bufPos(x, y, 5, TX), xmid);
+        b.put(bufPos(x, y, 6, TX), right);
+        b.put(bufPos(x, y, 7, TX), left);
+        b.put(bufPos(x, y, 8, TX), xmid);
+        b.put(bufPos(x, y, 9, TX), left);
+        b.put(bufPos(x, y, 10, TX), left);
+        b.put(bufPos(x, y, 11, TX), xmid);
+
+        b.put(bufPos(x, y, 0, TY), bottom);
+        b.put(bufPos(x, y, 1, TY), bottom);
+        b.put(bufPos(x, y, 2, TY), ymid);
+        b.put(bufPos(x, y, 3, TY), bottom);
+        b.put(bufPos(x, y, 4, TY), top);
+        b.put(bufPos(x, y, 5, TY), ymid);
+        b.put(bufPos(x, y, 6, TY), top);
+        b.put(bufPos(x, y, 7, TY), top);
+        b.put(bufPos(x, y, 8, TY), ymid);
+        b.put(bufPos(x, y, 9, TY), top);
+        b.put(bufPos(x, y, 10, TY), bottom);
+        b.put(bufPos(x, y, 11, TY), ymid);
+
+        changed[y] = true;
     }
 
-    private void setNormals(Point p) {
-        setNormals(p, 0, 1, 2);
-        setNormals(p, 3, 4, 5);
-        setNormals(p, 6, 7, 8);
-        setNormals(p, 9, 10, 11);
+    private void setNormals(int x, int y) {
+        setNormals(x, y, 0, 1, 2);
+        setNormals(x, y, 3, 4, 5);
+        setNormals(x, y, 6, 7, 8);
+        setNormals(x, y, 9, 10, 11);
     }
 
-    private void setNormals(Point p, int vertA, int vertB, int vertC) {
+    private void setNormals(int x, int y, int vertA, int vertB, int vertC) {
         //TODO: profiled:candidate for optimisation
-        Vector3 va,vb ,vc ,vn ;
+        Vector3 va, vb, vc,
+                vn;
         va = new Vector3();
         vb = new Vector3();
+
         vc = new Vector3();
 
         try {
-            va.x = b.get(bufPos(p, vertA, VX));
-            va.y = b.get(bufPos(p, vertA, VY));
-            va.z = b.get(bufPos(p, vertA, VZ));
+            va.x = b.get(bufPos(x, y, vertA, VX));
+            va.y = b.get(bufPos(x, y, vertA, VY));
+            va.z = b.get(bufPos(x, y, vertA, VZ));
 
-            vb.x = b.get(bufPos(p, vertB, VX));
-            vb.y = b.get(bufPos(p, vertB, VY));
-            vb.z = b.get(bufPos(p, vertB, VZ));
+            vb.x = b.get(bufPos(x, y, vertB, VX));
+            vb.y = b.get(bufPos(x, y, vertB, VY));
+            vb.z = b.get(bufPos(x, y, vertB, VZ));
 
-            vc.x = b.get(bufPos(p, vertC, VX));
-            vc.y = b.get(bufPos(p, vertC, VY));
-            vc.z = b.get(bufPos(p, vertC, VZ));
+            vc.x = b.get(bufPos(x, y, vertC, VX));
+            vc.y = b.get(bufPos(x, y, vertC, VY));
+            vc.z = b.get(bufPos(x, y, vertC, VZ));
 
             vn = Helpers.calcNormal(vc, va, vb);
 
-            b.put(bufPos(p, vertA, NX), vn.x);
-            b.put(bufPos(p, vertA, NY), vn.y);
-            b.put(bufPos(p, vertA, NZ), vn.z);
+            b.put(bufPos(x, y, vertA, NX), vn.x);
+            b.put(bufPos(x, y, vertA, NY), vn.y);
+            b.put(bufPos(x, y, vertA, NZ), vn.z);
 
-            b.put(bufPos(p, vertB, NX), vn.x);
-            b.put(bufPos(p, vertB, NY), vn.y);
-            b.put(bufPos(p, vertB, NZ), vn.z);
+            b.put(bufPos(x, y, vertB, NX), vn.x);
+            b.put(bufPos(x, y, vertB, NY), vn.y);
+            b.put(bufPos(x, y, vertB, NZ), vn.z);
 
-            b.put(bufPos(p, vertC, NX), vn.x);
-            b.put(bufPos(p, vertC, NY), vn.y);
-            b.put(bufPos(p, vertC, NZ), vn.z);
+            b.put(bufPos(x, y, vertC, NX), vn.x);
+            b.put(bufPos(x, y, vertC, NY), vn.y);
+            b.put(bufPos(x, y, vertC, NZ), vn.z);
         } catch (IndexOutOfBoundsException e) {
-            System.out.println("Array out of bounds in Client SetNormal:" + p.x + ", " + p.y);
+            System.out.println("Array out of bounds in Client SetNormal:" + x + ", " + y);
         }
-    }
-
-    public boolean inBounds(int x, int y) {
-        return (x >= 0 && y >= 0 && x < width && y < breadth);
-    }
-
-    public boolean inBounds(Point p) {
-        return (p.x >= 0 && p.y >= 0 && p.x < width && p.y < breadth);
     }
 
     public void init(final GL gl) {
@@ -396,8 +378,8 @@ ymid = (top+bottom)/2.0f;
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        displaylist = gl.glGenLists(breadth);
-        for (int n = 0; n < breadth - 1; n++) {
+        displaylist = gl.glGenLists(heightMap.breadth);
+        for (int n = 0; n < heightMap.breadth - 1; n++) {
             changed[n] = true;
         }
     }
@@ -415,13 +397,13 @@ ymid = (top+bottom)/2.0f;
         tex.enable();
         tex.bind();
         boolean firstChange = true;
-        for (int n = 0; n < breadth - 1; n++) { //todo - if this ever gets slow, limit to visible rows only
+        for (int n = 0; n < heightMap.breadth - 1; n++) { //todo - if this ever gets slow, limit to visible rows only
             if (changed[n]) {
                 if (firstChange) {
                     gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
                     gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
                     gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
-gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+                    gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
                     b.position(VX);
                     gl.glVertexPointer(3, GL.GL_FLOAT, vertexstride * 4, b);
                     b.position(NX);
@@ -433,7 +415,7 @@ gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
                 gl.glNewList(displaylist + n, GL_COMPILE_AND_EXECUTE);
 
                 synchronized (this) {
-                    gl.glDrawArrays(GL.GL_TRIANGLES, n * (width - 1) * 4 * 3, (width - 1) * 4 * 3);
+                    gl.glDrawArrays(GL.GL_TRIANGLES, n * (heightMap.width - 1) * 4 * 3, (heightMap.width - 1) * 4 * 3);
                 }
                 gl.glEndList();
                 changed[n] = false;
@@ -445,23 +427,23 @@ gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     public void applyUpdate(HeightMapUpdate u) {
+        int x, y;
         synchronized (this) {
             if (!u.dirtyRegion.isEmpty()) {
-                int x,  y;
 
                 for (y = 0; y < u.dirtyRegion.height; y++) {
                     for (x = 0; x < u.dirtyRegion.width; x++) {
-                        setHeight(new Point(u.dirtyRegion.x + x, u.dirtyRegion.y + y), u.heightData[x + y * u.dirtyRegion.width]);
+                        setHeight(u.dirtyRegion.x + x, u.dirtyRegion.y + y, u.heightData[x + y * u.dirtyRegion.width]);
                     }
                 }
                 for (y = -1; y < u.dirtyRegion.height + 1; y++) {
                     for (x = -1; x < u.dirtyRegion.width + 1; x++) {
-                        setMidTile(new Point(u.dirtyRegion.x + x, u.dirtyRegion.y + y));
+                        setMidTile(u.dirtyRegion.x + x, u.dirtyRegion.y + y);
                     }
                 }
             }
-            for (Entry<Point, Byte> e : u.texture.entrySet()) {
-                setTile(e.getKey(), e.getValue());
+            for (Entry<Integer, Byte> e : u.texture.entrySet()) {
+                setTile(e.getKey() % heightMap.width, e.getKey() / heightMap.width, e.getValue());
             }
         }
     }

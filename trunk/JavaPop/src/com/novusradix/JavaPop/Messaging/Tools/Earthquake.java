@@ -40,7 +40,7 @@ public class Earthquake extends Message {
                 int d = r.nextInt(4);
                 try {
                     for (int i = 0; i < 10; i++) {
-                        serverGame.heightMap.down(q);
+                        serverGame.heightMap.down(q.x,q.y);
                         switch (d) {
                             case 0:
                                 q.x += 1;
@@ -67,7 +67,7 @@ public class Earthquake extends Message {
                         Thread.sleep(200);
                     }
                     for (int i = 0; i < 2; i++) {
-                        serverGame.heightMap.down(p);
+                        serverGame.heightMap.down(p.x,p.y);
                         Thread.sleep(200);
                     }
                 } catch (InterruptedException ex) {

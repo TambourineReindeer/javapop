@@ -353,7 +353,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         Vector3 p;
 
         float d, oldD;
-        p = new Vector3(current.x, current.y, game.heightMap.getHeight(current));
+        p = new Vector3(current.x, current.y, game.heightMap.getHeight(current.x, current.y));
         d = Helpers.PointLineDistance(v0, v1, p);
         oldD = d;
 

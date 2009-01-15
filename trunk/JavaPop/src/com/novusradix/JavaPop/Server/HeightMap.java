@@ -7,12 +7,9 @@ import java.util.Random;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import static java.lang.Math.*;
@@ -28,23 +25,18 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
     private static int rowstride;
     private Rectangle dirty;
     public final Rectangle bounds;
-    private Map<Point, Byte> textureChanges;
+    private Map<Integer, Byte> textureChanges;
     private byte[][] tex;
     private byte[][] oldTex;
     private boolean[][] flat;
-    private SortedSet<Point> houseChanges;
+    private SortedSet<Integer> houseChanges;
 
     public HeightMap(Dimension mapSize) {
         super(mapSize);
-        //b = BufferUtil.newByteBuffer(width * breadth);
-        houseChanges = new TreeSet<Point>(new Comparator<Point>() {
+        houseChanges = new TreeSet<Integer>();
 
-            public int compare(Point o1, Point o2) {
-                return (o1.x == o2.x ? o1.y - o2.y : o1.x - o2.x);
-            }
-        });
         heights = new byte[width * breadth];
-        textureChanges = new HashMap<Point, Byte>();
+        textureChanges = new HashMap<Integer, Byte>();
         rowstride = width;
         bounds = new Rectangle(0, 0, width, breadth);
         tex = new byte[width - 1][breadth - 1];
@@ -54,23 +46,21 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         int x, y;
         for (y = 0; y < breadth; y++) {
             for (x = 0; x < width; x++) {
-                //b.put((byte) 0);
                 if (x < width - 1 && y < breadth - 1) {
                     flat[x][y] = true;
                 }
             }
         }
-    //b.flip();
     }
 
-    private static int bufPos(Point p) {
-        return p.y * rowstride + p.x;
+    private static int bufPos(int x, int y) {
+        return y * rowstride + x;
     }
 
-    public byte getHeight(Point p) {
-        if (inBounds(p)) {
+    public byte getHeight(int x, int y) {
+        if (inBounds(x, y)) {
             //return b.get(bufPos(p));
-            return heights[bufPos(p)];
+            return heights[bufPos(x, y)];
         }
         return 0;
     }
@@ -86,99 +76,92 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
                 y = r.nextInt(breadth);
                 int ups = r.nextInt(8);
                 for (m = 0; m < ups; m++) {
-                    up(new Point(x, y));
+                    up(x, y);
                 }
                 for (m = 0; m < r.nextInt(8); m++) {
-                    up(new Point(x - 5 + r.nextInt(10), y - 5 + r.nextInt(10)));
+                    up(x - 5 + r.nextInt(10), y - 5 + r.nextInt(10));
                 }
                 for (m = 0; m < r.nextInt(ups * 2 + 1); m++) {
-                    down(new Point(x - ups + r.nextInt(ups * 2 + 1), y - ups + r.nextInt(ups * 2 + 1)));
+                    down(x - ups + r.nextInt(ups * 2 + 1), y - ups + r.nextInt(ups * 2 + 1));
                 }
                 for (m = 0; m < r.nextInt(2); m++) {
-                    down(new Point(x, y));
+                    down(x, y);
                 }
             }
         }
     }
 
-    public void up(Point p) {
+    public void up(int x, int y) {
         synchronized (this) {
-            setHeight(p, (byte) (getHeight(p) + 1));
-            conform(p);
+            setHeight(x, y, (byte) (getHeight(x, y) + 1));
+            conform(x, y);
         }
     }
 
-    public void down(Point p) {
+    public void down(int x, int y) {
         synchronized (this) {
-            setHeight(p, (byte) (max(getHeight(p) - 1, 0)));
-            conform(p);
+            setHeight(x, y, (byte) (max(getHeight(x, y) - 1, 0)));
+            conform(x, y);
         }
     }
- public SortedSet<Point> takeHouseChanges() {
+
+    public SortedSet<Integer> takeHouseChanges() {
         synchronized (houseChanges) {
-            SortedSet<Point> temp = houseChanges;
-            houseChanges = new TreeSet<Point>(new Comparator<Point>() {
-
-                public int compare(Point o1, Point o2) {
-                   return (o1.x == o2.x ? o1.y - o2.y : o1.x - o2.x);
-                }
-            });
+            SortedSet<Integer> temp = houseChanges;
+            houseChanges = new TreeSet<Integer>();
             return temp;
         }
     }
-    public void setTile(Point p, Tile t) {
-        if (tileInBounds(p)) {
-            boolean bflat = isFlat(p);
-            boolean bseaLevel = isSeaLevel(p);
+
+    public void setTile(int x, int y, Tile t) {
+        if (tileInBounds(x, y)) {
+            boolean bflat = isFlat(x, y);
+            boolean bseaLevel = isSeaLevel(x, y);
             if (!bflat && !t.canExistOnSlope) {
                 return;
             }
             if (bseaLevel && !t.canExistAtSeaLevel) {
                 return;
             }
-           
-            //if (oldt == Tile.FARM.id || t.isFertile != Tile.values()[oldt].isFertile) {
-              if (t.isFertile != Tile.values()[tex[p.x][p.y]].isFertile) {
+
+            if (t.isFertile != Tile.values()[tex[x][y]].isFertile) {
                 synchronized (houseChanges) {
-                    houseChanges.add(p);
+                    houseChanges.add(x + y * width);
                 }
             }
-            tex[p.x][p.y] = t.id;
-
+            tex[x][y] = t.id;
         }
     }
 
-   
-
-    public void clearTile(Point p) {
-        boolean bflat = isFlat(p);
-        boolean bseaLevel = isSeaLevel(p);
+    public void clearTile(int x, int y) {
+        boolean bflat = isFlat(x, y);
+        boolean bseaLevel = isSeaLevel(x, y);
         if (bseaLevel) {
-            tex[p.x][p.y] = Tile.SEA.id;
+            tex[x][y] = Tile.SEA.id;
 
             return;
         }
         if (bflat) {
-            if (! Tile.values()[tex[p.x][p.y]].isFertile) {
+            if (!Tile.values()[tex[x][y]].isFertile) {
                 synchronized (houseChanges) {
-                    houseChanges.add(p);
+                    houseChanges.add(x + y * width);
                 }
             }
-            tex[p.x][p.y] = Tile.EMPTY_FLAT.id;
+            tex[x][y] = Tile.EMPTY_FLAT.id;
         } else {
-            tex[p.x][p.y] = Tile.EMPTY_SLOPE.id;
+            tex[x][y] = Tile.EMPTY_SLOPE.id;
         }
     }
 
-    public Tile getTile(Point p) {
-        return Tile.values()[tex[p.x][p.y]];
+    public Tile getTile(int x, int y) {
+        return Tile.values()[tex[x][y]];
     }
 
     private void difTex() {
         for (int x = 0; x < width - 1; x++) {
             for (int y = 0; y < breadth - 1; y++) {
                 if (tex[x][y] != oldTex[x][y]) {
-                    textureChanges.put(new Point(x, y), tex[x][y]);
+                    textureChanges.put(x + y * width, tex[x][y]);
                     oldTex[x][y] = tex[x][y];
                 }
             }
@@ -186,39 +169,37 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
     }
 
     @Override
-    public boolean isFlat(Point p) {
-        return flat[p.x][p.y];
+    public boolean isFlat(int x, int y) {
+        return flat[x][y];
     }
 
-    private void reFlat(Point p, int r) {
-        for (int ex = p.x - r; ex < p.x + r; ex++) {
-            for (int wy = p.y - r; wy < p.y + r; wy++) {
+    private void reFlat(int x, int y, int r) {
+        for (int ex = x - r; ex < x + r; ex++) {
+            for (int wy = y - r; wy < y + r; wy++) {
                 if (ex >= 0 && wy >= 0 && ex + 1 < width && wy + 1 < breadth) {
-                    Point p2 = new Point(ex, wy);
-                    flat[ex][wy] = super.isFlat(p2);
+                    flat[ex][wy] = super.isFlat(ex, wy);
                 }
             }
         }
     }
 
-    private void retexture(Point p, int r) {
-        for (int ex = p.x - r; ex < p.x + r; ex++) {
-            for (int wy = p.y - r; wy < p.y + r; wy++) {
+    private void retexture(int x, int y, int r) {
+        for (int ex = x - r; ex < x + r; ex++) {
+            for (int wy = y - r; wy < y + r; wy++) {
                 if (ex >= 0 && wy >= 0 && ex + 1 < width && wy + 1 < breadth) {
-                    Point p2 = new Point(ex, wy);
-                    Tile oldTile = getTile(p2);
-                    if (isSeaLevel(p2)) {
+                    Tile oldTile = getTile(ex, wy);
+                    if (isSeaLevel(ex, wy)) {
                         if (!oldTile.canExistAtSeaLevel) {
-                            setTile(p2, Tile.SEA);
+                            setTile(ex, wy, Tile.SEA);
                         }
                     } else {
-                        if (isFlat(p2)) {
+                        if (isFlat(ex, wy)) {
                             if (oldTile == Tile.EMPTY_SLOPE || oldTile == Tile.SEA) {
-                                setTile(p2, Tile.EMPTY_FLAT);
+                                setTile(ex, wy, Tile.EMPTY_FLAT);
                             }
                         } else {
                             if (!oldTile.canExistOnSlope) {
-                                setTile(p2, Tile.EMPTY_SLOPE);
+                                setTile(ex, wy, Tile.EMPTY_SLOPE);
                             }
                         }
                     }
@@ -227,48 +208,43 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         }
     }
 
-    protected void setHeight(Point p, byte height) {
-        if (inBounds(p)) {
+    protected void setHeight(int x, int y, byte height) {
+        if (inBounds(x, y)) {
             //b.put(bufPos(p), height);
-            heights[bufPos(p)] = height;
+            heights[bufPos(x, y)] = height;
         }
 
     }
 
-    private void conform(Point p) {
-        byte height = getHeight(p);
+    private void conform(int x, int y) {
+        byte height = getHeight(x, y);
         boolean bChanged = false;
-        Point p1;
+        int px, py;
 
         int r;
-        for (r = 1; r <
-                64; r++) {
+        for (r = 1; r < 64; r++) {
             bChanged = false;
             for (Point offset : Helpers.rings[r]) {
-                p1 = new Point(p.x + offset.x, p.y + offset.y);
-                if (bounds.contains(p1)) {
-                    if (getHeight(p1) - height > r) {
+                px = x + offset.x;
+                py = y + offset.y;
+                if (bounds.contains(px, py)) {
+                    if (getHeight(px, py) - height > r) {
                         bChanged = true;
-                        setHeight(p1, (byte) (height + r));
-                    } else if (height - getHeight(p1) > r) {
+                        setHeight(px, py, (byte) (height + r));
+                    } else if (height - getHeight(px, py) > r) {
                         bChanged = true;
-                        setHeight(p1, (byte) (height - r));
+                        setHeight(px, py, (byte) (height - r));
                     }
 
                 }
             }
 
             if (!bChanged) {
-                markDirty(new Rectangle(p.x - r + 1, p.y - r + 1, r * 2 - 1, r * 2 - 1));
-                reFlat(p, r);
-                retexture(p, r);
+                markDirty(new Rectangle(x - r + 1, y - r + 1, r * 2 - 1, r * 2 - 1));
+                reFlat(x, y, r);
+                retexture(x, y, r);
                 return;
-
             }
-
-
-
-
         }
     }
 

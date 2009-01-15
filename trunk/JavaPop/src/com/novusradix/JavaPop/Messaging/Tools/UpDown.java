@@ -14,23 +14,24 @@ import java.awt.Point;
 public class UpDown extends Message {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	public Point p;
-    public boolean primaryAction;
-    
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    private int x,y;
+    private boolean primaryAction;
+
     public UpDown(Point p, boolean primary) {
-        this.p = p;
+        x=p.x;
+        y=p.y;
         primaryAction = primary;
     }
 
     @Override
     public void execute() {
         if (primaryAction) {
-            serverGame.heightMap.up(p);
+            serverGame.heightMap.up(x, y);
         } else {
-            serverGame.heightMap.down(p);
+            serverGame.heightMap.down(x, y);
         }
     }
 }

@@ -1,8 +1,6 @@
 package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
-import java.awt.Dimension;
-import java.awt.Point;
 
 /**
  *
@@ -10,9 +8,9 @@ import java.awt.Point;
  */
 interface HeightMapImpl {
 
-    void initialise(Dimension mapsize);
-    void setHeight(Point p, byte height);
-    byte getHeight(Point p);
+    void initialise(HeightMap h);
+    void setHeight(int x, int y, byte height);
+    byte getHeight(int x, int y);
     void applyUpdate(HeightMapUpdate u);
-    void setTile(Point p, byte t);
+    void setTile(int x, int y, byte t);
 }

@@ -2,7 +2,6 @@ package com.novusradix.JavaPop.Effects;
 
 import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Server.Game;
-import com.novusradix.JavaPop.Server.Houses.House;
 import com.novusradix.JavaPop.Server.Peons.Peon;
 import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
@@ -61,7 +60,7 @@ public class LightningEffect extends Effect {
     @Override
     public void execute(Game g) {
         for (Point hit : hits) {
-            g.heightMap.setTile(hit, Tile.BURNT);
+            g.heightMap.setTile(hit.x, hit.y, Tile.BURNT);
             for (Peon p : g.peons.getPeons(hit)) {
                 p.hurt(50);
             }            

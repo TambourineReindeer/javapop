@@ -2,7 +2,6 @@ package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
-import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +31,7 @@ public class Houses implements AbstractHouses, GLObject {
         leaderHouses = new HashMap<Player, House>();
     }
 
-    public void updateHouse(int id, Point pos, Player p, int level) {
+    public void updateHouse(int id, int x, int y, Player p, int level) {
         synchronized (houses) {
             if (level < 0) {
                 //remove
@@ -40,14 +39,14 @@ public class Houses implements AbstractHouses, GLObject {
                     houses.remove(id);
                 }
             } else {
-                houses.put(id, new House(pos, p, level));
+                houses.put(id, new House(x,y, p, level));
             }
         }
     }
 
-    public boolean canBuild(Point p) {
-        if (game.heightMap.tileInBounds(p)) {
-            return (map[p.x][p.y] == EMPTY && game.heightMap.getHeight(p) > 0 && game.heightMap.isFlat(p));
+    public boolean canBuild(int x, int y) {
+        if (game.heightMap.tileInBounds(x,y)) {
+            return (map[x][y] == EMPTY && game.heightMap.getHeight(x,y) > 0 && game.heightMap.isFlat(x,y));
 
         }
         return false;
@@ -61,7 +60,7 @@ public class Houses implements AbstractHouses, GLObject {
             for (House h : houses.values()) {
                 Vector3 p;
                 Matrix4 basis;
-                p = new Vector3(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos));
+                p = new Vector3(h.x + 0.5f, h.y + 0.5f, game.heightMap.getHeight(h.x, h.y));
 
                 basis = new Matrix4(Matrix4.identity);
 
@@ -84,7 +83,7 @@ public class Houses implements AbstractHouses, GLObject {
                 gl.glMatrixMode(GL.GL_MODELVIEW);
 
                 gl.glPushMatrix();
-                gl.glTranslatef(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos));
+                gl.glTranslatef(h.x + 0.5f, h.y + 0.5f, game.heightMap.getHeight(h.x, h.y));
                 if (h.level > 9) {
                     gl.glScalef(3.0f, 3.0f, 1.0f);
                 }
@@ -105,8 +104,8 @@ public class Houses implements AbstractHouses, GLObject {
             if (h != null) {
                 Vector3 pos = new Vector3();
                 Matrix4 basis = new Matrix4(Matrix4.identity);
-                pos.x = h.pos.x + 0.5f;
-                pos.y = h.pos.y + 0.5f;
+                pos.x = h.x + 0.5f;
+                pos.y = h.y + 0.5f;
                 pos.z = game.heightMap.getHeight(pos.x, pos.y) + 1.0f;
 
                 ankhModel.display(pos, basis, gl, time);
@@ -117,13 +116,13 @@ public class Houses implements AbstractHouses, GLObject {
 
     public class House {
 
-        private Point pos;
+        private final int x,y;
         private int level;
         private Player player;
 
-        public House(Point p, Player player, int level) {
-            map[p.x][p.y] = HOUSE;
-            pos = (Point) p.clone();
+        public House(int px, int py, Player player, int level) {
+            x=px;y=py;
+            map[x][y] = HOUSE;
             this.level = level;
             this.player = player;
         }

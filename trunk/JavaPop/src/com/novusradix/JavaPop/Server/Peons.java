@@ -191,13 +191,13 @@ public class Peons {
                 player.info.mana -= this.strength;
                 return changeState(State.DEAD);
             }
-            if (game.heightMap.getTile(oldPos) == Tile.SEA) {
+            if (game.heightMap.getTile(oldPos.x, oldPos.y) == Tile.SEA) {
                 return changeState(State.DROWNING);
             }
-            if (game.heightMap.getTile(oldPos) == Tile.LAVA) {
+            if (game.heightMap.getTile(oldPos.x, oldPos.y) == Tile.LAVA) {
                 return changeState(State.DEAD);
             }
-            if (game.heightMap.getTile(oldPos) == Tile.SWAMP) {
+            if (game.heightMap.getTile(oldPos.x, oldPos.y) == Tile.SWAMP) {
                 return changeState(State.DEAD);
             }
             if (state != state.MERGING) {
@@ -216,7 +216,7 @@ public class Peons {
                     newx = pos.x + seconds * dx;
                     newy = pos.y + seconds * dy;
                     Point newPos = new Point((int) floor(newx), (int) floor(newy));
-                    if (game.heightMap.getTile(newPos).isObstruction) {
+                    if (game.heightMap.getTile(newPos.x, newPos.y).isObstruction) {
                         setDest(oldPos);
                         wanderCount = 3;
                         return changeState(State.WANDER);
@@ -226,7 +226,7 @@ public class Peons {
                     if (!oldPos.equals(newPos)) {
                         map.remove(oldPos, this);
                         map.put(newPos, this);
-                        House h = game.houses.getHouse(newPos);
+                        House h = game.houses.getHouse(newPos.x, newPos.y);
                         if (h != null) {
                             return changeState(h.addPeon(this, leaders.containsValue(this)));
                         }
@@ -238,8 +238,8 @@ public class Peons {
                 case ALIVE:
                     switch (player.peonMode) {
                         case SETTLE:
-                            if (game.houses.canBuild(oldPos)) {
-                                game.houses.addHouse(oldPos, player, strength, leaders.containsValue(this));
+                            if (game.houses.canBuild(oldPos.x, oldPos.y)) {
+                                game.houses.addHouse(oldPos.x, oldPos.y, player, strength, leaders.containsValue(this));
                                 return changeState(State.SETTLED);
                             }
                             setDest(findFlatLand(oldPos));
@@ -263,8 +263,8 @@ public class Peons {
                             setDest(findEnemy());
                             break;
                         case GROUP:
-                            if (game.houses.canBuild(oldPos)) {
-                                game.houses.addHouse(oldPos, player, strength, leaders.containsValue(this));
+                            if (game.houses.canBuild(oldPos.x, oldPos.y)) {
+                                game.houses.addHouse(oldPos.x, oldPos.y, player, strength, leaders.containsValue(this));
                                 return changeState(State.SETTLED);
                             }
                             setDest(findFriend());
@@ -283,7 +283,7 @@ public class Peons {
 
 
                 case DROWNING:
-                    if (!(game.heightMap.getTile(oldPos) == Tile.SEA)) {
+                    if (!(game.heightMap.getTile(oldPos.x, oldPos.y) == Tile.SEA)) {
                         return changeState(State.ALIVE);
                     }
                     strength -= 100.0f * seconds;
@@ -321,15 +321,12 @@ public class Peons {
 
                 case WANDER:
                     if (destx == -1) {
-                        for (Point p : Helpers.shuffledRings.get(1)) {
-                            Point p2 = new Point(oldPos.x + p.x, oldPos.y + p.y);
-                            if (game.heightMap.tileInBounds(p2) && !game.heightMap.getTile(p2).isObstruction) {
-                                setDest(p2);
-                                dx = destx + 0.5f - pos.x;
-                                dy = desty + 0.5f - pos.y;
-                                dist = (float) sqrt(dx * dx + dy * dy);
-                                dx = dx / dist;
-                                dy = dy / dist;
+                        int px, py;
+                        for (Point p2 : Helpers.shuffledRings.get(1)) {
+                            px = oldPos.x + p2.x;
+                            py = oldPos.y + p2.y;
+                            if (game.heightMap.tileInBounds(px, py) && !game.heightMap.getTile(px, py).isObstruction) {
+                                setDest(px, py);
                                 return changeState(State.WANDER);
                             }
                         }
@@ -363,18 +360,21 @@ public class Peons {
 
         private Point findFlatLand(Point start) {
             // TODO Auto-generated method stub
-            Point p = new Point();
+            int px, py;
+
             for (Collection<Point> ring : Helpers.shuffledRings.subList(0, 15)) {
                 for (Point offset : ring) {
-                    p.x = start.x + offset.x;
-                    p.y = start.y + offset.y;
-                    if (game.heightMap.tileInBounds(p)) {
-                        if (game.houses.canBuild(p)) {
-                            double d = start.distance(p);
+                    px = start.x + offset.x;
+                    py = start.y + offset.y;
+                    if (game.heightMap.tileInBounds(px, py)) {
+                        if (game.houses.canBuild(px, py)) {
+                            double d = (px - p.x) * (px - p.x) + (py - p.y) * (py - p.y);
+                            d = sqrt(d);
                             if (d > 5) {
-                                p = new Point(start.x + (int) (offset.x * 5.0 / d), start.y + (int) (offset.y * 5.0 / d));
+                                px = start.x + (int) (offset.x * 5.0 / d);
+                                py = start.y + (int) (offset.y * 5.0 / d);
                             }
-                            return p;
+                            return new Point(px, py);
                         }
                     }
                 }
@@ -385,17 +385,21 @@ public class Peons {
 
         private void setDest(Point p) {
             if (p != null) {
-                destx = p.x;
-                desty = p.y;
-                dx = destx + 0.5f - pos.x;
-                dy = desty + 0.5f - pos.y;
-                float dist = (float) sqrt(dx * dx + dy * dy);
-                dx = dx / dist;
-                dy = dy / dist;
+                setDest(p.x, p.y);
             } else {
                 dx = dy = 0;
                 destx = desty = -1;
             }
+        }
+
+        private void setDest(int x, int y) {
+            destx = x;
+            desty = y;
+            dx = destx + 0.5f - pos.x;
+            dy = desty + 0.5f - pos.y;
+            float dist = (float) sqrt(dx * dx + dy * dy);
+            dx = dx / dist;
+            dy = dy / dist;
         }
 
         private boolean reachedDest() {

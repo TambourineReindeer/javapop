@@ -2,7 +2,6 @@ package com.novusradix.JavaPop.Client.AI;
 
 import com.novusradix.JavaPop.Client.*;
 import com.novusradix.JavaPop.Math.MultiMap;
-import java.awt.Point;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +31,7 @@ public class Houses implements AbstractHouses {
         }
     }
 
-    public void updateHouse(int id, Point pos, Player p, int level) {
+    public void updateHouse(int id, int x, int y, Player p, int level) {
         synchronized (houses) {
             if (level < 0) {
                 //remove
@@ -51,7 +50,7 @@ public class Houses implements AbstractHouses {
                         playerHouses.put(p, h);
                     }
                 } else {
-                    House h = new House(pos, p, level);
+                    House h = new House(x,y, p, level);
                     houses.put(id, h);
                     playerHouses.put(p, h);
                 }
@@ -59,22 +58,23 @@ public class Houses implements AbstractHouses {
         }
     }
 
-    public boolean canBuild(Point p) {
-        if (game.heightMap.tileInBounds(p)) {
-            return (map[p.x][p.y] == EMPTY && game.heightMap.getHeight(p) > 0 && game.heightMap.isFlat(p));
+    public boolean canBuild(int x, int y) {
+        if (game.heightMap.tileInBounds(x,y)) {
+            return (map[x][y] == EMPTY && game.heightMap.getHeight(x,y) > 0 && game.heightMap.isFlat(x,y));
         }
         return false;
     }
 
     public class House {
 
-        public Point pos;
+        public final int x;
+        public final int y;
         public int level;
         public Player player;
 
-        public House(Point p, Player player, int level) {
-            map[p.x][p.y] = HOUSE;
-            pos = (Point) p.clone();
+        public House(int px, int py, Player player, int level) {
+            x=px;y=py;
+            map[x][y] = HOUSE;
             this.level = level;
             this.player = player;
         }

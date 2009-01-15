@@ -39,7 +39,7 @@ public class Player implements GLObject {
     public void display(GL gl, float time) {
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPushMatrix();
-        gl.glTranslatef(ankh.x + 0.5f, ankh.y + 0.5f, (float) (game.heightMap.getHeight(ankh) + abs(sin(time * 3.0))));
+        gl.glTranslatef(ankh.x + 0.5f, ankh.y + 0.5f, (float) (game.heightMap.getHeight(ankh.x, ankh.y) + abs(sin(time * 3.0))));
         gl.glRotated(time * 720.0, 0, 0, 1);
         gl.glDisable(GL.GL_LIGHTING);
         gl.glDisable(GL.GL_TEXTURE_2D);
