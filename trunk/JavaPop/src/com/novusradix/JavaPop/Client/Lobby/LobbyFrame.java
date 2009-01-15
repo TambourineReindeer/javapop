@@ -11,7 +11,7 @@ import java.awt.event.WindowListener;
 
 /**
  *
- * @author  mom
+ * @author gef
  */
 public class LobbyFrame extends javax.swing.JFrame implements WindowListener {
 

@@ -36,7 +36,6 @@ public abstract class HeightMap {
 
     public boolean tileInBounds(int x, int y) {
         return (x >= 0 && y >= 0 && x < width - 1 && y < breadth - 1);
-
     }
 
     public abstract byte getHeight(int x, int y);
@@ -83,27 +82,8 @@ public abstract class HeightMap {
     }
 
     public Vector2 getSlope(float x, float y) {
-         
-         
-         
-         
-         
-         
-         
-         
-         
-          int x1
-           
-           
-           
-            
-            
-          , x2
-          , y1
-          , y2;
-           
-                    
-              float ha, hb, hc, hd, hm;
+        int x1, x2, y1, y2;
+        float ha, hb, hc, hd, hm;
         x1 = (int) Math.floor(x);
         x2 = (int) Math.ceil(x);
         y1 = (int) Math.floor(y);

@@ -1,14 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Math;
 
 import java.io.Serializable;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class Vector4 implements Serializable {
 

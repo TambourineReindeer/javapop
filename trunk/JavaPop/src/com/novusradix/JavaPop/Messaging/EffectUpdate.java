@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Messaging;
 
 import com.novusradix.JavaPop.Effects.Effect;
@@ -16,7 +12,7 @@ import java.util.Map;
 
 /**
  *
- * @author erinhowie
+ * @author gef
  */
 public class EffectUpdate extends Message implements Externalizable {
 

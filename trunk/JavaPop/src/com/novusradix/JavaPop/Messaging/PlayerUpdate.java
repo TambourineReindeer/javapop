@@ -1,11 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Messaging;
 
 import com.novusradix.JavaPop.Server.Player.Info;
-import java.awt.Point;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -15,7 +10,7 @@ import java.util.Collection;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class PlayerUpdate extends Message implements Externalizable {
  private static final long serialVersionUID = 1L;

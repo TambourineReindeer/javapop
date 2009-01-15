@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Math;
 
 import java.util.ArrayList;
@@ -14,7 +10,7 @@ import java.util.Set;
 
 /**
  *
- * @author erinhowie
+ * @author gef
  */
 public class MultiMap<K, V> {
 

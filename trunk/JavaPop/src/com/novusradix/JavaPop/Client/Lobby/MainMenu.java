@@ -13,7 +13,7 @@ import java.awt.DisplayMode;
 
 /**
  *
- * @author  erinhowie
+ * @author gef
  */
 public class MainMenu extends javax.swing.JFrame {
 

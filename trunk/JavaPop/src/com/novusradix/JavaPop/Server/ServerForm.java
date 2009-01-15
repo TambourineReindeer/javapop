@@ -8,7 +8,7 @@ package com.novusradix.JavaPop.Server;
 
 /**
  *
- * @author  mom
+ * @author gef
  */
 public class ServerForm extends javax.swing.JFrame {
 

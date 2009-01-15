@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Server.Player.Info;
@@ -12,7 +8,7 @@ import static java.lang.Math.*;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class Player implements GLObject {
 

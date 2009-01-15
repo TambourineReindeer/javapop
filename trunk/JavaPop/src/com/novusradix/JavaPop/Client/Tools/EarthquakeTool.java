@@ -6,7 +6,7 @@ import java.awt.Point;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class EarthquakeTool extends BaseTool {
     

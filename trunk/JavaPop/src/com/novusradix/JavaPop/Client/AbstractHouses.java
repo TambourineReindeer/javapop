@@ -1,6 +1,5 @@
 package com.novusradix.JavaPop.Client;
 
-import java.awt.Point;
 import java.util.Map;
 
 /**

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Messaging;
 
 import java.awt.Rectangle;
@@ -15,13 +11,11 @@ import java.util.Map.Entry;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class HeightMapUpdate extends Message implements Externalizable {
 
-    /**
-     * 
-     */
+
     private static final long serialVersionUID = 1L;
     public Rectangle dirtyRegion;
     public byte[] heightData;

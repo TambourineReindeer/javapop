@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Server.Player.PeonMode;
@@ -11,7 +7,7 @@ import java.util.Collection;
 
 /**
  *
- * @author erinhowie
+ * @author gef
  */
 public class GLBehaviourButton extends GLButton {
 

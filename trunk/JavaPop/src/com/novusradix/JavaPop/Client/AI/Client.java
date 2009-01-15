@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Client.AI;
 
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
@@ -16,7 +12,7 @@ import java.util.logging.*;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class Client extends com.novusradix.JavaPop.Client.Client {
 

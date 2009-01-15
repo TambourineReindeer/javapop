@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Client.Lobby;
 
 import java.util.Vector;
@@ -11,11 +7,10 @@ import javax.swing.ListModel;
 
 import com.novusradix.JavaPop.Client.Client;
 import com.novusradix.JavaPop.Server.GameInfo;
-import java.util.Collection;
 
 /**
  *
- * @author erinhowie
+ * @author gef
  */
 public class Lobby {
 

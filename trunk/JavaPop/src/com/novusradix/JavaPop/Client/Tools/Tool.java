@@ -1,14 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Client.Tools;
 
 import java.awt.Point;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public interface Tool {
    

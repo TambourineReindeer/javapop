@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Server;
 
 import java.awt.Dimension;
@@ -11,7 +7,7 @@ import java.util.Map;
 
 /**
  *
- * @author erinhowie
+ * @author gef
  */
 public class GameInfo implements Serializable {
 
