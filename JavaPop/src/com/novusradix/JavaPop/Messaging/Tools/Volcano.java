@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Messaging.Tools;
 
 import com.novusradix.JavaPop.Effects.VolcanoEffect;
@@ -10,7 +6,7 @@ import java.awt.Point;
 
 /**
  *
- * @author erinhowie
+ * @author gef
  */
 public class Volcano extends Message {
 

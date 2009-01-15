@@ -5,9 +5,7 @@
 package com.novusradix.JavaPop.Client;
 
 import java.awt.Dimension;
-
 import javax.media.opengl.GL;
-
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 
 public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObject {

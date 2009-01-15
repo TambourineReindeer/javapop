@@ -6,7 +6,6 @@ package com.novusradix.JavaPop.Server;
 
 import com.novusradix.JavaPop.Messaging.Lobby.GameList;
 import com.novusradix.JavaPop.Messaging.Message;
-import com.novusradix.JavaPop.Messaging.PlayerUpdate;
 import java.awt.Point;
 import java.io.Externalizable;
 import java.io.IOException;
@@ -14,7 +13,6 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Messaging.Tools;
 
 import com.novusradix.JavaPop.Messaging.*;
@@ -14,7 +10,7 @@ import java.util.Random;
 
 /**
  *
- * @author erinhowie
+ * @author gef
  */
 public class Earthquake extends Message {
 

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Messaging;
 
 import com.novusradix.JavaPop.Server.Houses.House;
@@ -19,7 +15,7 @@ import java.util.Map.Entry;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class HouseUpdate extends Message implements Externalizable {
 

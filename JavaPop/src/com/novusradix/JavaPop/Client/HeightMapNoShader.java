@@ -6,7 +6,6 @@ import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.novusradix.JavaPop.Tile;
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.TextureIO;
-import java.awt.Dimension;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.FloatBuffer;

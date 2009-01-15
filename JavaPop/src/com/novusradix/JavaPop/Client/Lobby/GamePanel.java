@@ -10,7 +10,7 @@ import javax.swing.DefaultListModel;
 
 /**
  *
- * @author  mom
+ * @author gef
  */
 public class GamePanel extends javax.swing.JPanel implements GameListener {
 

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Client.AI;
 
 import com.novusradix.JavaPop.Client.Peons;
@@ -12,7 +8,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class Game extends com.novusradix.JavaPop.Client.Game {
 

@@ -1,7 +1,6 @@
 package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Math.Matrix4;
-import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Messaging.PeonUpdate.Detail;
 import com.novusradix.JavaPop.Server.Peons.State;

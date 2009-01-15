@@ -8,7 +8,6 @@ import java.awt.Dimension;
 
 
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
-import java.awt.Point;
 import java.util.Map.Entry;
 
 public class HeightMap extends com.novusradix.JavaPop.HeightMap {

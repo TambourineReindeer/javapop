@@ -4,7 +4,6 @@ import com.novusradix.JavaPop.Client.GLHelper.GLHelperException;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.TextureIO;
-import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.IOException;
 import java.net.URL;

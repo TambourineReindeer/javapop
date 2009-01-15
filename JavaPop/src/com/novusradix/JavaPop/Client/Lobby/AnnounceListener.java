@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Client.Lobby;
 
 import java.io.IOException;
@@ -13,7 +9,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class AnnounceListener implements Runnable {
 

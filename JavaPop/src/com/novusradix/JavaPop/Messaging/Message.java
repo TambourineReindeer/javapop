@@ -1,15 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Messaging;
 
-import java.io.Externalizable;
 import java.io.Serializable;
 
 /**
  *
- * @author erinhowie
+ * @author gef
  */
 public abstract class Message implements Serializable {
 

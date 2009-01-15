@@ -1,14 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Messaging;
 
-import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Server.Peons;
 import com.novusradix.JavaPop.Server.Peons.Peon;
 import com.novusradix.JavaPop.Server.Player;
-import java.awt.Point;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -21,7 +15,7 @@ import java.util.Map.Entry;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class PeonUpdate extends Message implements Externalizable {
 

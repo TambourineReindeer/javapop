@@ -11,7 +11,7 @@ import com.novusradix.JavaPop.Server.GameInfo;
 
 /**
  *
- * @author  mom
+ * @author gef
  */
 public class GamesPanel extends javax.swing.JPanel {
 

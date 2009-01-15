@@ -5,7 +5,7 @@ import com.novusradix.JavaPop.Messaging.Message;
 
 /**
  *
- * @author erinhowie
+ * @author gef
  */
 public class StopLightning extends Message {
 

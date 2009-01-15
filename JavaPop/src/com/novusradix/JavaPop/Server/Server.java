@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Server;
 
 import com.novusradix.JavaPop.Messaging.Lobby.GameList;
@@ -17,7 +13,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author mom
+ * @author gef
  */
 public class Server implements Runnable {
 
