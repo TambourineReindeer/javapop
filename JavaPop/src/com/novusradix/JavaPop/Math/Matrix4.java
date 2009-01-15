@@ -13,16 +13,18 @@ import java.io.Serializable;
 public class Matrix4 implements Serializable {
 
     public static final Matrix4 identity;
-    static{
+    
+
+    static {
         identity = new Matrix4();
-        identity.m[0]=1;
-        identity.m[5]=1;
-        identity.m[10]=1;
-        identity.m[15]=1;
-        
+        identity.m[0] = 1;
+        identity.m[5] = 1;
+        identity.m[10] = 1;
+        identity.m[15] = 1;
+
     }
     private float[] m;
-    
+
     public Matrix4() {
         m = new float[16];
     }
@@ -43,7 +45,28 @@ public class Matrix4 implements Serializable {
         m[9] = up.y;
         m[10] = up.z;
         m[15] = 1;
-        
+
+    }
+
+    public void setBasis(Vector3 front, Vector3 left, Vector3 up) {
+
+        m[0] = front.x;
+        m[1] = front.y;
+        m[2] = front.z;
+        m[3] = 0;
+        m[4] = left.x;
+        m[5] = left.y;
+        m[6] = left.z;
+        m[7] = 0;
+        m[8] = up.x;
+        m[9] = up.y;
+        m[10] = up.z;
+        m[11] = 0;
+        m[12] = 0;
+        m[13] = 0;
+        m[14] = 0;
+        m[15] = 1;
+
     }
 
     public float determinant() {
@@ -162,14 +185,14 @@ public class Matrix4 implements Serializable {
         m[13] = a.m[12] * b.m[1] + a.m[13] * b.m[5] + a.m[14] * b.m[9] + a.m[15] * b.m[13];
         m[14] = a.m[12] * b.m[2] + a.m[13] * b.m[6] + a.m[14] * b.m[10] + a.m[15] * b.m[14];
         m[15] = a.m[12] * b.m[3] + a.m[13] * b.m[7] + a.m[14] * b.m[11] + a.m[15] * b.m[15];
-        
+
         this.m = m;
     }
 
     public void scale(float x, float y, float z) {
-        m[0]*=x;
-        m[5]*=y;
-        m[10]*=z;
+        m[0] *= x;
+        m[5] *= y;
+        m[10] *= z;
     }
 
     public void set(float[] buf) {
@@ -178,15 +201,15 @@ public class Matrix4 implements Serializable {
 
     public void transform(Vector3 v) {
 
-        float x, y, z, w;
+        float x,   y,   z,   w;
         x = m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3];
         y = m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7];
         z = m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11];
         w = m[12] * v.x + m[13] * v.y + m[14] * v.z + m[15];
-        
-        v.x = x/w;
-        v.y = y/w;
-        v.z = z/w;
+
+        v.x = x / w;
+        v.y = y / w;
+        v.z = z / w;
     }
 
     public void transpose() {

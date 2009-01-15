@@ -44,14 +44,7 @@ public class PlayerUpdate extends Message implements Externalizable {
     public void writeExternal(ObjectOutput o) throws IOException {
         o.writeInt(info.size());
         for (Info i : info) {
-            o.writeInt(i.id);
-            o.writeUTF(i.name);
-            o.writeInt(i.ankh.x);
-            o.writeInt(i.ankh.y);
-            o.writeFloat(i.colour[0]);
-            o.writeFloat(i.colour[1]);
-            o.writeFloat(i.colour[2]);
-            o.writeDouble(i.mana);
+            o.writeObject(i);
         }
     }
 
@@ -59,17 +52,8 @@ public class PlayerUpdate extends Message implements Externalizable {
         info = new ArrayList<Info>();
         int n = i.readInt();
         for (; n > 0; n--) {
-            Info inf = new Info();
-            inf.id = i.readInt();
-            inf.name = i.readUTF();
-            inf.ankh = new Point();
-            inf.ankh.x = i.readInt();
-            inf.ankh.y = i.readInt();
-            inf.colour = new float[3];
-            inf.colour[0] = i.readFloat();
-            inf.colour[1] = i.readFloat();
-            inf.colour[2] = i.readFloat();
-            inf.mana = i.readDouble();
+            Info inf = (Info) i.readObject();
+            
             info.add(inf);
         }
     }

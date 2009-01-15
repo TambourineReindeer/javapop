@@ -42,6 +42,9 @@ public class Player implements GLObject {
         gl.glTranslatef(ankh.x + 0.5f, ankh.y + 0.5f, (float) (game.heightMap.getHeight(ankh) + abs(sin(time * 3.0))));
         gl.glRotated(time * 720.0, 0, 0, 1);
         gl.glDisable(GL.GL_LIGHTING);
+        gl.glDisable(GL.GL_TEXTURE_2D);
+        gl.glUseProgram(0);
+                
         gl.glBegin(GL.GL_TRIANGLES);
 
         gl.glColor3fv(colour, 0);

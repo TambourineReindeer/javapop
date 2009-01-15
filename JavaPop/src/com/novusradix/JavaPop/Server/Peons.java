@@ -8,9 +8,10 @@ import com.novusradix.JavaPop.Server.Houses.House;
 import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Random;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -26,27 +27,31 @@ public class Peons {
     };
     private Vector<Peon> peons;
     private MultiMap<Point, Peon> map;
-    private int nextId = 0;
+    private int nextId = 1;
+    private Map<Player, Peon> leaders;
 
     public Peons(Game g) {
         game = g;
         peons = new Vector<Peon>();
         map = new MultiMap<Point, Peon>();
+        leaders = new HashMap<Player, Peon>();
     }
 
     public Collection<Peon> getPeons(Point p) {
         return map.get(p);
     }
 
-    public void addPeon(float x, float y, float strength, Player player) {
+    public void addPeon(float x, float y, float strength, Player player, boolean leader) {
         Peon p = new Peon(x, y, strength, player);
         peons.add(p);
         map.put(p.getPoint(), p);
-
+        if (leader) {
+            leaders.put(player, p);
+        }
     }
 
-    public void addPeon(Point p, float strength, Player player) {
-        addPeon(p.x + 0.5f, p.y + 0.5f, strength, player);
+    public void addPeon(Point p, float strength, Player player, boolean leader) {
+        addPeon(p.x + 0.5f, p.y + 0.5f, strength, player, leader);
     }
 
     public void step(float seconds) {
@@ -66,6 +71,10 @@ public class Peons {
                 }
                 switch (p.state) {
                     case DEAD:
+                        if (leaders.containsValue(p)) {
+                            p.player.info.ankh = p.getPoint();
+                            leaders.remove(p.player);
+                        }
                     case SETTLED:
                         i.remove();
                         map.remove(p.getPoint(), p);
@@ -73,7 +82,7 @@ public class Peons {
                 }
             }
             if (pds.size() > 0) {
-                game.sendAllPlayers(new PeonUpdate(pds));
+                game.sendAllPlayers(new PeonUpdate(pds, leaders));
                 pds.clear();
             }
         }
@@ -84,15 +93,22 @@ public class Peons {
         public int id;
         public Vector2 pos;
         float strength;
-        private Point dest; // destination to walk to.
+        private int destx,  desty; // destination to walk to.
         private State state;
         private float dx,  dy;
         Player player;
         private float walkingTime;
         private int wanderCount;
+        private Point p;
 
         public Point getPoint() {
-            return new Point((int) floor(pos.x), (int) floor(pos.y));
+            int fx, fy;
+            fx = (int) floor(pos.x);
+            fy = (int) floor(pos.y);
+            if (p == null || fx != p.x || fy != p.y) {
+                p = new Point(fx, fy);
+            }
+            return p;
         }
 
         public Peon(float x, float y, float strength, Player p) {
@@ -162,7 +178,7 @@ public class Peons {
 
         private PeonUpdate.Detail changeState(State s) {
             state = s;
-            return new PeonUpdate.Detail(id, state, pos, dest, dx, dy, player.getId());
+            return new PeonUpdate.Detail(id, state, pos.x, pos.y, destx, desty, dx, dy, player.getId());
         }
 
         private PeonUpdate.Detail step(float seconds) {
@@ -212,8 +228,7 @@ public class Peons {
                         map.put(newPos, this);
                         House h = game.houses.getHouse(newPos);
                         if (h != null) {
-                            h.addPeon(this);
-                            return changeState(State.DEAD);
+                            return changeState(h.addPeon(this, leaders.containsValue(this)));
                         }
                     }
 
@@ -224,20 +239,32 @@ public class Peons {
                     switch (player.peonMode) {
                         case SETTLE:
                             if (game.houses.canBuild(oldPos)) {
-                                game.houses.addHouse(oldPos, player, strength);
+                                game.houses.addHouse(oldPos, player, strength, leaders.containsValue(this));
                                 return changeState(State.SETTLED);
                             }
                             setDest(findFlatLand(oldPos));
                             break;
                         case ANKH:
-                            setDest(player.info.ankh);
+                            if (leaders.containsKey(player)) {
+                                Peon l = leaders.get(player);
+                                if (this == l) {
+                                    setDest(player.info.ankh);
+                                } else {
+                                    setDest(l.getPoint());
+                                }
+                            } else {
+                                setDest(player.info.ankh);
+                                if (reachedDest()) {
+                                    leaders.put(player, this);
+                                }
+                            }
                             break;
                         case FIGHT:
                             setDest(findEnemy());
                             break;
                         case GROUP:
                             if (game.houses.canBuild(oldPos)) {
-                                game.houses.addHouse(oldPos, player, strength);
+                                game.houses.addHouse(oldPos, player, strength, leaders.containsValue(this));
                                 return changeState(State.SETTLED);
                             }
                             setDest(findFriend());
@@ -245,7 +272,7 @@ public class Peons {
                         default:
                     }
 
-                    if (dest == null) {
+                    if (destx == -1) {//no destination set
                         wanderCount = 3;
                         setDest(oldPos);
                         return changeState(State.WANDER);
@@ -269,10 +296,16 @@ public class Peons {
 
                     }
                     Peon other = map.get(oldPos).get(0);
+                    if (this == other) {
+                        other = map.get(oldPos).get(1);
+                    }
                     if (other.player == this.player) {
                         //merge
                         other.strength += strength;
                         map.remove(oldPos, this);
+                        if (leaders.containsValue(this)) {
+                            leaders.put(player, other);
+                        }
                         return changeState(State.DEAD);
 
                     } else {
@@ -287,13 +320,13 @@ public class Peons {
                     }
 
                 case WANDER:
-                    if (dest == null) {
+                    if (destx == -1) {
                         for (Point p : Helpers.shuffledRings.get(1)) {
                             Point p2 = new Point(oldPos.x + p.x, oldPos.y + p.y);
                             if (game.heightMap.tileInBounds(p2) && !game.heightMap.getTile(p2).isObstruction) {
                                 setDest(p2);
-                                dx = dest.x + 0.5f - pos.x;
-                                dy = dest.y + 0.5f - pos.y;
+                                dx = destx + 0.5f - pos.x;
+                                dy = desty + 0.5f - pos.y;
                                 dist = (float) sqrt(dx * dx + dy * dy);
                                 dx = dx / dist;
                                 dy = dy / dist;
@@ -307,7 +340,7 @@ public class Peons {
                     } else {
                         pos.x += seconds * dx;
                         pos.y += seconds * dy;
-                        newPos = getPoint();
+                        newPos = new Point((int) floor(pos.x), (int) floor(pos.y));
 
                         if (!oldPos.equals(newPos)) {
                             map.remove(oldPos, this);
@@ -330,10 +363,11 @@ public class Peons {
 
         private Point findFlatLand(Point start) {
             // TODO Auto-generated method stub
-            Point p;
+            Point p = new Point();
             for (Collection<Point> ring : Helpers.shuffledRings.subList(0, 15)) {
                 for (Point offset : ring) {
-                    p = new Point(start.x + offset.x, start.y + offset.y);
+                    p.x = start.x + offset.x;
+                    p.y = start.y + offset.y;
                     if (game.heightMap.tileInBounds(p)) {
                         if (game.houses.canBuild(p)) {
                             double d = start.distance(p);
@@ -350,24 +384,25 @@ public class Peons {
         }
 
         private void setDest(Point p) {
-            dest = p;
-            if (dest != null) {
-                dx = dest.x + 0.5f - pos.x;
-                dy = dest.y + 0.5f - pos.y;
+            if (p != null) {
+                destx = p.x;
+                desty = p.y;
+                dx = destx + 0.5f - pos.x;
+                dy = desty + 0.5f - pos.y;
                 float dist = (float) sqrt(dx * dx + dy * dy);
                 dx = dx / dist;
                 dy = dy / dist;
             } else {
                 dx = dy = 0;
+                destx = desty = -1;
             }
         }
 
         private boolean reachedDest() {
-            float ex = pos.x - (dest.x + 0.5f);
-            float ey = pos.y - (dest.y + 0.5f);
-            return
-             ((abs(ex) < 0.1 && abs(ey)<0.1));
-        
+            float ex = pos.x - (destx + 0.5f);
+            float ey = pos.y - (desty + 0.5f);
+            return ((abs(ex) < 0.1 && abs(ey) < 0.1));
+
         }
     }
 }

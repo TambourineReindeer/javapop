@@ -8,6 +8,7 @@ import com.novusradix.JavaPop.Server.Peons.State;
 import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import javax.media.opengl.GL;
 
 import static java.lang.Math.*;
@@ -16,13 +17,17 @@ public class Peons implements GLObject {
 
     public Game game;
     private Map<Integer, Peon> peons;
-    private XModel peonModel;
-    private boolean firstPeon=true;
+    private XModel peonModel,  ankhModel;
+    private boolean firstPeon = true;
+    Map<Player, Peon> leaders;
+
     public Peons(Game g) {
         game = g;
         peons = new HashMap<Integer, Peon>();
+        leaders = new HashMap<Player, Peon>();
         if (g.getClass() == com.novusradix.JavaPop.Client.Game.class) {
             peonModel = new XModel("/com/novusradix/JavaPop/models/peon5.x", "/com/novusradix/JavaPop/textures/peon.png");
+            ankhModel = new XModel("/com/novusradix/JavaPop/models/ankh.x", "/com/novusradix/JavaPop/textures/marble.png");
         }
     }
 
@@ -37,27 +42,48 @@ public class Peons implements GLObject {
             } else {
                 if (!(d.state == State.DEAD || d.state == State.SETTLED)) {
                     peons.put(d.id, new Peon(d));
-                    if(firstPeon && game.players.get(d.playerId) == game.me)
-                    {
+                    if (firstPeon && game.players.get(d.playerId) == game.me) {
                         firstPeon = false;
-                        game.lookAt(new Point((int)d.pos.x, (int)d.pos.y));
+                        game.lookAt(new Point((int) d.posx, (int) d.posy));
                     }
                 }
             }
         }
-    } 
-    
+    }
+
     public void display(GL gl, float time) {
         synchronized (peons) {
             for (Peon p : peons.values()) {
                 p.display(gl, time);
-                
+            }
+        }
+        synchronized (leaders) {
+            for (Peon p : leaders.values()) {
+                if (p != null) {
+                    Vector3 pos = new Vector3();
+                    Matrix4 basis = new Matrix4(Matrix4.identity);
+                    pos.x = p.posx + 0.5f;
+                    pos.y = p.posy + 0.5f;
+                    pos.z = game.heightMap.getHeight(pos.x, pos.y) + 1.0f;
+
+                    ankhModel.display(pos, basis, gl, time);
+                }
             }
         }
     }
 
     public void init(GL gl) {
         peonModel.init(gl);
+        ankhModel.init(gl);
+    }
+
+    public void setLeaders(Map<Integer, Integer> leadermap) {
+        synchronized (leaders) {
+            leaders.clear();
+            for (Entry<Integer, Integer> e : leadermap.entrySet()) {
+                leaders.put(game.players.get(e.getKey()), peons.get(e.getValue()));
+            }
+        }
     }
 
     void step(float seconds) {
@@ -69,26 +95,32 @@ public class Peons implements GLObject {
     }
 
     private class Peon {
-        private Vector2 pos;
-        private Point dest;
+
+        private float posx,posy;
+        private int destx, desty;
         private float dx,  dy;
         private State state;
         private Player player;
         private Matrix4 basis;
 
         public Peon(Detail d) {
-            pos = d.pos;
-            dest = d.dest;
+            posx=d.posx;
+            posy= d.posy;
+            destx = d.destx;
+            desty=d.desty;
             dx = d.dx;
             dy = d.dy;
             state = d.state;
             player = game.players.get(d.playerId);
+            basis = new Matrix4();
             calcBasis();
         }
 
         public void Update(Detail d) {
-            pos = d.pos;
-            dest = d.dest;
+            posx=d.posx;
+            posy= d.posy;
+            destx = d.destx;
+            desty=d.desty;
             dx = d.dx;
             dy = d.dy;
             state = d.state;
@@ -97,16 +129,16 @@ public class Peons implements GLObject {
 
         private void display(GL gl, float time) {
             time += hashCode() % 10000;
-            Vector3 p = new Vector3(pos.x, pos.y, game.heightMap.getHeight(pos.x, pos.y));
+            Vector3 p = new Vector3(posx, posy, game.heightMap.getHeight(posx, posy));
             switch (state) {
                 case DROWNING:
-                    p.z+= (float) abs((float) sin(time * 4.0f) / 2.0f + 0.1f);
+                    p.z += (float) abs((float) sin(time * 4.0f) / 2.0f + 0.1f);
                 default:
             }
             gl.glDisable(GL.GL_LIGHTING);
             gl.glColor3fv(player.colour, 0);
-               
-            peonModel.display(p, basis, gl, time);           
+
+            peonModel.display(p, basis, gl, time);
         }
 
         public void step(float seconds) {
@@ -114,11 +146,11 @@ public class Peons implements GLObject {
                 case WALKING:
                 case WANDER:
                     //if already reached destination, wait there - there'll be another message along shortly!
-                    if (signum(pos.x - (dest.x+0.5f)) == signum(dx) || signum(pos.y - (dest.y+0.5f)) == signum(dy)) {
+                    if (reachedDest()) {
                         break;
                     }
-                    pos.x += seconds * dx;
-                    pos.y += seconds * dy;
+                    posx += seconds * dx;
+                    posy += seconds * dy;
                     break;
             }
         }
@@ -134,7 +166,15 @@ public class Peons implements GLObject {
             up = new Vector3(0, 0, 1);
             left = new Vector3();
             left.cross(front, up);
-            basis = new Matrix4(front, left, up);
+            basis.setBasis(front, left, up);
+
+        }
+
+        private boolean reachedDest() {
+            float ex = posx - (destx + 0.5f);
+            float ey = posy - (desty + 0.5f);
+            return ((abs(ex) < 0.1 && abs(ey) < 0.1));
+
         }
     }
 }

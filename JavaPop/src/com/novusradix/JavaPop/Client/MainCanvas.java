@@ -54,9 +54,11 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private ClickableHandler clickables;
     private boolean mouseIsOver;
 
+    public static GLHelper glHelper;
+    
     public MainCanvas(GLCapabilities caps, Game g) {
         super(caps);
-
+        glHelper = new GLHelper();
         keys = new boolean[0x20e];
         startMillis = System.currentTimeMillis();
         this.game = g;

@@ -130,7 +130,7 @@ public class HeightMapGLSL implements HeightMapImpl {
             e.printStackTrace();
         }
 
-        GLHelper glh = new GLHelper();
+        GLHelper glh = MainCanvas.glHelper;
         try {
             shader = glh.LoadShaderProgram(gl, "/com/novusradix/JavaPop/Client/Shaders/HeightMapVertex.shader", "/com/novusradix/JavaPop/Client/Shaders/HeightMapFragment.shader");
         } catch (IOException ex) {

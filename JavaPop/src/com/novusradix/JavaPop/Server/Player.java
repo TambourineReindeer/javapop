@@ -8,8 +8,11 @@ import com.novusradix.JavaPop.Messaging.Lobby.GameList;
 import com.novusradix.JavaPop.Messaging.Message;
 import com.novusradix.JavaPop.Messaging.PlayerUpdate;
 import java.awt.Point;
+import java.io.Externalizable;
 import java.io.IOException;
+import java.io.ObjectInput;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
@@ -63,7 +66,6 @@ public class Player implements Runnable {
 
     public void MoveAnkh(Point where) {
         info.ankh = where;
-        currentGame.sendAllPlayers(new PlayerUpdate(info));
     }
 
     public int getId() {
@@ -124,16 +126,16 @@ public class Player implements Runnable {
         }
     }
 
-    public static class Info implements Serializable {
+    public static class Info implements Externalizable {
 
         public int id;
         public String name;
         public Point ankh;
         public float[] colour;
         public double mana;
+        public int leaderPeonId,  leaderHouseId;
 
         public Info() {//todo move externalization into this class and privatise this constructor.
-            
         }
 
         private Info(int id, String name, Point ankh, float[] colour, double mana) {
@@ -142,6 +144,30 @@ public class Player implements Runnable {
             this.ankh = ankh;
             this.colour = colour;
             this.mana = mana;
+        }
+
+        public void writeExternal(ObjectOutput o) throws IOException {
+            o.writeInt(id);
+            o.writeUTF(name);
+            o.writeInt(ankh.x);
+            o.writeInt(ankh.y);
+            o.writeFloat(colour[0]);
+            o.writeFloat(colour[1]);
+            o.writeFloat(colour[2]);
+            o.writeDouble(mana);
+        }
+
+        public void readExternal(ObjectInput i) throws IOException, ClassNotFoundException {
+            id = i.readInt();
+            name = i.readUTF();
+            ankh = new Point();
+            ankh.x = i.readInt();
+            ankh.y = i.readInt();
+            colour = new float[3];
+            colour[0] = i.readFloat();
+            colour[1] = i.readFloat();
+            colour[2] = i.readFloat();
+            mana = i.readDouble();
         }
     }
 }
