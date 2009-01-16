@@ -40,6 +40,7 @@ public abstract class GLButton implements GLObject, GLClickable {
     public abstract void select();
 
     public void display(GL gl, float time) {
+        //TODO: most of this only needs to be done once per frame, not per button.
         if(!visible)
             return;
         int[] view = new int[4];

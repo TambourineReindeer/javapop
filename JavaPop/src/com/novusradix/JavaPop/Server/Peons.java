@@ -72,7 +72,7 @@ public class Peons {
                 switch (p.state) {
                     case DEAD:
                         if (leaders.containsValue(p)) {
-                            p.player.info.ankh = p.getPoint();
+                            p.player.info.ankh.setLocation(p.getPoint());
                             leaders.remove(p.player);
                         }
                     case SETTLED:
@@ -303,7 +303,7 @@ public class Peons {
                         //merge
                         other.strength += strength;
                         map.remove(oldPos, this);
-                        if (leaders.containsValue(this)) {
+                        if (leaders.containsValue(this)) { //consider leaving the leader alone??
                             leaders.put(player, other);
                         }
                         return changeState(State.DEAD);
@@ -398,8 +398,10 @@ public class Peons {
             dx = destx + 0.5f - pos.x;
             dy = desty + 0.5f - pos.y;
             float dist = (float) sqrt(dx * dx + dy * dy);
-            dx = dx / dist;
-            dy = dy / dist;
+            if (dist > 0.01) {
+                dx = dx / dist;
+                dy = dy / dist;
+            }
         }
 
         private boolean reachedDest() {

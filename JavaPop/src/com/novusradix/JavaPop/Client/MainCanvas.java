@@ -28,6 +28,8 @@ import javax.media.opengl.GLEventListener;
 
 
 import java.awt.event.MouseWheelListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static java.lang.Math.*;
 import static java.awt.event.KeyEvent.*;
 import static javax.media.opengl.GL.*;
@@ -151,7 +153,13 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         flush(gl);
         handleKeys();
-        printFPS();
+        //printFPS();
+        try{
+            glHelper.checkGL(gl);
+        }catch(GLHelper.GLHelperException e)
+        {
+            Logger.getLogger(MainCanvas.class.getName()).log(Level.SEVERE, null, e);
+        }
     }
 
     void lookAt(Point p) {

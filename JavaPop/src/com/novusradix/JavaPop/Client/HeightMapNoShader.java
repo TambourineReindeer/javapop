@@ -398,27 +398,23 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
         tex.enable();
         tex.bind();
         boolean firstChange = true;
-        for (int n = 0; n <
-                heightMap.breadth - 1; n++) { //todo - if this ever gets slow, limit to visible rows only
+        for (int n = 0; n < heightMap.breadth - 1; n++) { //todo - if this ever gets slow, limit to visible rows only
             if (changed[n]) {
-                if (firstChange) {
-                    gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
-                    gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
-                    gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
-                    gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
-                    b.position(VX);
-                    gl.glVertexPointer(3, GL.GL_FLOAT, vertexstride * 4, b);
-                    b.position(NX);
-                    gl.glNormalPointer(GL.GL_FLOAT, vertexstride * 4, b);
-                    b.position(TX);
-                    gl.glTexCoordPointer(2, GL.GL_FLOAT, vertexstride * 4, b);
-                    firstChange =
-                            false;
-                }
-
-                gl.glNewList(displaylist + n, GL_COMPILE_AND_EXECUTE);
-
                 synchronized (this) {
+                    if (firstChange) {
+                        gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
+                        gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
+                        gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
+                        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
+                        b.position(VX);
+                        gl.glVertexPointer(3, GL.GL_FLOAT, vertexstride * 4, b);
+                        b.position(NX);
+                        gl.glNormalPointer(GL.GL_FLOAT, vertexstride * 4, b);
+                        b.position(TX);
+                        gl.glTexCoordPointer(2, GL.GL_FLOAT, vertexstride * 4, b);
+                        firstChange = false;
+                    }
+                    gl.glNewList(displaylist + n, GL_COMPILE_AND_EXECUTE);
                     gl.glDrawArrays(GL.GL_TRIANGLES, n * (heightMap.width - 1) * 4 * 3, (heightMap.width - 1) * 4 * 3);
                 }
 
@@ -433,29 +429,18 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     }
 
     public void applyUpdate(HeightMapUpdate u) {
-         
-         
-          
-             int 
-                 x  , y;
+        int x, y;
         synchronized (this) {
             if (!u.dirtyRegion.isEmpty()) {
-
-                for (y = 0; y <
-                        u.dirtyRegion.height; y++) {
-                    for (x = 0; x <
-                            u.dirtyRegion.width; x++) {
+                for (y = 0; y < u.dirtyRegion.height; y++) {
+                    for (x = 0; x < u.dirtyRegion.width; x++) {
                         setHeight(u.dirtyRegion.x + x, u.dirtyRegion.y + y, u.heightData[x + y * u.dirtyRegion.width]);
                     }
-
                 }
-                for (y = -1; y <
-                        u.dirtyRegion.height + 1; y++) {
-                    for (x = -1; x <
-                            u.dirtyRegion.width + 1; x++) {
+                for (y = -1; y < u.dirtyRegion.height + 1; y++) {
+                    for (x = -1; x < u.dirtyRegion.width + 1; x++) {
                         setMidTile(u.dirtyRegion.x + x, u.dirtyRegion.y + y);
                     }
-
                 }
             }
             for (Entry<Integer, Byte> e : u.texture.entrySet()) {
