@@ -51,11 +51,22 @@ public class Peons implements GLObject {
     }
 
     public void display(GL gl, float time) {
+        float t;
+        Vector3 v = new Vector3();
+        gl.glDisable(GL.GL_LIGHTING);
         synchronized (peons) {
             for (Peon p : peons.values()) {
-                p.display(gl, time);
+                t = time + hashCode() % 10000;
+                v.set(p.posx, p.posy, game.heightMap.getHeight(p.posx, p.posy));
+                if (p.state == State.DROWNING) {
+                    v.z += (float) abs((float) sin(t * 4.0f) / 2.0f + 0.1f);
+                }
+                gl.glColor3fv(p.player.colour, 0);
+                peonModel.display(v, p.basis, gl, time);
             }
         }
+
+
         synchronized (leaders) {
             for (Peon p : leaders.values()) {
                 if (p != null) {
@@ -67,6 +78,7 @@ public class Peons implements GLObject {
 
                     ankhModel.display(pos, basis, gl, time);
                 }
+
             }
         }
     }
@@ -82,6 +94,7 @@ public class Peons implements GLObject {
             for (Entry<Integer, Integer> e : leadermap.entrySet()) {
                 leaders.put(game.players.get(e.getKey()), peons.get(e.getValue()));
             }
+
         }
     }
 
@@ -95,18 +108,18 @@ public class Peons implements GLObject {
 
     private class Peon {
 
-        private float posx,posy;
-        private int destx, desty;
+        float posx, posy;
+        private int destx,  desty;
         private float dx,  dy;
-        private State state;
-        private Player player;
-        private Matrix4 basis;
+        State state;
+        Player player;
+        Matrix4 basis;
 
         public Peon(Detail d) {
-            posx=d.posx;
-            posy= d.posy;
+            posx = d.posx;
+            posy = d.posy;
             destx = d.destx;
-            desty=d.desty;
+            desty = d.desty;
             dx = d.dx;
             dy = d.dy;
             state = d.state;
@@ -116,28 +129,14 @@ public class Peons implements GLObject {
         }
 
         public void Update(Detail d) {
-            posx=d.posx;
-            posy= d.posy;
+            posx = d.posx;
+            posy = d.posy;
             destx = d.destx;
-            desty=d.desty;
+            desty = d.desty;
             dx = d.dx;
             dy = d.dy;
             state = d.state;
             calcBasis();
-        }
-
-        private void display(GL gl, float time) {
-            time += hashCode() % 10000;
-            Vector3 p = new Vector3(posx, posy, game.heightMap.getHeight(posx, posy));
-            switch (state) {
-                case DROWNING:
-                    p.z += (float) abs((float) sin(time * 4.0f) / 2.0f + 0.1f);
-                default:
-            }
-            gl.glDisable(GL.GL_LIGHTING);
-            gl.glColor3fv(player.colour, 0);
-
-            peonModel.display(p, basis, gl, time);
         }
 
         public void step(float seconds) {
@@ -161,7 +160,8 @@ public class Peons implements GLObject {
                 front.y = -1;
             }
             front.normalize();
-            Vector3 up, left;
+            Vector3 up,
+                    left;
             up = new Vector3(0, 0, 1);
             left = new Vector3();
             left.cross(front, up);

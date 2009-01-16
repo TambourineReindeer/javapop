@@ -39,6 +39,21 @@ public class XModel {
     private int[] vbos;
     private static Plane3 left,  right,  top,  bottom;
     private float radius; //Maximum distance from the origin;
+    private static Vector3 tl,  tr,  bl,  br,  ftl,  fbr;
+    
+
+    static {
+        tl = new Vector3();
+        tr = new Vector3();
+        bl = new Vector3();
+        br = new Vector3();
+        ftl = new Vector3();
+        fbr = new Vector3();
+        left = new Plane3();
+        right = new Plane3();
+        top = new Plane3();
+        bottom = new Plane3();
+    }
 
     public XModel(String model, String texture) {
         this.textureName = texture;
@@ -63,23 +78,23 @@ public class XModel {
     }
 
     public static void setRenderVolume(Matrix4 inverseMVP) {
-        Vector3 tl, tr, bl, br, ftl, fbr;
-        tl = new Vector3(-1, -1, 0);
-        tr = new Vector3(1, -1, 0);
-        bl = new Vector3(-1, 1, 0);
-        br = new Vector3(1, 1, 0);
-        ftl = new Vector3(-1, -1, 1);
-        fbr = new Vector3(1, 1, 1);
+        tl.set(-1, -1, 0);
+        tr.set(1, -1, 0);
+        bl.set(-1, 1, 0);
+        br.set(1, 1, 0);
+        ftl.set(-1, -1, 1);
+        fbr.set(1, 1, 1);
+
         inverseMVP.transform(tl);
         inverseMVP.transform(tr);
         inverseMVP.transform(bl);
         inverseMVP.transform(br);
         inverseMVP.transform(ftl);
         inverseMVP.transform(fbr);
-        left = new Plane3(tl, ftl, bl);
-        right = new Plane3(br, fbr, tr);
-        top = new Plane3(tl, tr, ftl);
-        bottom = new Plane3(br, bl, fbr);
+        left.set(tl, ftl, bl);
+        right.set(br, fbr, tr);
+        top.set(tl, tr, ftl);
+        bottom.set(br, bl, fbr);
     }
 
     public void display(Vector3 position, Matrix4 basis, GL gl, float time) {
@@ -162,7 +177,7 @@ public class XModel {
                 GL.GL_STATIC_DRAW);
 
         try {
-            
+
             GLHelper glh = MainCanvas.glHelper;
             tex = glh.getTexture(gl, textureName);
             shader = glh.LoadShaderProgram(gl, null, "/com/novusradix/JavaPop/Client/Shaders/ModelFragment.shader");

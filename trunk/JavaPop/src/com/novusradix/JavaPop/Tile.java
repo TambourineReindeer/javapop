@@ -16,12 +16,16 @@ public enum Tile {
     TREE((byte) 7, false, false, true, false),
     BASALT((byte) 8, true, true, false, false),
     LAVA((byte) 9, false, true, false, false);
-    
     public final byte id;
     public final boolean canExistAtSeaLevel;
     public final boolean canExistOnSlope;
     public final boolean isFertile;
     public final boolean isObstruction;
+    public final static Tile[] tiles;
+    
+    static {
+        tiles = values();
+    }
 
     private Tile(byte id, boolean sealevel, boolean slope, boolean fertile, boolean obstruction) {
         this.id = id;
