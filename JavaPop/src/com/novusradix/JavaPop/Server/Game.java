@@ -132,7 +132,7 @@ public class Game extends TimerTask {
             p.info.ankh.setLocation(heightMap.width / 2, heightMap.breadth / 2);
         }
         
-        int numPeons = 2;
+        int numPeons = 3;
         nextPlayer:
         for (Map.Entry<Player, Point> me : startingPosition.entrySet()) {
             int placed = 0;
@@ -141,7 +141,7 @@ public class Game extends TimerTask {
                     Point p2 = new Point(p.x + me.getValue().x, p.y + me.getValue().y);
                     if (heightMap.tileInBounds(p2.x, p2.y) && heightMap.getHeight(p2.x, p2.y) > 0) {
                         placed++;
-                        peons.addPeon(p2, 400, me.getKey(), true);
+                        peons.addPeon(p2.x, p2.y, 200, me.getKey(), true);
                         if (placed == numPeons) {
                             continue nextPlayer;
                         }
