@@ -63,7 +63,7 @@ public class Player implements Runnable {
     }
 
     public void MoveAnkh(Point where) {
-        info.ankh = where;
+        info.ankh.setLocation(where);
     }
 
     public int getId() {

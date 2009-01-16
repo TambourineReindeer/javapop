@@ -252,8 +252,8 @@ public class Houses {
             player.info.mana -= p.strength;
             if (strength < 0) {
                 if (leaderHouses.containsValue(this)) {
-                    leaderHouses.remove(this);
-                    player.info.ankh = this.pos;
+                    leaderHouses.remove(player);
+                    player.info.ankh.setLocation(this.pos);
                 }
                 player.info.mana -= strength;
                 player = p.player;

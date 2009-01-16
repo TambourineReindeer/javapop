@@ -20,15 +20,16 @@ public class Player implements GLObject {
     private int index;
 
     public Player(Info i, Game g, int index) {
-        update(i);
         game = g;
+        ankh = new Point();
         this.index = index;
+        update(i);
     }
 
     public void update(Info i) {
         name = i.name;
         colour = i.colour;
-        ankh = i.ankh;
+        ankh.setLocation(i.ankh);
         mana = i.mana;
     }
 
@@ -40,7 +41,7 @@ public class Player implements GLObject {
         gl.glDisable(GL.GL_LIGHTING);
         gl.glDisable(GL.GL_TEXTURE_2D);
         gl.glUseProgram(0);
-                
+
         gl.glBegin(GL.GL_TRIANGLES);
 
         gl.glColor3fv(colour, 0);
@@ -59,8 +60,8 @@ public class Player implements GLObject {
         gl.glBegin(GL.GL_QUADS);
 
         gl.glVertex3f(-0.95f + index * 0.1f, 0.85f, 0.0f);
-        gl.glVertex3f(-0.95f + index * 0.1f,(float) (0.85f + max(0,log(mana) * 0.01f)), 0.0f);
-        gl.glVertex3f(-0.9f + index * 0.1f, (float) (0.85f + max(0,log(mana) * 0.01f)), 0.0f);
+        gl.glVertex3f(-0.95f + index * 0.1f, (float) (0.85f + max(0, log(mana) * 0.01f)), 0.0f);
+        gl.glVertex3f(-0.9f + index * 0.1f, (float) (0.85f + max(0, log(mana) * 0.01f)), 0.0f);
         gl.glVertex3f(-0.9f + index * 0.1f, 0.85f, 0.0f);
 
         gl.glEnd();

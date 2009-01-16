@@ -129,15 +129,17 @@ public class Game extends TimerTask {
         Map<Player, Point> startingPosition = new HashMap<Player, Point>();
         for (Player p : players) {
             startingPosition.put(p, new Point(r.nextInt(heightMap.getWidth()), r.nextInt(heightMap.getBreadth())));
+            p.info.ankh.setLocation(heightMap.width / 2, heightMap.breadth / 2);
         }
-        int numPeons = 1;
+        
+        int numPeons = 2;
         nextPlayer:
         for (Map.Entry<Player, Point> me : startingPosition.entrySet()) {
             int placed = 0;
             for (ArrayList<Point> ring : Helpers.shuffledRings) {
                 for (Point p : ring) {
                     Point p2 = new Point(p.x + me.getValue().x, p.y + me.getValue().y);
-                    if (heightMap.tileInBounds(p2.x, p2.y) && heightMap.getHeight(p2.x,p2.y) > 0) {
+                    if (heightMap.tileInBounds(p2.x, p2.y) && heightMap.getHeight(p2.x, p2.y) > 0) {
                         placed++;
                         peons.addPeon(p2, 400, me.getKey(), true);
                         if (placed == numPeons) {
@@ -215,7 +217,7 @@ public class Game extends TimerTask {
                     pl.sendMessage(bytes);
                 }
             }
-            //System.out.println(System.currentTimeMillis() + ", " + m.getClass().getName() + ", " + bytes.length);
+        //System.out.println(System.currentTimeMillis() + ", " + m.getClass().getName() + ", " + bytes.length);
 
         } catch (IOException ex) {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
