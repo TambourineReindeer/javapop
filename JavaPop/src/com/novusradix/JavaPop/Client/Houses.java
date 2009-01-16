@@ -39,89 +39,90 @@ public class Houses implements AbstractHouses, GLObject {
                     houses.remove(id);
                 }
             } else {
-                houses.put(id, new House(x,y, p, level));
+                houses.put(id, new House(x, y, p, level));
             }
         }
     }
 
     public boolean canBuild(int x, int y) {
-        if (game.heightMap.tileInBounds(x,y)) {
-            return (map[x][y] == EMPTY && game.heightMap.getHeight(x,y) > 0 && game.heightMap.isFlat(x,y));
+        if (game.heightMap.tileInBounds(x, y)) {
+            return (map[x][y] == EMPTY && game.heightMap.getHeight(x, y) > 0 && game.heightMap.isFlat(x, y));
 
         }
         return false;
     }
 
     public void display(GL gl, float time) {
-         synchronized (houses) {
-        if (houses != null) {
-            gl.glUseProgram(0);
+        synchronized (houses) {
+            if (houses != null) {
+                gl.glUseProgram(0);
+                Vector3 p = new Vector3();
+                Matrix4 basis = new Matrix4();
+                for (House h : houses.values()) {
 
-            for (House h : houses.values()) {
-                Vector3 p;
-                Matrix4 basis;
-                p = new Vector3(h.x + 0.5f, h.y + 0.5f, game.heightMap.getHeight(h.x, h.y));
+                    p.set(h.x + 0.5f, h.y + 0.5f, game.heightMap.getHeight(h.x, h.y));
 
-                basis = new Matrix4(Matrix4.identity);
+                    basis.set(Matrix4.identity);
 
-                if (h.level > 9) {
-                    basis.scale(3.0f, 3.0f, 1.0f);
+                    if (h.level > 9) {
+                        basis.scale(3.0f, 3.0f, 1.0f);
+                    }
+                    if (h.level == 49) {
+                        basis.scale(1.0f, 1.0f, 2.0f);
+                    }
+
+                    gl.glColor3f(1, 1, 1);
+                    gl.glEnable(GL.GL_LIGHTING);
+                    houseModel.display(p, basis, gl, time);
+
                 }
-                if (h.level == 49) {
-                    basis.scale(1.0f, 1.0f, 2.0f);
+                gl.glDisable(GL.GL_LIGHTING);
+                gl.glDisable(GL.GL_TEXTURE_2D);
+                gl.glUseProgram(0);
+                for (House h : houses.values()) {
+                    gl.glMatrixMode(GL.GL_MODELVIEW);
+
+                    gl.glPushMatrix();
+                    gl.glTranslatef(h.x + 0.5f, h.y + 0.5f, game.heightMap.getHeight(h.x, h.y));
+                    if (h.level > 9) {
+                        gl.glScalef(3.0f, 3.0f, 1.0f);
+                    }
+                    if (h.level == 49) {
+                        gl.glScalef(1.0f, 1.0f, 2.0f);
+                    }
+
+                    gl.glColor3fv(h.player.colour, 0);
+                    gl.glBegin(GL.GL_TRIANGLES);
+                    gl.glVertex3f(0.3f, -0.3f, 1.3f);
+                    gl.glVertex3f(0.3f, -0.3f, 1.5f);
+                    gl.glVertex3f(0.4f, -0.4f, 1.4f);
+                    gl.glEnd();
+                    gl.glPopMatrix();
                 }
-
-                gl.glColor3f(1, 1, 1);
-                gl.glEnable(GL.GL_LIGHTING);
-                houseModel.display(p, basis, gl, time);
-
             }
-            gl.glDisable(GL.GL_LIGHTING);
-            gl.glDisable(GL.GL_TEXTURE_2D);
-            gl.glUseProgram(0);
-            for (House h : houses.values()) {
-                gl.glMatrixMode(GL.GL_MODELVIEW);
+            for (House h : leaderHouses.values()) {
+                if (h != null) {
+                    Vector3 pos = new Vector3();
+                    Matrix4 basis = new Matrix4(Matrix4.identity);
+                    pos.x = h.x + 0.5f;
+                    pos.y = h.y + 0.5f;
+                    pos.z = game.heightMap.getHeight(pos.x, pos.y) + 1.0f;
 
-                gl.glPushMatrix();
-                gl.glTranslatef(h.x + 0.5f, h.y + 0.5f, game.heightMap.getHeight(h.x, h.y));
-                if (h.level > 9) {
-                    gl.glScalef(3.0f, 3.0f, 1.0f);
+                    ankhModel.display(pos, basis, gl, time);
                 }
-                if (h.level == 49) {
-                    gl.glScalef(1.0f, 1.0f, 2.0f);
-                }
-
-                gl.glColor3fv(h.player.colour, 0);
-                gl.glBegin(GL.GL_TRIANGLES);
-                gl.glVertex3f(0.3f, -0.3f, 1.3f);
-                gl.glVertex3f(0.3f, -0.3f, 1.5f);
-                gl.glVertex3f(0.4f, -0.4f, 1.4f);
-                gl.glEnd();
-                gl.glPopMatrix();
             }
         }
-        for (House h : leaderHouses.values()) {
-            if (h != null) {
-                Vector3 pos = new Vector3();
-                Matrix4 basis = new Matrix4(Matrix4.identity);
-                pos.x = h.x + 0.5f;
-                pos.y = h.y + 0.5f;
-                pos.z = game.heightMap.getHeight(pos.x, pos.y) + 1.0f;
-
-                ankhModel.display(pos, basis, gl, time);
-            }
-        }
-    }
     }
 
     public class House {
 
-        private final int x,y;
+        private final  int x,  y;
         private int level;
         private Player player;
 
         public House(int px, int py, Player player, int level) {
-            x=px;y=py;
+            x = px;
+            y = py;
             map[x][y] = HOUSE;
             this.level = level;
             this.player = player;

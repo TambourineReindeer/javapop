@@ -242,6 +242,7 @@ public class Houses {
                 strength += p.strength;
                 if (leader) {
                     leaderHouses.put(player, this);
+                    changed = true;
                 }
                 return Peons.State.SETTLED;
             }
@@ -261,6 +262,7 @@ public class Houses {
                 if (leader) {
                     leaderHouses.put(player, this);
                 }
+                changed = true;
                 return Peons.State.SETTLED;
             }
             return Peons.State.DEAD;
@@ -268,6 +270,7 @@ public class Houses {
 
         void makeLeader() {
             leaderHouses.put(this.player, this);
+            changed = true;
         }
 
         private void paintmap(byte[][] newmap) {

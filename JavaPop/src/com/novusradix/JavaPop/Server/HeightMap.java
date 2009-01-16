@@ -124,7 +124,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
                 return;
             }
 
-            if (t.isFertile != Tile.values()[tex[x][y]].isFertile) {
+            if (t.isFertile != Tile.tiles[tex[x][y]].isFertile) {
                 synchronized (houseChanges) {
                     houseChanges.add(x + y * width);
                 }
@@ -142,7 +142,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
             return;
         }
         if (bflat) {
-            if (!Tile.values()[tex[x][y]].isFertile) {
+            if (!Tile.tiles[tex[x][y]].isFertile) {
                 synchronized (houseChanges) {
                     houseChanges.add(x + y * width);
                 }
@@ -154,7 +154,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
     }
 
     public Tile getTile(int x, int y) {
-        return Tile.values()[tex[x][y]];
+        return Tile.tiles[tex[x][y]];
     }
 
     private void difTex() {

@@ -1,7 +1,5 @@
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Math.Helpers;
-import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.novusradix.JavaPop.Tile;
 import com.sun.opengl.util.BufferUtil;
@@ -42,18 +40,19 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     private FloatBuffer b;
     private int rowstride,  tilestride,  vertexstride;
     private static final int VX = 0,  VY = 1,  VZ = 2,  NX = 3,  NY = 4,  NZ = 5,  TX = 6,  TY = 7;
-    private HeightMap heightMap;  
+    private HeightMap heightMap;
     private boolean[] changed;
     private int displaylist;
+    private static float[] tempFloats;
 
     public void initialise(HeightMap h) {
-        heightMap = h;       
+        heightMap = h;
         vertexstride = 8;
         tilestride = 12 * vertexstride;
         rowstride = tilestride * (heightMap.width - 1);
         changed = new boolean[heightMap.breadth - 1];
         b = BufferUtil.newFloatBuffer((heightMap.width - 1) * (heightMap.breadth - 1) * tilestride);
-
+        tempFloats = new float[tilestride];
         int x, y;
         for (y = 0; y < (heightMap.breadth - 1); y++) {
             for (x = 0; x < (heightMap.width - 1); x++) {
@@ -233,7 +232,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
         }
         float m;
 
-        m = heightMap.getHeight(x+0.5f, y+0.5f);
+        m = heightMap.getHeight(x + 0.5f, y + 0.5f);
 
         try {
             b.put(bufPos(x, y, 2, VZ), m);
@@ -250,7 +249,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     public void setTile(int x, int y, byte t) {
         float left, xmid, right, top, bottom, ymid;
         int texid;
-        switch (Tile.values()[t]) {
+        switch (Tile.tiles[t]) {
             case SEA:
                 texid = (new Random()).nextInt(3);
                 break;
@@ -287,7 +286,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
         top = ty * 32.0f;
         bottom = top + 31.0f;
         ymid = (top + bottom) / 2.0f;
-
+//Todo: bulk update??
         b.put(bufPos(x, y, 0, TX), left);
         b.put(bufPos(x, y, 1, TX), right);
         b.put(bufPos(x, y, 2, TX), xmid);
@@ -318,58 +317,59 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     }
 
     private void setNormals(int x, int y) {
-        setNormals(x, y, 0, 1, 2);
-        setNormals(x, y, 3, 4, 5);
-        setNormals(x, y, 6, 7, 8);
-        setNormals(x, y, 9, 10, 11);
+        //read entire tile
+        b.position(bufPos(x, y, 0, VX));
+        b.get(tempFloats, 0, tilestride);
+        setNormals(x, y, 0, 1, 2, tempFloats);
+        setNormals(x, y, 3, 4, 5, tempFloats);
+        setNormals(x, y, 6, 7, 8, tempFloats);
+        setNormals(x, y, 9, 10, 11, tempFloats);
+        b.position(bufPos(x, y, 0, VX));
+        b.put(tempFloats, 0, tilestride);
     }
 
-    private void setNormals(int x, int y, int vertA, int vertB, int vertC) {
-        //TODO: profiled:candidate for optimisation
-        Vector3 va, vb, vc,
-                vn;
-        va = new Vector3();
-        vb = new Vector3();
+    private void setNormals(int x, int y, int vertA, int vertB, int vertC, float[] tileData) {
+        float ax, ay, az, bx, by, bz, cx, cy, cz;
+        float nx, ny, nz;
+        ax = tileData[bufPos(0, 0, vertA, VX)];
+        ay = tileData[bufPos(0, 0, vertA, VY)];
+        az = tileData[bufPos(0, 0, vertA, VZ)];
 
-        vc = new Vector3();
+        bx = tileData[bufPos(0, 0, vertB, VX)] - ax;
+        by = tileData[bufPos(0, 0, vertB, VY)] - ay;
+        bz = tileData[bufPos(0, 0, vertB, VZ)] - az;
 
-        try {
-            va.x = b.get(bufPos(x, y, vertA, VX));
-            va.y = b.get(bufPos(x, y, vertA, VY));
-            va.z = b.get(bufPos(x, y, vertA, VZ));
+        cx = tileData[bufPos(0, 0, vertC, VX)] - ax;
+        cy = tileData[bufPos(0, 0, vertC, VY)] - ay;
+        cz = tileData[bufPos(0, 0, vertC, VZ)] - az;
 
-            vb.x = b.get(bufPos(x, y, vertB, VX));
-            vb.y = b.get(bufPos(x, y, vertB, VY));
-            vb.z = b.get(bufPos(x, y, vertB, VZ));
+        nx = by * cz - bz * cy;
+        ny = bz * cx - bx * cz;
+        nz = bx * cy - by * cx;
 
-            vc.x = b.get(bufPos(x, y, vertC, VX));
-            vc.y = b.get(bufPos(x, y, vertC, VY));
-            vc.z = b.get(bufPos(x, y, vertC, VZ));
+        ax = (float) Math.sqrt(nx * nx + ny * ny + nz * nz);
 
-            vn = Helpers.calcNormal(vc, va, vb);
+        nx /= ax;
+        ny /= ax;
+        nz /= ax;
 
-            b.put(bufPos(x, y, vertA, NX), vn.x);
-            b.put(bufPos(x, y, vertA, NY), vn.y);
-            b.put(bufPos(x, y, vertA, NZ), vn.z);
+        tileData[bufPos(0, 0, vertA, NX)] = nx;
+        tileData[bufPos(0, 0, vertA, NY)] = ny;
+        tileData[bufPos(0, 0, vertA, NZ)] = nz;
 
-            b.put(bufPos(x, y, vertB, NX), vn.x);
-            b.put(bufPos(x, y, vertB, NY), vn.y);
-            b.put(bufPos(x, y, vertB, NZ), vn.z);
+        tileData[bufPos(0, 0, vertB, NX)] = nx;
+        tileData[bufPos(0, 0, vertB, NY)] = ny;
+        tileData[bufPos(0, 0, vertB, NZ)] = nz;
 
-            b.put(bufPos(x, y, vertC, NX), vn.x);
-            b.put(bufPos(x, y, vertC, NY), vn.y);
-            b.put(bufPos(x, y, vertC, NZ), vn.z);
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println("Array out of bounds in Client SetNormal:" + x + ", " + y);
-        }
+        tileData[bufPos(0, 0, vertC, NX)] = nx;
+        tileData[bufPos(0, 0, vertC, NY)] = ny;
+        tileData[bufPos(0, 0, vertC, NZ)] = nz;
     }
 
     public void init(final GL gl) {
-
         try {
             URL u = getClass().getResource("/com/novusradix/JavaPop/textures/tex.png");
             tex = TextureIO.newTexture(u, false, "png");
-
         } catch (GLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -377,8 +377,10 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
         displaylist = gl.glGenLists(heightMap.breadth);
-        for (int n = 0; n < heightMap.breadth - 1; n++) {
+        for (int n = 0; n <
+                heightMap.breadth - 1; n++) {
             changed[n] = true;
         }
     }
@@ -396,7 +398,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
         tex.enable();
         tex.bind();
         boolean firstChange = true;
-        for (int n = 0; n < heightMap.breadth - 1; n++) { //todo - if this ever gets slow, limit to visible rows only
+        for (int n = 0; n <
+                heightMap.breadth - 1; n++) { //todo - if this ever gets slow, limit to visible rows only
             if (changed[n]) {
                 if (firstChange) {
                     gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
@@ -409,36 +412,50 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                     gl.glNormalPointer(GL.GL_FLOAT, vertexstride * 4, b);
                     b.position(TX);
                     gl.glTexCoordPointer(2, GL.GL_FLOAT, vertexstride * 4, b);
-                    firstChange = false;
+                    firstChange =
+                            false;
                 }
+
                 gl.glNewList(displaylist + n, GL_COMPILE_AND_EXECUTE);
 
                 synchronized (this) {
                     gl.glDrawArrays(GL.GL_TRIANGLES, n * (heightMap.width - 1) * 4 * 3, (heightMap.width - 1) * 4 * 3);
                 }
+
                 gl.glEndList();
                 changed[n] = false;
             } else {
                 gl.glCallList(displaylist + n);
             }
+
         }
         tex.disable();
     }
 
     public void applyUpdate(HeightMapUpdate u) {
-        int x, y;
+         
+         
+          
+             int 
+                 x  , y;
         synchronized (this) {
             if (!u.dirtyRegion.isEmpty()) {
 
-                for (y = 0; y < u.dirtyRegion.height; y++) {
-                    for (x = 0; x < u.dirtyRegion.width; x++) {
+                for (y = 0; y <
+                        u.dirtyRegion.height; y++) {
+                    for (x = 0; x <
+                            u.dirtyRegion.width; x++) {
                         setHeight(u.dirtyRegion.x + x, u.dirtyRegion.y + y, u.heightData[x + y * u.dirtyRegion.width]);
                     }
+
                 }
-                for (y = -1; y < u.dirtyRegion.height + 1; y++) {
-                    for (x = -1; x < u.dirtyRegion.width + 1; x++) {
+                for (y = -1; y <
+                        u.dirtyRegion.height + 1; y++) {
+                    for (x = -1; x <
+                            u.dirtyRegion.width + 1; x++) {
                         setMidTile(u.dirtyRegion.x + x, u.dirtyRegion.y + y);
                     }
+
                 }
             }
             for (Entry<Integer, Byte> e : u.texture.entrySet()) {

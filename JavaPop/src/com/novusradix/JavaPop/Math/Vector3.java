@@ -38,11 +38,30 @@ public class Vector3 implements Serializable {
         z = tz;
     }
 
+    public void cross(float ax, float ay, float az, float bx, float by, float bz) {
+        // A x B = <Ay*Bz - Az*By, Az*Bx - Ax*Bz, Ax*By - Ay*Bx>
+        x = ay * bz - az * by;
+        y = az * bx - ax * bz;
+        z = ax * by - ay * bx;
+    }
+
     public void normalize() {
         float l = length();
         x = x / l;
         y = y / l;
         z = z / l;
+    }
+
+    public void set(float x, float y, float z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    public void set(Vector3 v) {
+        this.x = v.x;
+        this.y = v.y;
+        this.z = v.z;
     }
 
     public void sub(Vector3 a, Vector3 b) {

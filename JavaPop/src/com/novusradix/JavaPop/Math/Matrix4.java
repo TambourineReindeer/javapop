@@ -44,6 +44,10 @@ public class Matrix4 implements Serializable {
 
     }
 
+    public void set(Matrix4 mat) {
+        System.arraycopy(mat.m, 0, m, 0, m.length);
+    }
+
     public void setBasis(Vector3 front, Vector3 left, Vector3 up) {
 
         m[0] = front.x;
@@ -84,7 +88,7 @@ public class Matrix4 implements Serializable {
     }
 
     public float[] getArray() {
-        return m.clone();
+        return m;
     }
 
     /**
@@ -197,7 +201,7 @@ public class Matrix4 implements Serializable {
 
     public void transform(Vector3 v) {
 
-        float x,   y,   z,   w;
+        float x, y, z, w;
         x = m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3];
         y = m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7];
         z = m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11];
