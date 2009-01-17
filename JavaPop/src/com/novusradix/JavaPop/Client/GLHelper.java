@@ -15,8 +15,7 @@ public class GLHelper {
     private Map<String, Texture> textures;
 
     public GLHelper() {
-        textures = new HashMap<String, Texture>();
-    }
+        }
 
     public int LoadShaderProgram(GL gl, String vertexSource, String fragmentSource) throws IOException, GLHelperException {
         int v, f;
@@ -58,6 +57,11 @@ public class GLHelper {
         return tex;
     }
 
+    public void init(GL gl)
+    {
+        textures = new HashMap<String, Texture>();
+    }
+    
     public void checkGL(GL gl) throws GLHelperException {
         int e = gl.glGetError();
         if (e != 0) {

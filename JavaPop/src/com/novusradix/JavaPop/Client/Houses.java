@@ -58,6 +58,7 @@ public class Houses implements AbstractHouses, GLObject {
                 gl.glUseProgram(0);
                 Vector3 p = new Vector3();
                 Matrix4 basis = new Matrix4();
+                houseModel.prepare(gl);
                 for (House h : houses.values()) {
 
                     p.set(h.x + 0.5f, h.y + 0.5f, game.heightMap.getHeight(h.x, h.y));
@@ -100,6 +101,7 @@ public class Houses implements AbstractHouses, GLObject {
                     gl.glPopMatrix();
                 }
             }
+            ankhModel.prepare(gl);
             for (House h : leaderHouses.values()) {
                 if (h != null) {
                     Vector3 pos = new Vector3();

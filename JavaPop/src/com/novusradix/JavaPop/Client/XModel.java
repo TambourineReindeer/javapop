@@ -97,6 +97,26 @@ public class XModel {
         bottom.set(br, bl, fbr);
     }
 
+    public void prepare(GL gl) {
+        tex.enable();
+        tex.bind();
+        gl.glEnable(GL_LIGHTING);
+        gl.glDisable(GL.GL_BLEND);
+        gl.glShadeModel(GL.GL_SMOOTH);
+        gl.glEnable(GL.GL_DEPTH_TEST);
+        gl.glMatrixMode(GL.GL_TEXTURE);
+        gl.glLoadIdentity();
+        gl.glUseProgram(shader);
+        gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
+        gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
+        gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
+
+        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbos[0]);
+        gl.glVertexPointer(3, GL.GL_FLOAT, vertexstride * 4, VX * 4);
+        gl.glNormalPointer(GL.GL_FLOAT, vertexstride * 4, NX * 4);
+        gl.glTexCoordPointer(2, GL.GL_FLOAT, vertexstride * 4, TX * 4);
+    }
+
     public void display(Vector3 position, Matrix4 basis, GL gl, float time) {
         if (left != null) {
             if (left.distance(position) + radius < 0 || right.distance(position) + radius < 0 || top.distance(position) + radius < 0 || bottom.distance(position) + radius < 0) {
@@ -110,56 +130,12 @@ public class XModel {
         gl.glMultMatrixf(basis.getArray(), 0);
         gl.glScalef(1, 1, 2);
         gl.glMultMatrixf(transform.getArray(), 0);
-        tex.enable();
-        tex.bind();
-        gl.glEnable(GL_LIGHTING);
-        gl.glDisable(GL.GL_BLEND);
-        gl.glShadeModel(GL.GL_SMOOTH);
-        gl.glEnable(GL.GL_DEPTH_TEST);
-        gl.glMatrixMode(GL.GL_TEXTURE);
-        gl.glLoadIdentity();
-
-
-        gl.glUseProgram(shader);
-        /*if (!listCreated) {
-        gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
-        gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
-        gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
-        
-        b.position(VX);
-        gl.glVertexPointer(3, GL.GL_FLOAT, vertexstride * 4, b);
-        b.position(NX);
-        gl.glNormalPointer(GL.GL_FLOAT, vertexstride * 4, b);
-        b.position(TX);
-        gl.glTexCoordPointer(2, GL.GL_FLOAT, vertexstride * 4, b);
-        gl.glNewList(displayList, GL.GL_COMPILE_AND_EXECUTE);
-        gl.glDrawArrays(GL.GL_TRIANGLES, 0, triangleCount * 3);
-        gl.glEndList();
-        listCreated = true;
-        } else {
-        gl.glCallList(displayList);
-        }*/
-        gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
-        gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
-        gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
-
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbos[0]);
-
-        gl.glVertexPointer(3, GL.GL_FLOAT, vertexstride * 4, VX * 4);
-
-        gl.glNormalPointer(GL.GL_FLOAT, vertexstride * 4, NX * 4);
-
-        gl.glTexCoordPointer(2, GL.GL_FLOAT, vertexstride * 4, TX * 4);
 
         gl.glDrawArrays(GL.GL_TRIANGLES, 0, triangleCount * 3);
-
-        gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
-        gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         gl.glMatrixMode(GL_MODELVIEW);
 
         gl.glPopMatrix();
-        tex.disable();
     }
 
     public void init(GL gl) {
@@ -360,7 +336,28 @@ public class XModel {
 
     private class Vector8 {
 
-        float x, y, z, nx, ny, nz, tx, ty;
+         
+         
+         
+         
+         
+         
+         
+         
+
+          
+        
+
+           
+                           
+        
+
+            
+                
+                    
+                                               
+            
+             float x, y, z, nx, ny, nz, tx, ty;
 
         public Vector8() {
         }

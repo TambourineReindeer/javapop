@@ -13,11 +13,19 @@ public class ToolGroup {
     private Collection<Tool> tools;
     private String iconName;
     private Point position;
+    private Point nextToolPosition;
+    static private Point nextGroupPosition;
+    
+    static {
+        nextGroupPosition = new Point(50, -175);
+    }
 
-    public ToolGroup(String icon, Point position) {
+    public ToolGroup(String icon) {
         tools = new ArrayList<Tool>();
         iconName = icon;
-        this.position = position;
+        this.position = new Point(nextGroupPosition);
+        nextGroupPosition.translate(50, 25);
+        nextToolPosition = new Point(0,-150);
     }
 
     public Collection<Tool> getTools() {
@@ -26,6 +34,8 @@ public class ToolGroup {
 
     public void addTool(Tool t) {
         tools.add(t);
+        t.setPosition(nextToolPosition);
+        nextToolPosition.translate(50, 25);
     }
 
     public String getIconName() {

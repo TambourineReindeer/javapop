@@ -1,29 +1,30 @@
 package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
-import com.novusradix.JavaPop.Messaging.Tools.Swamp;
+import com.novusradix.JavaPop.Messaging.Tools.Volcano;
 import java.awt.Point;
 
 /**
  *
  * @author gef
  */
-public class SwampTool extends Tool {
-public SwampTool(ToolGroup tg, Client c)
-    {
+public class BasaltTool extends Tool {
+
+    public BasaltTool(ToolGroup tg, Client c) {
         super(tg, c);
     }
-    
+
     @Override
     public void PrimaryAction(Point p) {
-        client.sendMessage(new Swamp(p));
+       
     }
 
     public String getIconName() {
-        return "/com/novusradix/JavaPop/icons/Swamp.png";
+        return "/com/novusradix/JavaPop/icons/Basalt.png";
     }
 
     public String getToolTip() {
-        return "Swamp";
+        return "Basalt";
     }
+
 }

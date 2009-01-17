@@ -8,7 +8,7 @@ import java.awt.Point;
  *
  * @author gef
  */
-public class MoveAnkhTool extends BaseTool{
+public class MoveAnkhTool extends Tool{
 
     public MoveAnkhTool(ToolGroup tg, Client c)
     {
@@ -28,7 +28,4 @@ public class MoveAnkhTool extends BaseTool{
         return "MoveAnkh";
     }
     
-    public Point getPosition() {
-        return new Point(50,-125);
-    }
 }

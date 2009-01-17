@@ -54,6 +54,7 @@ public class Peons implements GLObject {
         float t;
         Vector3 v = new Vector3();
         gl.glDisable(GL.GL_LIGHTING);
+        peonModel.prepare(gl);
         synchronized (peons) {
             for (Peon p : peons.values()) {
                 t = time + hashCode() % 10000;
@@ -66,7 +67,8 @@ public class Peons implements GLObject {
             }
         }
 
-
+        ankhModel.prepare(gl);
+               
         synchronized (leaders) {
             for (Peon p : leaders.values()) {
                 if (p != null) {

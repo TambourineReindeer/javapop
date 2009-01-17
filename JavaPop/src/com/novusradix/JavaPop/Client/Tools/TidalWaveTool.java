@@ -7,7 +7,7 @@ import java.awt.Point;
  *
  * @author gef
  */
-public class TidalWaveTool extends BaseTool {
+public class TidalWaveTool extends Tool {
 
     public TidalWaveTool(ToolGroup tg, Client c) {
         super(tg, c);
@@ -25,7 +25,4 @@ public class TidalWaveTool extends BaseTool {
         return "TidalWave";
     }
 
-    public Point getPosition() {
-        return new Point(250, -25);
-    }
 }

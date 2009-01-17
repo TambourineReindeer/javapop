@@ -71,6 +71,7 @@ public class GLToolButton extends GLButton {
     public void select() {
         selected = this;
         groupButton.select();
+        tool.Select();
     }
 
     @Override

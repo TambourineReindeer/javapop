@@ -8,7 +8,7 @@ import java.awt.Point;
  *
  * @author gef
  */
-public class VolcanoTool extends BaseTool {
+public class VolcanoTool extends Tool {
 
     public VolcanoTool(ToolGroup tg, Client c) {
         super(tg, c);
@@ -27,7 +27,4 @@ public class VolcanoTool extends BaseTool {
         return "Volcano";
     }
 
-    public Point getPosition() {
-        return new Point(200, -50);
-    }
 }

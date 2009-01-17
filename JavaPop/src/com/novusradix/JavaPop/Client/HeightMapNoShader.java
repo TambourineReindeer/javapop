@@ -368,8 +368,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
 
     public void init(final GL gl) {
         try {
-            URL u = getClass().getResource("/com/novusradix/JavaPop/textures/tex.png");
-            tex = TextureIO.newTexture(u, false, "png");
+            //URL u = getClass().getResource();
+            tex = MainCanvas.glHelper.getTexture(gl, "/com/novusradix/JavaPop/textures/tex.png");
         } catch (GLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -397,6 +397,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
 
         tex.enable();
         tex.bind();
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         boolean firstChange = true;
         for (int n = 0; n < heightMap.breadth - 1; n++) { //todo - if this ever gets slow, limit to visible rows only
             if (changed[n]) {

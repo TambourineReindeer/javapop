@@ -8,7 +8,7 @@ import java.awt.Point;
  *
  * @author gef
  */
-public class EarthquakeTool extends BaseTool {
+public class EarthquakeTool extends Tool {
     
     public EarthquakeTool(ToolGroup tg, Client c)
     {
@@ -27,8 +27,5 @@ public class EarthquakeTool extends BaseTool {
     public String getToolTip() {
         return "Earthquake";
     }
- 
-    public Point getPosition() {
-        return new Point(100,-100);
-    }
+
 }
