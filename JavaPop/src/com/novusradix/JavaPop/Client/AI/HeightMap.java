@@ -8,7 +8,9 @@ import java.awt.Dimension;
 
 
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
+import java.awt.Point;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
@@ -52,5 +54,13 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
     public void setTile(int x, int y, byte t) {
         tiles[x][y] = t;
+    }
+
+    @Override
+    public void addRocks(Set<Point> newRocks) {
+    }
+
+    @Override
+    public void removeRocks(Set<Point> deadRocks) {
     }
 }

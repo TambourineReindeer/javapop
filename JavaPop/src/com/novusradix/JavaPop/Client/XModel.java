@@ -117,7 +117,7 @@ public class XModel {
         gl.glTexCoordPointer(2, GL.GL_FLOAT, vertexstride * 4, TX * 4);
     }
 
-    public void display(Vector3 position, Matrix4 basis, GL gl, float time) {
+    public void display(Vector3 position, Matrix4 basis, GL gl) {
         if (left != null) {
             if (left.distance(position) + radius < 0 || right.distance(position) + radius < 0 || top.distance(position) + radius < 0 || bottom.distance(position) + radius < 0) {
                 return;

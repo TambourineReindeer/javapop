@@ -5,6 +5,8 @@
 package com.novusradix.JavaPop.Client;
 
 import java.awt.Dimension;
+import java.awt.Point;
+import java.util.Set;
 import javax.media.opengl.GL;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 
@@ -43,5 +45,15 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObj
     @Override
     protected void setHeight(int x, int y, byte b) {
         implementation.setHeight(x, y, b);
+    }
+
+    @Override
+    public void addRocks(Set<Point> newRocks) {
+        implementation.addRocks(newRocks);
+    }
+
+    @Override
+    public void removeRocks(Set<Point> deadRocks) {
+        implementation.removeRocks(deadRocks);
     }
 }

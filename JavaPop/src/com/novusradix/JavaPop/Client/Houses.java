@@ -74,7 +74,7 @@ public class Houses implements AbstractHouses, GLObject {
 
                     gl.glColor3f(1, 1, 1);
                     gl.glEnable(GL.GL_LIGHTING);
-                    houseModel.display(p, basis, gl, time);
+                    houseModel.display(p, basis, gl);
 
                 }
                 gl.glDisable(GL.GL_LIGHTING);
@@ -110,7 +110,7 @@ public class Houses implements AbstractHouses, GLObject {
                     pos.y = h.y + 0.5f;
                     pos.z = game.heightMap.getHeight(pos.x, pos.y) + 1.0f;
 
-                    ankhModel.display(pos, basis, gl, time);
+                    ankhModel.display(pos, basis, gl);
                 }
             }
         }

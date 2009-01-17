@@ -1,15 +1,21 @@
 package com.novusradix.JavaPop.Server;
 
-import com.novusradix.JavaPop.Math.Helpers;
+import com.novusradix.JavaPop.Math.*;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
+import com.novusradix.JavaPop.Messaging.RockUpdate;
 import com.novusradix.JavaPop.Tile;
+import com.sun.opengl.impl.mipmap.HalveImage;
 import java.util.Random;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import static java.lang.Math.*;
@@ -30,9 +36,15 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
     private byte[][] oldTex;
     private boolean[][] flat;
     private SortedSet<Integer> houseChanges;
+    private Set<Point> staticRocks;
+    private Map<Point, MutableFloat> dynamicRocks;
+    private Set<Point> newRocks;
 
     public HeightMap(Dimension mapSize) {
         super(mapSize);
+        staticRocks = new HashSet<Point>();
+        newRocks = new HashSet<Point>();
+        dynamicRocks = new HashMap<Point, MutableFloat>();
         houseChanges = new TreeSet<Integer>();
 
         heights = new byte[width * breadth];
@@ -115,6 +127,10 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
     public void setTile(int x, int y, Tile t) {
         if (tileInBounds(x, y)) {
+            Tile oldTile = Tile.tiles[tex[x][y]];
+            if (t == oldTile) {
+                return;
+            }
             boolean bflat = isFlat(x, y);
             boolean bseaLevel = isSeaLevel(x, y);
             if (!bflat && !t.canExistOnSlope) {
@@ -124,33 +140,50 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
                 return;
             }
 
-            if (t.isFertile != Tile.tiles[tex[x][y]].isFertile) {
+            if (!bseaLevel && dynamicRocks.containsKey(new Point(x, y))) {
+                //Rock beats scissors
+                t = Tile.ROCK;
+            }
+
+            if (t.isFertile != oldTile.isFertile) {
                 synchronized (houseChanges) {
                     houseChanges.add(x + y * width);
                 }
             }
+            if (oldTile == Tile.ROCK) {
+                Point p = new Point(x, y);
+                if (!dynamicRocks.containsKey(p)) {
+                    dynamicRocks.put(p, new MutableFloat(1.0f));
+                }
+                staticRocks.remove(p);
+            }
+            if (t == Tile.ROCK) {
+                Point p = new Point(x, y);
+                if (!dynamicRocks.containsKey(p)) {
+                    dynamicRocks.put(p, new MutableFloat(0.0f));
+                    newRocks.add(p);
+                }
+                staticRocks.remove(p);
+            }
             tex[x][y] = t.id;
+
         }
     }
 
     public void clearTile(int x, int y) {
         boolean bflat = isFlat(x, y);
         boolean bseaLevel = isSeaLevel(x, y);
+        Tile t;
         if (bseaLevel) {
-            tex[x][y] = Tile.SEA.id;
-
+            t = Tile.SEA;
             return;
         }
         if (bflat) {
-            if (!Tile.tiles[tex[x][y]].isFertile) {
-                synchronized (houseChanges) {
-                    houseChanges.add(x + y * width);
-                }
-            }
-            tex[x][y] = Tile.EMPTY_FLAT.id;
+            t = Tile.EMPTY_FLAT;
         } else {
-            tex[x][y] = Tile.EMPTY_SLOPE.id;
+            t = Tile.EMPTY_SLOPE;
         }
+        setTile(x, y, t);
     }
 
     public Tile getTile(int x, int y) {
@@ -276,5 +309,51 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         }
 
         return m;
+    }
+
+    public RockUpdate updateRocks(float timeElapsed) {
+        Set<Point> deadRocks;
+        deadRocks = new HashSet<Point>();
+        Iterator<Entry<Point, MutableFloat>> i;
+        Entry<Point, MutableFloat> e;
+        Point p;
+        MutableFloat f;
+        boolean sea;
+        i = dynamicRocks.entrySet().iterator();
+        while (i.hasNext()) {
+            e = i.next();
+            p = e.getKey();
+            f = e.getValue();
+            sea = isSeaLevel(p.x, p.y);
+            if (sea) {
+                f.f -= timeElapsed / 2.0f;
+                if (f.f < 0.0f) {
+                    deadRocks.add(p);
+                    i.remove();
+                }
+            } else {
+                f.f += timeElapsed / 2.0f;
+                if (f.f > 1.0f) {
+                    staticRocks.add(p);
+                    i.remove();
+                }
+            }
+        }
+        RockUpdate ru = null;
+        if (deadRocks.size() + newRocks.size() > 0) {
+            ru = new RockUpdate(newRocks, deadRocks);
+        }
+        newRocks.clear();
+        return ru;
+    }
+
+    @Override
+    public void addRocks(Set<Point> newRocks) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void removeRocks(Set<Point> deadRocks) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

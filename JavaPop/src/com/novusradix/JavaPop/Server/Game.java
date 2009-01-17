@@ -10,6 +10,7 @@ import com.novusradix.JavaPop.Messaging.Message;
 import com.novusradix.JavaPop.Messaging.PlayerUpdate;
 import com.novusradix.JavaPop.Effects.Effect;
 import com.novusradix.JavaPop.Effects.LightningEffect;
+import com.novusradix.JavaPop.Messaging.RockUpdate;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.io.ByteArrayOutputStream;
@@ -171,14 +172,18 @@ public class Game extends TimerTask {
             timer.cancel();
         }
         HeightMapUpdate m;
-        //synchronized (heightMap) { //TODO:Does this need to be synchronized at this high a level?
         peons.step(seconds);
         houses.step(seconds);
         m = heightMap.GetUpdate();
-        //}
         if (m != null) {
             sendAllPlayers(m);
         }
+        
+        RockUpdate ru;
+        ru= heightMap.updateRocks(seconds);
+        if(ru!=null)
+            sendAllPlayers(ru);
+        
         for (Effect e : effects.values()) {
             e.execute(this);
         }
