@@ -268,6 +268,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 break;
             case EMPTY_FLAT:
             case EMPTY_SLOPE:
+            case ROCK:
+            case TREE:
                 texid = 3;
                 break;
             case FARM:
@@ -285,8 +287,6 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
             case BASALT:
                 texid = 8;
                 break;
-            case ROCK:
-            case TREE:
             default:
                 texid = 9;
                 break;
@@ -517,7 +517,7 @@ lastTime = time;
             for (Entry<Point, MutableFloat> e : rocks.entrySet()) {
                 x = e.getKey().x;
                 y = e.getKey().y;
-                p.set(x, y, e.getValue().f + heightMap.getHeight(x+0.5f, y+0.5f));
+                p.set(x, y, e.getValue().f + heightMap.getHeight(x+0.5f, y+0.5f)-1.0f);
                 rock.display(p, Matrix4.identity, gl);
             }
         }
