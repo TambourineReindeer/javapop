@@ -1,8 +1,8 @@
 package com.novusradix.JavaPop.Messaging.Tools;
 
+import com.novusradix.JavaPop.Effects.BatholithEffect;
 import com.novusradix.JavaPop.Effects.Effect;
 import com.novusradix.JavaPop.Messaging.Message;
-import com.novusradix.JavaPop.Effects.LightningEffect;
 import java.awt.Point;
 import java.util.Map;
 
@@ -10,24 +10,24 @@ import java.util.Map;
  *
  * @author gef
  */
-public class StartLightning extends Message {
+public class StartBatholith extends Message {
 
     Point target;
 
-    public StartLightning(Point p) {
+    public StartBatholith(Point p) {
         target = p;
     }
 
     @Override
     public void execute() {
-        LightningEffect le = new LightningEffect(target);
+        BatholithEffect be = new BatholithEffect(target);
         Map<Class, Effect> myEffects = serverGame.persistentEffects.get(serverPlayer);
-        if (myEffects.containsKey(LightningEffect.class)){
+        if (myEffects.containsKey(BatholithEffect.class)){
             
-            serverGame.deleteEffect(myEffects.get(LightningEffect.class));
+            serverGame.deleteEffect(myEffects.get(BatholithEffect.class));
         }
 
-        serverGame.addEffect(le);
-        myEffects.put(LightningEffect.class, le);
+        serverGame.addEffect(be);
+        myEffects.put(BatholithEffect.class, be);
     }
 }

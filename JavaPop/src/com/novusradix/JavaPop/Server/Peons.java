@@ -129,22 +129,29 @@ public class Peons {
             enemies.remove(player);
             Point nearestPeon = nearestPeon(getPoint(), enemies, 8);
             Point nearestHouse = game.houses.nearestHouse(getPoint(), enemies);
+            Point nearest;
             float dp, dh;
             if (nearestHouse == null && nearestPeon == null) {
                 return findFlatLand(getPoint());
             }
             if (nearestPeon == null) {
-                return nearestHouse;
+                nearest= nearestHouse;
             }
             if (nearestHouse == null) {
-                return nearestPeon;
+                nearest= nearestPeon;
             }
             dp = (pos.x - nearestPeon.x) * (pos.x - nearestPeon.x) + (pos.y - nearestPeon.y) * (pos.y - nearestPeon.y);
             dh = (pos.x - nearestHouse.x) * (pos.x - nearestHouse.x) + (pos.y - nearestHouse.y) * (pos.y - nearestHouse.y);
             if (dp < dh) {
-                return nearestPeon;
+                nearest = nearestPeon;
             }
-            return nearestHouse;
+            else
+            { nearest= nearestHouse;
+        }
+            if((p.x-nearest.x)*(p.x-nearest.x)+(p.y-nearest.y)+(p.y-nearest.y)>100)
+                return findFlatLand(getPoint());
+            return nearest;
+                
         }
 
         private Point findFriend() {
@@ -260,6 +267,10 @@ public class Peons {
                             }
                             break;
                         case FIGHT:
+                            if (game.houses.canBuild(oldPos.x, oldPos.y)) {
+                                game.houses.addHouse(oldPos.x, oldPos.y, player, strength, leaders.containsValue(this));
+                                return changeState(State.SETTLED);
+                            }
                             setDest(findEnemy());
                             break;
                         case GROUP:

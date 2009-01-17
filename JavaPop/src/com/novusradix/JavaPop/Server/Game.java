@@ -47,7 +47,8 @@ public class Game extends TimerTask {
     private Map<Integer, Effect> effects;
     private Map<Integer, Effect> newEffects;
     private Collection<Integer> deletedEffects;
-    public Map<Player, LightningEffect> lightningEffects;
+    public Map<Player, Map<Class,Effect>> persistentEffects;
+    
     private long frame;
 
     public Game(Player owner) {
@@ -61,7 +62,7 @@ public class Game extends TimerTask {
         effects = new HashMap<Integer, Effect>();
         newEffects = new HashMap<Integer, Effect>();
         deletedEffects = new HashSet<Integer>();
-        lightningEffects = new HashMap<Player, LightningEffect>();
+        persistentEffects = new HashMap<Player, Map<Class, Effect>>();
     }
 
     public int getId() {
@@ -126,10 +127,12 @@ public class Game extends TimerTask {
             Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        
         Map<Player, Point> startingPosition = new HashMap<Player, Point>();
         for (Player p : players) {
             startingPosition.put(p, new Point(r.nextInt(heightMap.getWidth()), r.nextInt(heightMap.getBreadth())));
             p.info.ankh.setLocation(heightMap.width / 2, heightMap.breadth / 2);
+            persistentEffects.put(p, new HashMap<Class, Effect>());
         }
         
         int numPeons = 3;

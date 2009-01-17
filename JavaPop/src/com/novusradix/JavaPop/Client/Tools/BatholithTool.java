@@ -1,6 +1,8 @@
 package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
+import com.novusradix.JavaPop.Messaging.Tools.StartBatholith;
+import com.novusradix.JavaPop.Messaging.Tools.StopBatholith;
 import java.awt.Point;
 
 /**
@@ -14,7 +16,13 @@ public class BatholithTool extends Tool {
     }
 
     @Override
-    public void PrimaryAction(Point p) {
+    public void ButtonDown(Point p) {
+        client.sendMessage(new StartBatholith(p));
+    }
+
+    @Override
+    public void ButtonUp(Point p) {
+        client.sendMessage(new StopBatholith());
     }
 
     public String getIconName() {

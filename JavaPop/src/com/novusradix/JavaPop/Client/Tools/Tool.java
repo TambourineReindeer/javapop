@@ -2,6 +2,7 @@ package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
 import com.novusradix.JavaPop.Client.GLToolButton;
+import java.awt.Cursor;
 import java.awt.Point;
 
 /**
@@ -52,4 +53,9 @@ public abstract class Tool {
     }
     
     public abstract String getIconName();
+    
+    public Cursor getCursor()
+    {
+        return Cursor.getDefaultCursor();
+    }
 }
