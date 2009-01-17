@@ -4,14 +4,37 @@
  */
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Client.Tools.AchillesTool;
+import com.novusradix.JavaPop.Client.Tools.AdonisTool;
+import com.novusradix.JavaPop.Client.Tools.ArmageddonTool;
+import com.novusradix.JavaPop.Client.Tools.BaptismalFontsTool;
+import com.novusradix.JavaPop.Client.Tools.BasaltTool;
+import com.novusradix.JavaPop.Client.Tools.Tool;
+import com.novusradix.JavaPop.Client.Tools.BatholithTool;
 import com.novusradix.JavaPop.Client.Tools.EarthquakeTool;
+import com.novusradix.JavaPop.Client.Tools.FireColumnTool;
+import com.novusradix.JavaPop.Client.Tools.FireRainTool;
+import com.novusradix.JavaPop.Client.Tools.ForestTool;
+import com.novusradix.JavaPop.Client.Tools.FungusTool;
+import com.novusradix.JavaPop.Client.Tools.HelenOfTroyTool;
+import com.novusradix.JavaPop.Client.Tools.HeraclesTool;
+import com.novusradix.JavaPop.Client.Tools.Hurricane;
 import com.novusradix.JavaPop.Client.Tools.LightningTool;
 import com.novusradix.JavaPop.Client.Tools.MoveAnkhTool;
+import com.novusradix.JavaPop.Client.Tools.OdysseusTool;
+import com.novusradix.JavaPop.Client.Tools.PerseusTool;
+import com.novusradix.JavaPop.Client.Tools.PlagueTool;
 import com.novusradix.JavaPop.Client.Tools.RaiseLowerTool;
+import com.novusradix.JavaPop.Client.Tools.RenewTool;
+import com.novusradix.JavaPop.Client.Tools.RoadsTool;
+import com.novusradix.JavaPop.Client.Tools.StormTool;
 import com.novusradix.JavaPop.Client.Tools.SwampTool;
 import com.novusradix.JavaPop.Client.Tools.TidalWaveTool;
 import com.novusradix.JavaPop.Client.Tools.ToolGroup;
 import com.novusradix.JavaPop.Client.Tools.VolcanoTool;
+import com.novusradix.JavaPop.Client.Tools.WallsTool;
+import com.novusradix.JavaPop.Client.Tools.WhirlpoolTool;
+import com.novusradix.JavaPop.Client.Tools.WhirlwindTool;
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Effects.Effect;
 import com.novusradix.JavaPop.Server.Player.Info;
@@ -41,7 +64,7 @@ public class Game extends TimerTask {
     Collection<GLObject> objects;
     public Map<Integer, Effect> effects;
     public Collection<ToolGroup> toolGroups;
-    
+
     protected Game() {
     }
 
@@ -69,31 +92,54 @@ public class Game extends TimerTask {
                 me = p;
             }
         }
+        //Todo: receive these from the server
         toolGroups = new ArrayList<ToolGroup>();
-        ToolGroup people = new ToolGroup("/com/novusradix/JavaPop/icons/People.png", new Point(50, -175));
+        ToolGroup people = new ToolGroup("/com/novusradix/JavaPop/icons/People.png");
         toolGroups.add(people);
         people.addTool(new RaiseLowerTool(people, client));
         people.addTool(new MoveAnkhTool(people, client));
-        
-        ToolGroup veg = new ToolGroup("/com/novusradix/JavaPop/icons/Vegetation.png", new Point(100, -150));
+        people.addTool(new PerseusTool(people, client));
+        people.addTool(new PlagueTool(people, client));
+        people.addTool(new ArmageddonTool(people, client));
+
+        ToolGroup veg = new ToolGroup("/com/novusradix/JavaPop/icons/Vegetation.png");
         toolGroups.add(veg);
+        veg.addTool(new ForestTool(veg, client));
+        veg.addTool(new RenewTool(veg, client));
         veg.addTool(new SwampTool(veg, client));
-        
-        ToolGroup earth = new ToolGroup("/com/novusradix/JavaPop/icons/Earth.png", new Point(150, -125));
+        veg.addTool(new FungusTool(veg, client));
+        veg.addTool(new AdonisTool(veg, client));
+
+        ToolGroup earth = new ToolGroup("/com/novusradix/JavaPop/icons/Earth.png");
         toolGroups.add(earth);
+        earth.addTool(new RoadsTool(earth, client));
+        earth.addTool(new WallsTool(earth, client));
         earth.addTool(new EarthquakeTool(earth, client));
-        
-        ToolGroup air = new ToolGroup("/com/novusradix/JavaPop/icons/Air.png", new Point(200, -100));
+        earth.addTool(new BatholithTool(earth, client));
+        earth.addTool(new HeraclesTool(earth, client));
+
+        ToolGroup air = new ToolGroup("/com/novusradix/JavaPop/icons/Air.png");
         toolGroups.add(air);
         air.addTool(new LightningTool(air, client));
-        
-        ToolGroup fire = new ToolGroup("/com/novusradix/JavaPop/icons/Fire.png", new Point(250, -75));
+        air.addTool(new WhirlwindTool(air, client));
+        air.addTool(new StormTool(air, client));
+        air.addTool(new Hurricane(air, client));
+        air.addTool(new OdysseusTool(air, client));
+
+        ToolGroup fire = new ToolGroup("/com/novusradix/JavaPop/icons/Fire.png");
         toolGroups.add(fire);
+        fire.addTool(new FireColumnTool(fire, client));
+        fire.addTool(new FireRainTool(fire, client));
         fire.addTool(new VolcanoTool(fire, client));
-        
-        ToolGroup water = new ToolGroup("/com/novusradix/JavaPop/icons/Water.png", new Point(300, -50));
+        fire.addTool(new AchillesTool(fire, client));
+
+        ToolGroup water = new ToolGroup("/com/novusradix/JavaPop/icons/Water.png");
         toolGroups.add(water);
+        water.addTool(new BasaltTool(water, client));
+        water.addTool(new WhirlpoolTool(water, client));
+        water.addTool(new BaptismalFontsTool(water, client));
         water.addTool(new TidalWaveTool(water, client));
+        water.addTool(new HelenOfTroyTool(water, client));
 
         startTimer();
         frame = new GameFrame(this);
@@ -116,10 +162,10 @@ public class Game extends TimerTask {
         peons.step(seconds);
     //houses.step(seconds);
     }
-    
-    public void lookAt(Point p)
-    {
-        if(frame!=null)
+
+    public void lookAt(Point p) {
+        if (frame != null) {
             frame.mc.lookAt(p);
+        }
     }
 }

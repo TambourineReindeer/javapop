@@ -1,12 +1,10 @@
 package com.novusradix.JavaPop.Client;
 
 import com.sun.opengl.util.texture.Texture;
-import com.sun.opengl.util.texture.TextureIO;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -65,6 +63,7 @@ public abstract class GLButton implements GLObject, GLClickable {
         gl.glShadeModel(GL.GL_FLAT);
         gl.glDisable(GL.GL_DEPTH_TEST);
         gl.glEnable(GL.GL_TEXTURE_2D);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR_MIPMAP_LINEAR);
         gl.glUseProgram(0);
         if (isSelected() || (mDown && mOver)) {
             gl.glColor3f(0.6f, 0.6f, 0.8f);
@@ -78,7 +77,7 @@ public abstract class GLButton implements GLObject, GLClickable {
 
         gl.glLoadIdentity();
         gl.glPushMatrix();
-        gl.glScalef(0.1f, 0.2f, 0.1f);
+        //gl.glScalef(0.1f, 0.2f, 0.1f);
 
         gl.glBegin(GL.GL_POLYGON);
 
@@ -90,6 +89,7 @@ public abstract class GLButton implements GLObject, GLClickable {
         gl.glPopMatrix();
         tex.enable();
         tex.bind();
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         gl.glBegin(GL.GL_POLYGON);
 
         for (int n = 0; n < buttonShape.npoints; n++) {
@@ -107,13 +107,10 @@ public abstract class GLButton implements GLObject, GLClickable {
     }
 
     public void init(GL gl) {
-        URL u = getClass().getResource(texname);
-        URL u2 = getClass().getResource("/com/novusradix/JavaPop/textures/marble.png");
+        
         try {
-            tex = TextureIO.newTexture(u, false, "png");
-            if (marble == null) {
-                marble = TextureIO.newTexture(u2, true, "png");
-            }
+            tex = MainCanvas.glHelper.getTexture(gl, texname);
+            marble = MainCanvas.glHelper.getTexture(gl, "/com/novusradix/JavaPop/textures/marble.png");
         } catch (IOException ex) {
             Logger.getLogger(GLButton.class.getName()).log(Level.SEVERE, null, ex);
         } catch (GLException ex) {

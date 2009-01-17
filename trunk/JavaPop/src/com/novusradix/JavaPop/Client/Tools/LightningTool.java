@@ -9,7 +9,7 @@ import java.awt.Point;
  *
  * @author gef
  */
-public class LightningTool extends BaseTool {
+public class LightningTool extends Tool {
 
     public LightningTool(ToolGroup tg, Client c) {
         super(tg,c);
@@ -31,9 +31,5 @@ public class LightningTool extends BaseTool {
 
     public String getToolTip() {
         return "Lightning";
-    }
-
-    public Point getPosition() {
-        return new Point(150, -75);
     }
 }

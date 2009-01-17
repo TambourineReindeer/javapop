@@ -55,9 +55,8 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private long frameTime;
     private ClickableHandler clickables;
     private boolean mouseIsOver;
-
     public static GLHelper glHelper;
-    
+
     public MainCanvas(GLCapabilities caps, Game g) {
         super(caps);
         glHelper = new GLHelper();
@@ -106,10 +105,10 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPushMatrix();
 
-        gl.glTranslatef(0,0,-50);
+        gl.glTranslatef(0, 0, -50);
         gl.glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
         gl.glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
-        gl.glTranslatef((0.70711f * xPos - yPos / 0.70711f), -(yPos / 0.70711f) - xPos * 0.70711f,0);
+        gl.glTranslatef((0.70711f * xPos - yPos / 0.70711f), -(yPos / 0.70711f) - xPos * 0.70711f, 0);
 
         gl.glScalef(1.0f, 1.0f, fHeightScale);
 
@@ -154,18 +153,17 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         flush(gl);
         handleKeys();
         //printFPS();
-        try{
+        try {
             glHelper.checkGL(gl);
-        }catch(GLHelper.GLHelperException e)
-        {
+        } catch (GLHelper.GLHelperException e) {
             Logger.getLogger(MainCanvas.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 
     void lookAt(Point p) {
-       xPos = (p.y-p.x)/1.4f;
-       yPos = (p.x+p.y)/2.8f;
-       //rough and ready
+        xPos = (p.y - p.x) / 1.4f;
+        yPos = (p.x + p.y) / 2.8f;
+    //rough and ready
     }
 
     private void flush(GL gl) { //separate method helps when profiling
@@ -226,8 +224,10 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     public void init(final GLAutoDrawable glDrawable) {
+        //Called before first display and on fullscreen/mode changes
         final GL gl = glDrawable.getGL();
-
+        Logger.getLogger(MainCanvas.class.getName()).log(Level.INFO, "GL Init");
+        glHelper.init(gl);
         gl.setSwapInterval(1);
         gl.glEnable(GL.GL_LIGHTING);
         float global_ambient[] = {0.1f, 0.1f, 0.1f, 1.0f};
@@ -309,14 +309,14 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private void mousePick() {
         float l;
 
-        Vector3 z0, z1, s;
+        Vector3 z0,z1 ,s ;
         z0 = new Vector3(xMouse, yMouse, 10);
         z1 = new Vector3(xMouse, yMouse, 11);
 
         mvpInverse.transform(z0);
         mvpInverse.transform(z1);
 
-        Vector3 v0n, v1n;
+        Vector3 v0n,v1n ;
         v0n = new Vector3(z0);
         v1n = new Vector3(z1);
 
@@ -360,12 +360,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Point iterateSelection(Point current, Vector3 v0, Vector3 v1) {
         Vector3 p;
 
-        float d, oldD;
+        float d,  oldD;
         p = new Vector3(current.x, current.y, game.heightMap.getHeight(current.x, current.y));
         d = Helpers.PointLineDistance(v0, v1, p);
         oldD = d;
 
-        int x, y;
+        int x,  y;
         for (Point offset : Helpers.rings[1]) {
             x = current.x + offset.x;
             y = current.y + offset.y;

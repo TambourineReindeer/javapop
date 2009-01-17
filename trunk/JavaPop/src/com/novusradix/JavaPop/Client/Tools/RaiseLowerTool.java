@@ -8,7 +8,7 @@ import java.awt.Point;
  *
  * @author gef
  */
-public class RaiseLowerTool extends BaseTool {
+public class RaiseLowerTool extends Tool {
 
     public RaiseLowerTool(ToolGroup tg, Client c) {
         super(tg, c);
@@ -30,9 +30,5 @@ public class RaiseLowerTool extends BaseTool {
 
     public String getToolTip() {
         return "Raise/Lower land";
-    }
-
-    public Point getPosition() {
-        return new Point(0, -150);
     }
 }
