@@ -4,12 +4,14 @@ import com.novusradix.JavaPop.Client.GLHelper.GLHelperException;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.TextureIO;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.GL;
@@ -254,5 +256,14 @@ public class HeightMapGLSL implements HeightMapImpl {
             dirtyTiles.height = y - dirtyTiles.y;
         }
 
+    }
+    
+    public void addRocks(Set<Point> newRocks) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    
+    public void removeRocks(Set<Point> deadRocks) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

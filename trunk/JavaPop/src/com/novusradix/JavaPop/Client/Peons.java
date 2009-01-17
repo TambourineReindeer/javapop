@@ -63,7 +63,7 @@ public class Peons implements GLObject {
                     v.z += (float) abs((float) sin(t * 4.0f) / 2.0f + 0.1f);
                 }
                 gl.glColor3fv(p.player.colour, 0);
-                peonModel.display(v, p.basis, gl, time);
+                peonModel.display(v, p.basis, gl);
             }
         }
 
@@ -73,12 +73,12 @@ public class Peons implements GLObject {
             for (Peon p : leaders.values()) {
                 if (p != null) {
                     Vector3 pos = new Vector3();
-                    Matrix4 basis = new Matrix4(Matrix4.identity);
+                    
                     pos.x = p.posx + 0.5f;
                     pos.y = p.posy + 0.5f;
                     pos.z = game.heightMap.getHeight(pos.x, pos.y) + 1.0f;
 
-                    ankhModel.display(pos, basis, gl, time);
+                    ankhModel.display(pos, Matrix4.identity, gl);
                 }
 
             }

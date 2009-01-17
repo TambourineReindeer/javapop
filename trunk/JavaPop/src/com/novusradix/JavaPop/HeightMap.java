@@ -7,6 +7,8 @@ package com.novusradix.JavaPop;
 import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import java.awt.Dimension;
+import java.awt.Point;
+import java.util.Set;
 
 /**
  *
@@ -137,7 +139,7 @@ public abstract class HeightMap {
     }
 
     public boolean isFlat(int x, int y) {
-           int ha = 0, hb = 0, hc = 0, hd = 0;
+        int ha = 0, hb = 0, hc = 0, hd = 0;
         if (x < 0 || y < 0 || x + 1 >= width || y + 1 >= breadth) {
             return false;
         }
@@ -155,4 +157,8 @@ public abstract class HeightMap {
     public void applyUpdate(HeightMapUpdate u) {
         throw new UnsupportedOperationException("Not implemented in superclass");
     }
+
+    public abstract void addRocks(Set<Point> newRocks);
+
+    public abstract void removeRocks(Set<Point> deadRocks);
 }

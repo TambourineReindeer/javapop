@@ -1,12 +1,20 @@
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Math.Matrix4;
+import com.novusradix.JavaPop.Math.MutableFloat;
+import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.novusradix.JavaPop.Tile;
 import com.sun.opengl.util.BufferUtil;
+import java.awt.Point;
 import java.io.IOException;
 import java.nio.FloatBuffer;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import javax.media.opengl.*;
 import static javax.media.opengl.GL.*;
 
@@ -42,8 +50,15 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     private boolean[] changed;
     private int displaylist;
     private static float[] tempFloats;
+    private XModel rock,  tree;
+    private Map<Point, MutableFloat> rocks;
+    
+    float lastTime;
 
     public void initialise(HeightMap h) {
+        rock = new XModel("/com/novusradix/JavaPop/models/rock.x", "/com/novusradix/JavaPop/textures/marble.png");
+        tree = new XModel("/com/novusradix/JavaPop/models/tree.x", "/com/novusradix/JavaPop/textures/tree.png");
+        rocks = new HashMap<Point, MutableFloat>();
         heightMap = h;
         vertexstride = 8;
         tilestride = 12 * vertexstride;
@@ -269,6 +284,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 break;
             case BASALT:
                 texid = 8;
+                break;
             case ROCK:
             case TREE:
             default:
@@ -329,8 +345,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     }
 
     private void setNormals(int x, int y, int vertA, int vertB, int vertC, float[] tileData) {
-        float ax,  ay,  az,  bx,  by,  bz,  cx,  cy,  cz;
-        float nx,  ny,  nz;
+        float ax, ay, az, bx, by, bz, cx, cy, cz;
+        float nx, ny, nz;
         ax = tileData[bufPos(0, 0, vertA, VX)];
         ay = tileData[bufPos(0, 0, vertA, VY)];
         az = tileData[bufPos(0, 0, vertA, VZ)];
@@ -383,9 +399,12 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 heightMap.breadth - 1; n++) {
             changed[n] = true;
         }
+        tree.init(gl);
+        rock.init(gl);
     }
 
     public void display(GL gl, float time) {
+
         gl.glEnable(GL_LIGHTING);
         gl.glEnable(GL.GL_LIGHT1);
 
@@ -426,11 +445,13 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
             }
 
         }
-        tex.disable();
+        stepRocks(time-lastTime);
+        renderRocks(gl);
+lastTime = time;
     }
 
     public void applyUpdate(HeightMapUpdate u) {
-        int x,  y;
+        int x, y;
         synchronized (this) {
             if (!u.dirtyRegion.isEmpty()) {
                 for (y = 0; y < u.dirtyRegion.height; y++) {
@@ -448,5 +469,58 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 setTile(e.getKey() % heightMap.width, e.getKey() / heightMap.width, e.getValue());
             }
         }
+    }
+
+    public void addRocks(Set<Point> r) {
+        synchronized (rocks) {
+            for (Point p : r) {
+                rocks.put(p, new MutableFloat(0));
+
+            }
+        }
+    }
+
+    public void removeRocks(Set<Point> r) {
+        synchronized (rocks) {
+            for (Point p : r) {
+                rocks.remove(p);
+            }
+        }
+    }
+
+    private void stepRocks(float elapsedTime) {
+        Entry<Point, MutableFloat> e;
+        MutableFloat f;
+        Point p;
+        Boolean sea;
+        Iterator<Entry<Point, MutableFloat>> i = rocks.entrySet().iterator();
+        while (i.hasNext()) {
+            e = i.next();
+            f = e.getValue();
+            p = e.getKey();
+            sea = heightMap.isSeaLevel(p.x, p.y);
+            if (sea) {
+                f.f = Math.max(0.0f, f.f - elapsedTime / 2.0f);
+            } else {
+                f.f = Math.min(1.0f, f.f + elapsedTime / 2.0f);
+            }
+        }
+
+    }
+
+    private void renderRocks(GL gl) {
+        rock.prepare(gl);
+        Vector3 p = new Vector3();
+        gl.glUseProgram(0);
+        int x, y;
+        synchronized (rocks) {
+            for (Entry<Point, MutableFloat> e : rocks.entrySet()) {
+                x = e.getKey().x;
+                y = e.getKey().y;
+                p.set(x, y, e.getValue().f + heightMap.getHeight(x+0.5f, y+0.5f));
+                rock.display(p, Matrix4.identity, gl);
+            }
+        }
+
     }
 }
