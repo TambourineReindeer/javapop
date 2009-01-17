@@ -3,9 +3,7 @@ package com.novusradix.JavaPop.Client;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.novusradix.JavaPop.Tile;
 import com.sun.opengl.util.BufferUtil;
-import com.sun.opengl.util.texture.TextureIO;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.FloatBuffer;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -255,8 +253,6 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 break;
             case EMPTY_FLAT:
             case EMPTY_SLOPE:
-            case ROCK:
-            case TREE:
                 texid = 3;
                 break;
             case FARM:
@@ -271,8 +267,12 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
             case SWAMP:
                 texid = 7;
                 break;
-            default:
+            case BASALT:
                 texid = 8;
+            case ROCK:
+            case TREE:
+            default:
+                texid = 9;
                 break;
         }
 
@@ -329,8 +329,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     }
 
     private void setNormals(int x, int y, int vertA, int vertB, int vertC, float[] tileData) {
-        float ax, ay, az, bx, by, bz, cx, cy, cz;
-        float nx, ny, nz;
+        float ax,  ay,  az,  bx,  by,  bz,  cx,  cy,  cz;
+        float nx,  ny,  nz;
         ax = tileData[bufPos(0, 0, vertA, VX)];
         ay = tileData[bufPos(0, 0, vertA, VY)];
         az = tileData[bufPos(0, 0, vertA, VZ)];
@@ -430,7 +430,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     }
 
     public void applyUpdate(HeightMapUpdate u) {
-        int x, y;
+        int x,  y;
         synchronized (this) {
             if (!u.dirtyRegion.isEmpty()) {
                 for (y = 0; y < u.dirtyRegion.height; y++) {

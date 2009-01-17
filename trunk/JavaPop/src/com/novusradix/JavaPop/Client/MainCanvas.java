@@ -9,7 +9,6 @@ import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Effects.Effect;
 import com.novusradix.JavaPop.Server.Player.PeonMode;
-import java.awt.Cursor;
 import java.awt.Point;
 
 import java.awt.event.KeyEvent;
@@ -93,7 +92,10 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     public void display(final GLAutoDrawable glAD) {
+        if (mouseIsOver) {
+            setCursor(GLToolButton.getSelected().getCursor());
         // TODO Auto-generated method stub
+        }
         final GL gl = glAD.getGL();
         gl.glClearColor(0, 0, 0, 0);
         gl.glEnable(GL.GL_LIGHTING);
@@ -172,7 +174,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     private void displayCursor(final GL gl) {
         if (mouseIsOver) {
-            float cW, cH;
+            float cW,   cH;
             cW = 0.02f;
             cH = 0.1f;
             gl.glDisable(GL.GL_LIGHTING);
@@ -360,12 +362,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Point iterateSelection(Point current, Vector3 v0, Vector3 v1) {
         Vector3 p;
 
-        float d,  oldD;
+        float d,   oldD;
         p = new Vector3(current.x, current.y, game.heightMap.getHeight(current.x, current.y));
         d = Helpers.PointLineDistance(v0, v1, p);
         oldD = d;
 
-        int x,  y;
+        int x,   y;
         for (Point offset : Helpers.rings[1]) {
             x = current.x + offset.x;
             y = current.y + offset.y;
@@ -386,7 +388,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     public void mouseEntered(MouseEvent e) {
-        setCursor(Cursor.getDefaultCursor());
         mouseIsOver = true;
     }
 

@@ -1,5 +1,6 @@
 package com.novusradix.JavaPop.Effects;
 
+import com.novusradix.JavaPop.Direction;
 import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Server.Game;
 import com.novusradix.JavaPop.Tile;
@@ -43,10 +44,10 @@ public class VolcanoEffect extends Effect {
                 py = p.y + target.y;
                 g.heightMap.setTile(px, py, Tile.LAVA);
             }
-            g.addEffect(new LavaTrailEffect(target, LavaTrailEffect.Direction.NORTH));
-            g.addEffect(new LavaTrailEffect(new Point(target.x - 1, target.y), LavaTrailEffect.Direction.WEST));
-            g.addEffect(new LavaTrailEffect(new Point(target.x, target.y - 1), LavaTrailEffect.Direction.EAST));
-            g.addEffect(new LavaTrailEffect(new Point(target.x - 1, target.y - 1), LavaTrailEffect.Direction.SOUTH));
+            g.addEffect(new LavaTrailEffect(target, Direction.NORTH));
+            g.addEffect(new LavaTrailEffect(new Point(target.x - 1, target.y), Direction.WEST));
+            g.addEffect(new LavaTrailEffect(new Point(target.x, target.y - 1), Direction.EAST));
+            g.addEffect(new LavaTrailEffect(new Point(target.x - 1, target.y - 1), Direction.SOUTH));
             g.deleteEffect(this);
         }
         age++;
