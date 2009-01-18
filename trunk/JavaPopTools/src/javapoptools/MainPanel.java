@@ -6,6 +6,7 @@ import com.novusradix.JavaPop.Math.Vector3;
 import java.nio.FloatBuffer;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLJPanel;
@@ -14,7 +15,7 @@ import javax.media.opengl.GLJPanel;
  *
  * @author gef
  */
-public class MainPanel extends GLJPanel implements GLEventListener {
+public class MainPanel extends GLCanvas implements GLEventListener {
 
     private static final float fHeightScale = 0.4082f;
     Model model;
@@ -30,7 +31,7 @@ public class MainPanel extends GLJPanel implements GLEventListener {
     
     public void setData(ModelData d) {
         data = d;
-        model = new Model(d, "");
+        model = new Model(d, "/com/novusradix/JavaPop/textures/marble.png");
         modelPosition = new Vector3();
         modelBasis = new Matrix4(Matrix4.identity);
     }
@@ -73,6 +74,7 @@ public class MainPanel extends GLJPanel implements GLEventListener {
         gl.glScalef(1.0f, 1.0f, fHeightScale);
 
         if (model != null) {
+            
             model.prepare(gl);
             model.display(modelPosition, modelBasis, gl);
         }

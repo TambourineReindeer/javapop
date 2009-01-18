@@ -24,11 +24,15 @@ public class MainWindow extends javax.swing.JFrame {
     /** Creates new form MainWindow */
     public MainWindow() {
         initComponents();
+        
         GLCapabilities caps = new GLCapabilities();
         caps.setSampleBuffers(true);
         caps.setNumSamples(8);
         mp = new MainPanel(caps);
-        add(mp);
+        
+        
+        previewPanel.add(mp);
+        mp.setSize(100,100);
         Animator a =new Animator(mp);
         a.start();
     }
@@ -42,6 +46,9 @@ public class MainWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        optionPanel = new javax.swing.JPanel();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        previewPanel = new javax.swing.JPanel();
         Menu = new javax.swing.JMenuBar();
         FileMenu = new javax.swing.JMenu();
         OpenMenuItem = new javax.swing.JMenuItem();
@@ -49,7 +56,13 @@ public class MainWindow extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setName("JavaPop tools"); // NOI18N
-        getContentPane().setLayout(new java.awt.FlowLayout());
+
+        optionPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Options"));
+
+        jRadioButton1.setText("jRadioButton1");
+        optionPanel.add(jRadioButton1);
+
+        previewPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Preview"));
 
         FileMenu.setText("File");
 
@@ -67,6 +80,21 @@ public class MainWindow extends javax.swing.JFrame {
         Menu.add(jMenu2);
 
         setJMenuBar(Menu);
+
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(previewPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 245, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(optionPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 173, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(optionPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
+            .add(previewPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
+        );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -104,6 +132,9 @@ private void OpenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     private javax.swing.JMenuBar Menu;
     private javax.swing.JMenuItem OpenMenuItem;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JPanel optionPanel;
+    private javax.swing.JPanel previewPanel;
     // End of variables declaration//GEN-END:variables
 
 }
