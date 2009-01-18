@@ -11,7 +11,15 @@ import javax.media.opengl.glu.GLU;
 import static javax.media.opengl.GL.*;
 
 public class GLHelper {
-
+    static private GLHelper instance;
+    
+    public static GLHelper getHelper()
+    {
+        if(instance==null)
+            instance = new GLHelper();
+        return instance;
+    }
+    
     private Map<String, Texture> textures;
 
     public GLHelper() {
@@ -82,7 +90,7 @@ public class GLHelper {
         return strings;
     }
 
-    class GLHelperException extends Exception {
+    public class GLHelperException extends Exception {
 
         private String message;
         public int code;

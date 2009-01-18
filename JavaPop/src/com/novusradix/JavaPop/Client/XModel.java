@@ -336,28 +336,7 @@ public class XModel {
 
     private class Vector8 {
 
-         
-         
-         
-         
-         
-         
-         
-         
-
-          
-        
-
-           
-                           
-        
-
-            
-                
-                    
-                                               
-            
-             float x, y, z, nx, ny, nz, tx, ty;
+        float x, y, z, nx, ny, nz, tx, ty;
 
         public Vector8() {
         }
