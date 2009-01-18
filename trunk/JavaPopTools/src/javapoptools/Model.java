@@ -95,12 +95,13 @@ public class Model {
             tex.bind();
             gl.glUseProgram(shader);
             gl.glUniform1i(gl.glGetUniformLocation(shader, "tex1"), 0);
+            gl.glUniform4f(gl.glGetUniformLocation(shader, "color"), 1,0,0,0.5f);
         } else {
             gl.glDisable(GL_TEXTURE_2D);
             gl.glUseProgram(0);
         }
 
-        gl.glEnable(GL_LIGHTING);
+        gl.glDisable(GL_LIGHTING);
         gl.glDisable(GL.GL_BLEND);
         gl.glShadeModel(GL.GL_SMOOTH);
         gl.glEnable(GL.GL_DEPTH_TEST);
@@ -163,7 +164,7 @@ public class Model {
             if (shader == 0) {
                 gl.glDeleteProgram(shader);
             }
-            shader = glh.LoadShaderProgram(gl, null, "/com/novusradix/JavaPop/Client/Shaders/ModelFragment.shader");
+            shader = glh.LoadShaderProgram(gl, "/com/novusradix/JavaPop/Client/Shaders/ModelVertex.shader", "/com/novusradix/JavaPop/Client/Shaders/ModelFragment.shader");
         } catch (IOException ex) {
             Logger.getLogger(Model.class.getName()).log(Level.INFO, null, ex);
         } catch (GLHelperException ex) {
