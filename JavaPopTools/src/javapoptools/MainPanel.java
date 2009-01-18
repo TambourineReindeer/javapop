@@ -72,7 +72,7 @@ public class MainPanel extends GLCanvas implements GLEventListener {
         final GL gl = glAD.getGL();
         float time = (System.nanoTime() - startTime) / 1000.0f;
 
-        gl.glClearColor(0, 0, 0, 0);
+        gl.glClearColor(0, 0, 0.8f, 0);
         gl.glEnable(GL.GL_LIGHTING);
 
         gl.glShadeModel(GL.GL_FLAT);
@@ -89,7 +89,7 @@ public class MainPanel extends GLCanvas implements GLEventListener {
         gl.glScalef(1.0f, 1.0f, fHeightScale);
 
         gl.glRotatef(0, 0, 1, time);
-        gl.glColor4f(1, 0, 0, 1);
+        
         if (model != null) {
 
             model.prepare(gl);
