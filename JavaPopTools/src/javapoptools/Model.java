@@ -27,6 +27,8 @@ public class Model {
     private int[] vbos;
     private static Plane3 left,  right,  top,  bottom;
     private static Vector3 tl,  tr,  bl,  br,  ftl,  fbr;
+    private boolean initialised = false;
+    
 
     static {
         tl = new Vector3();
@@ -69,6 +71,8 @@ public class Model {
     }
 
     public void prepare(GL gl) {
+        if(!initialised)
+            init(gl);
         if (tex == null) {
             texInit(gl);
         }
@@ -139,6 +143,7 @@ public class Model {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        initialised = true;
     }
 
     private void texInit(GL gl) {
@@ -147,5 +152,9 @@ public class Model {
         } catch (IOException ex) {
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public boolean isInitialised() {
+        return initialised;
     }
 }
