@@ -6,6 +6,7 @@
 package javapoptools;
 
 import com.sun.opengl.util.Animator;
+import java.awt.Dimension;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
@@ -20,20 +21,25 @@ import javax.swing.JFileChooser;
 public class MainWindow extends javax.swing.JFrame {
 
     MainPanel mp;
+    final JFileChooser modelChooser = new JFileChooser();
+    final JFileChooser textureChooser = new JFileChooser();
 
     /** Creates new form MainWindow */
     public MainWindow() {
         initComponents();
-        
+
         GLCapabilities caps = new GLCapabilities();
         caps.setSampleBuffers(true);
         caps.setNumSamples(8);
         mp = new MainPanel(caps);
-        
-        
+
+
+        mp.setPreferredSize(new Dimension(128, 128));
         previewPanel.add(mp);
-        mp.setSize(100,100);
-        Animator a =new Animator(mp);
+
+        XImporter i = new XImporter(getClass().getResource("/com/novusradix/JavaPop/models/peon5.x"));
+        mp.setData(i.getModel());
+        Animator a = new Animator(mp);
         a.start();
     }
 
@@ -52,6 +58,7 @@ public class MainWindow extends javax.swing.JFrame {
         Menu = new javax.swing.JMenuBar();
         FileMenu = new javax.swing.JMenu();
         OpenMenuItem = new javax.swing.JMenuItem();
+        openTextureMenuItem = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -66,13 +73,21 @@ public class MainWindow extends javax.swing.JFrame {
 
         FileMenu.setText("File");
 
-        OpenMenuItem.setText("Open...");
+        OpenMenuItem.setText("Open Model...");
         OpenMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 OpenMenuItemActionPerformed(evt);
             }
         });
         FileMenu.add(OpenMenuItem);
+
+        openTextureMenuItem.setText("Open Texture...");
+        openTextureMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openTextureMenuItemActionPerformed(evt);
+            }
+        });
+        FileMenu.add(openTextureMenuItem);
 
         Menu.add(FileMenu);
 
@@ -100,21 +115,34 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
 private void OpenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OpenMenuItemActionPerformed
-    final JFileChooser fc = new JFileChooser();
 
+    int returnVal = modelChooser.showOpenDialog(this);
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+        File f = modelChooser.getSelectedFile();
+        XImporter i;
+        try {
+            i = new XImporter(f.toURL());
+            mp.setData(i.getModel());
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+}//GEN-LAST:event_OpenMenuItemActionPerformed
 
-    int returnVal = fc.showOpenDialog(this);
-    File f = fc.getSelectedFile();
-    XImporter i;
-   
-    try {
-        i = new XImporter(f.toURL());
-        mp.setData(i.getModel());
-    } catch (MalformedURLException ex) {
-        Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+private void openTextureMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openTextureMenuItemActionPerformed
+// TODO add your handling code here:
+//GEN-LAST:event_openTextureMenuItemActionPerformed
+    int returnVal = textureChooser.showOpenDialog(this);
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+        File f = textureChooser.getSelectedFile();
+        try{
+            mp.setTexture(f.toURL());
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-}//GEN-LAST:event_OpenMenuItemActionPerformed
+}
 
     /**
     * @param args the command line arguments
@@ -133,6 +161,7 @@ private void OpenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     private javax.swing.JMenuItem OpenMenuItem;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JMenuItem openTextureMenuItem;
     private javax.swing.JPanel optionPanel;
     private javax.swing.JPanel previewPanel;
     // End of variables declaration//GEN-END:variables

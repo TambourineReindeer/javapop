@@ -1,15 +1,19 @@
 package javapoptools;
 
 import com.novusradix.JavaPop.Client.GLHelper;
+import com.novusradix.JavaPop.Client.GLHelper.GLHelperException;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
+import java.net.URL;
 import java.nio.FloatBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLJPanel;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 /**
  *
@@ -18,22 +22,31 @@ import javax.media.opengl.GLJPanel;
 public class MainPanel extends GLCanvas implements GLEventListener {
 
     private static final float fHeightScale = 0.4082f;
-    Model model;
-    ModelData data;
-    Vector3 modelPosition;
-    Matrix4 modelBasis;
+    private Model model;
+    private ModelData data;
+    private URL textureURL;
+    private Vector3 modelPosition;
+    private Matrix4 modelBasis;
+    private long startTime;
 
-    public MainPanel(GLCapabilities caps)
-    {
+    public MainPanel(GLCapabilities caps) {
         super(caps);
         addGLEventListener(this);
+        startTime = System.nanoTime();
     }
-    
+
     public void setData(ModelData d) {
         data = d;
-        model = new Model(d, "/com/novusradix/JavaPop/textures/marble.png");
+        model = new Model(d, textureURL);
         modelPosition = new Vector3();
         modelBasis = new Matrix4(Matrix4.identity);
+    }
+
+    public void setTexture(URL u) {
+        textureURL = u;
+        if (model != null) {
+            model.setTextureURL(u);
+        }
     }
 
     public void init(GLAutoDrawable glAD) {
@@ -57,6 +70,8 @@ public class MainPanel extends GLCanvas implements GLEventListener {
 
     public void display(GLAutoDrawable glAD) {
         final GL gl = glAD.getGL();
+        float time = (System.nanoTime() - startTime) / 1000.0f;
+
         gl.glClearColor(0, 0, 0, 0);
         gl.glEnable(GL.GL_LIGHTING);
 
@@ -73,13 +88,19 @@ public class MainPanel extends GLCanvas implements GLEventListener {
 
         gl.glScalef(1.0f, 1.0f, fHeightScale);
 
+        gl.glRotatef(0, 0, 1, time);
+        gl.glColor4f(1, 0, 0, 1);
         if (model != null) {
-            
+
             model.prepare(gl);
             model.display(modelPosition, modelBasis, gl);
         }
         gl.glPopMatrix();
-
+        try {
+            GLHelper.getHelper().checkGL(gl);
+        } catch (GLHelperException ex) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void reshape(final GLAutoDrawable glDrawable, final int x, final int y, final int w, int h) {

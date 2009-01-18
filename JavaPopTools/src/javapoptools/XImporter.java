@@ -3,7 +3,6 @@ package javapoptools;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.sun.opengl.util.BufferUtil;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StreamTokenizer;
@@ -50,10 +49,14 @@ public class XImporter {
     public ModelData getModel() {
         ModelData m = new ModelData();
         m.vertices = BufferUtil.newFloatBuffer(b.limit());
+        m.vertices.put(b);
+        m.vertices.flip();
         m.normals = true;
         m.texcoords = true;
         m.indices = null;
         m.triangleCount = triangleCount;
+        m.radius = radius;
+        m.transform = new Matrix4(transform);               
         return m;
     }
 
