@@ -1,5 +1,6 @@
 package javapoptools;
 
+import com.novusradix.JavaPop.Math.Matrix4;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -14,6 +15,7 @@ public class ModelData {
     float radius;                   //Maximum distance from the origin, used for whole object viewport clipping.
     boolean normals;                //Set if vertices have normals
     boolean texcoords;              //Set if vertices have texture coordinates
+    Matrix4 transform;              //Object space transform
     
     public int getVertexStride()
     {
