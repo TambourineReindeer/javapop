@@ -12,20 +12,29 @@ import static javax.media.opengl.GL.*;
 
 public class GLHelper {
 
-    static private GLHelper instance;
+    final static public GLHelper glHelper = new GLHelper();
 
-    public static GLHelper getHelper() {
-        if (instance == null) {
-            instance = new GLHelper();
-        }
-        return instance;
-    }
     private Map<URL, Texture> textures;
 
     public GLHelper() {
     }
 
+    public String CompileShader(GL gl, int shader, String[] source) {
+        int[] is = new int[1];
+        byte[] chars;
+        gl.glShaderSource(shader, source.length, source, (int[]) null, 0);
+        gl.glCompileShader(shader);
+        gl.glGetShaderiv(shader, GL_INFO_LOG_LENGTH, is, 0);
+        if (is[0] > 0) {
+            chars = new byte[is[0]];
+            gl.glGetShaderInfoLog(shader, is[0], is, 0, chars, 0);
+            return new String(chars);           
+        }
+        return "OK\n";
+    }
+
     public int LoadShaderProgram(GL gl, String vertexSource, String fragmentSource) throws IOException, GLHelperException {
+        StringBuffer sb = new StringBuffer();
         int v, f;
         String[] strings;
         int[] is = new int[1];
@@ -34,37 +43,37 @@ public class GLHelper {
         if (vertexSource != null) {
             v = gl.glCreateShader(GL.GL_VERTEX_SHADER);
             strings = loadResource(vertexSource);
-            gl.glShaderSource(v, strings.length, strings, (int[]) null, 0);
-            gl.glCompileShader(v);
-            gl.glGetShaderiv(v, GL_INFO_LOG_LENGTH, is, 0);
-            if (is[0] > 0) {
-                chars = new byte[is[0]];
-                gl.glGetShaderInfoLog(v, is[0], is, 0, chars, 0);
-                String s = new String(chars);
-                throw new GLHelperException(0, s);
-            }
+            sb.append("Vertex shader compile:");
+            sb.append(CompileShader(gl, v, strings));
             gl.glAttachShader(shaderprogram, v);
         }
         if (fragmentSource != null) {
             f = gl.glCreateShader(GL.GL_FRAGMENT_SHADER);
             strings = loadResource(fragmentSource);
-            gl.glShaderSource(f, strings.length, strings, (int[]) null, 0);
-            gl.glCompileShader(f);
-            gl.glGetShaderiv(f, GL_INFO_LOG_LENGTH, is, 0);
-            if (is[0] > 0) {
-                chars = new byte[is[0]];
-                gl.glGetShaderInfoLog(f, is[0], is, 0, chars, 0);
-                String s = new String(chars);
-                throw new GLHelperException(0, s);
-
-            }
+            sb.append("Fragment shader compile:");
+            sb.append(CompileShader(gl, f, strings));
             gl.glAttachShader(shaderprogram, f);
         }
         gl.glLinkProgram(shaderprogram);
-        checkGL(gl);
+        gl.glGetProgramiv(shaderprogram, GL_INFO_LOG_LENGTH, is, 0);
+        if (is[0] > 0) {
+            chars = new byte[is[0]];
+            gl.glGetProgramInfoLog(shaderprogram, is[0], is, 0, chars, 0);
+            sb.append("Link:");
+            sb.append(new String(chars));   
+        }
         gl.glValidateProgram(shaderprogram);
-        checkGL(gl);
-        gl.glUseProgram(shaderprogram);
+        gl.glGetProgramiv(shaderprogram, GL_INFO_LOG_LENGTH, is, 0);
+        if (is[0] > 0) {
+            chars = new byte[is[0]];
+            gl.glGetProgramInfoLog(shaderprogram, is[0], is, 0, chars, 0);
+            sb.append("Validate:");
+            sb.append(new String(chars));
+        }
+        gl.glGetProgramiv(shaderprogram,GL_VALIDATE_STATUS,is,0);
+        if(is[0] == GL_FALSE)
+            throw new GLHelperException(0,sb.toString());
+            
         checkGL(gl);
         return shaderprogram;
     }
@@ -138,7 +147,7 @@ public class GLHelper {
 
         public GLHelperException(int errorcode, String extraInfo) {
             GLU glu = new GLU();
-            message = extraInfo + "/n" + glu.gluErrorString(errorcode);
+            message = extraInfo + "\n" + glu.gluErrorString(errorcode);
             code = errorcode;
         }
 
