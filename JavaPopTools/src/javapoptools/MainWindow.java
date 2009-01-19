@@ -14,7 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.media.opengl.GLCapabilities;
-import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 
 /**
@@ -23,25 +22,19 @@ import javax.swing.JFileChooser;
  */
 public class MainWindow extends javax.swing.JFrame {
 
-    MainPanel mp;
+    PreviewPanel mp;
     final JFileChooser modelChooser = new JFileChooser();
     final JFileChooser textureChooser = new JFileChooser();
-    final TextEditorForm vertexShaderEditor, fragmentShaderEditor;
-    Color playerColor=Color.RED;
-    
+    Color playerColor = Color.RED;
+
     /** Creates new form MainWindow */
     public MainWindow() {
         initComponents();
-        vertexShaderEditor = new TextEditorForm();
-        vertexShaderEditor.setTitle("Vertex Shader");
-        fragmentShaderEditor = new TextEditorForm();
-        fragmentShaderEditor.setTitle("Fragment Shader");
-        
-        
+
         GLCapabilities caps = new GLCapabilities();
         caps.setSampleBuffers(true);
         caps.setNumSamples(8);
-        mp = new MainPanel(caps, this);
+        mp = new PreviewPanel(caps, this);
 
 
         mp.setPreferredSize(new Dimension(128, 128));
@@ -53,34 +46,46 @@ public class MainWindow extends javax.swing.JFrame {
         a.start();
     }
 
-    public void setVertexStatus(String s)
-    {
-        vertexShaderEditor.setStatus(s);
+    public void setStatus(String s) {
+        status.setText(s);
     }
 
-    public void setFragmentStatus(String s){
-        fragmentShaderEditor.setStatus(s);
-    }
-      
-    public void appendVertexStatus(String s)
-    {
-        vertexShaderEditor.appendStatus(s);
+    public void appendStatus(String s) {
+        status.append(s);
     }
 
-    public void appendFragmentStatus(String s){
-        fragmentShaderEditor.appendStatus(s);
+    public boolean isVertexShaderEnabled() {
+        return vertexOnOff.isSelected();
     }
-    
-    public String getVertexShader()
-    {
-        return vertexShaderEditor.getText();
+
+    public boolean isFragmentShaderEnabled() {
+        return fragmentOnOff.isSelected();
     }
-    
-    public String getFragmentShader()
-    {
-        return fragmentShaderEditor.getText();
+
+    public String getVertexShader() {
+        return vertexEditor.getText();
     }
-    
+
+    public String getFragmentShader() {
+        return fragmentEditor.getText();
+    }
+
+    public float getRed() {
+        return redSlider.getValue() / 256.0f;
+    }
+
+    public float getGreen() {
+        return greenSlider.getValue() / 256.0f;
+    }
+
+    public float getBlue() {
+        return blueSlider.getValue() / 256.0f;
+    }
+
+    public float getAlpha() {
+        return alphaSlider.getValue() / 256.0f;
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -90,12 +95,49 @@ public class MainWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        renderGroup = new javax.swing.ButtonGroup();
         optionPanel = new javax.swing.JPanel();
+        panelZoom = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jSlider1 = new javax.swing.JSlider();
-        ShaderButton = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        panelColour = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        redSlider = new javax.swing.JSlider();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        greenSlider = new javax.swing.JSlider();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        blueSlider = new javax.swing.JSlider();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel7 = new javax.swing.JLabel();
+        alphaSlider = new javax.swing.JSlider();
+        panelRender = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        renderFixedFunction = new javax.swing.JRadioButton();
+        renderDefault = new javax.swing.JRadioButton();
+        renderCustom = new javax.swing.JRadioButton();
         previewPanel = new javax.swing.JPanel();
+        Menu = new javax.swing.JMenuBar();
+        FileMenu = new javax.swing.JMenu();
+        OpenMenuItem = new javax.swing.JMenuItem();
+        openTextureMenuItem = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        editors = new javax.swing.JPanel();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        jSplitPane2 = new javax.swing.JSplitPane();
+        vertexPane = new javax.swing.JPanel();
+        vertexOnOff = new javax.swing.JToggleButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        vertexEditor = new javax.swing.JEditorPane();
+        fragmentPane = new javax.swing.JPanel();
+        fragmentOnOff = new javax.swing.JToggleButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        fragmentEditor = new javax.swing.JEditorPane();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        status = new javax.swing.JTextArea();
         Menu = new javax.swing.JMenuBar();
         FileMenu = new javax.swing.JMenu();
         OpenMenuItem = new javax.swing.JMenuItem();
@@ -106,8 +148,15 @@ public class MainWindow extends javax.swing.JFrame {
         setName("JavaPop tools"); // NOI18N
 
         optionPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Options"));
+        optionPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        panelZoom.setMinimumSize(new java.awt.Dimension(120, 54));
+        panelZoom.setPreferredSize(new java.awt.Dimension(120, 70));
+        panelZoom.setRequestFocusEnabled(false);
+        panelZoom.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
 
         jLabel1.setText("Zoom");
+        panelZoom.add(jLabel1);
 
         jSlider1.setMajorTickSpacing(1);
         jSlider1.setMaximum(4);
@@ -116,56 +165,188 @@ public class MainWindow extends javax.swing.JFrame {
         jSlider1.setPaintTicks(true);
         jSlider1.setSnapToTicks(true);
         jSlider1.setValue(1);
-        jSlider1.setPreferredSize(new java.awt.Dimension(170, 54));
+        jSlider1.setPreferredSize(new java.awt.Dimension(113, 54));
         jSlider1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 jSlider1StateChanged(evt);
             }
         });
+        panelZoom.add(jSlider1);
 
-        ShaderButton.setText("Edit shaders");
-        ShaderButton.addActionListener(new java.awt.event.ActionListener() {
+        optionPanel.add(panelZoom);
+
+        panelColour.setMinimumSize(new java.awt.Dimension(120, 100));
+        panelColour.setPreferredSize(new java.awt.Dimension(120, 180));
+        panelColour.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+
+        jLabel3.setText("Player colour");
+        panelColour.add(jLabel3);
+
+        jLabel4.setText("R");
+        jPanel1.add(jLabel4);
+
+        redSlider.setMajorTickSpacing(32);
+        redSlider.setMaximum(256);
+        redSlider.setPaintTicks(true);
+        redSlider.setValue(256);
+        redSlider.setName(""); // NOI18N
+        redSlider.setPreferredSize(new java.awt.Dimension(100, 30));
+        jPanel1.add(redSlider);
+
+        panelColour.add(jPanel1);
+
+        jLabel5.setText("G");
+        jPanel2.add(jLabel5);
+
+        greenSlider.setMajorTickSpacing(32);
+        greenSlider.setMaximum(256);
+        greenSlider.setPaintTicks(true);
+        greenSlider.setName(""); // NOI18N
+        greenSlider.setPreferredSize(new java.awt.Dimension(100, 30));
+        jPanel2.add(greenSlider);
+
+        panelColour.add(jPanel2);
+
+        jLabel6.setText("B");
+        jPanel3.add(jLabel6);
+
+        blueSlider.setMajorTickSpacing(32);
+        blueSlider.setMaximum(256);
+        blueSlider.setPaintTicks(true);
+        blueSlider.setName(""); // NOI18N
+        blueSlider.setPreferredSize(new java.awt.Dimension(100, 30));
+        jPanel3.add(blueSlider);
+
+        panelColour.add(jPanel3);
+
+        jLabel7.setText("A");
+        jPanel4.add(jLabel7);
+
+        alphaSlider.setMajorTickSpacing(32);
+        alphaSlider.setMaximum(256);
+        alphaSlider.setPaintTicks(true);
+        alphaSlider.setValue(256);
+        alphaSlider.setName(""); // NOI18N
+        alphaSlider.setPreferredSize(new java.awt.Dimension(100, 30));
+        jPanel4.add(alphaSlider);
+
+        panelColour.add(jPanel4);
+
+        optionPanel.add(panelColour);
+
+        panelRender.setMaximumSize(new java.awt.Dimension(140, 100));
+        panelRender.setMinimumSize(new java.awt.Dimension(140, 100));
+        panelRender.setPreferredSize(new java.awt.Dimension(130, 90));
+        panelRender.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0));
+
+        jLabel2.setText("Rendering");
+        panelRender.add(jLabel2);
+
+        renderGroup.add(renderFixedFunction);
+        renderFixedFunction.setLabel("Fixed Function");
+        renderFixedFunction.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ShaderButtonActionPerformed(evt);
+                renderFixedFunctionActionPerformed(evt);
             }
         });
+        panelRender.add(renderFixedFunction);
 
-        jButton1.setText("jButton1");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        renderGroup.add(renderDefault);
+        renderDefault.setLabel("Model default");
+        renderDefault.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                renderDefaultActionPerformed(evt);
             }
         });
+        panelRender.add(renderDefault);
 
-        org.jdesktop.layout.GroupLayout optionPanelLayout = new org.jdesktop.layout.GroupLayout(optionPanel);
-        optionPanel.setLayout(optionPanelLayout);
-        optionPanelLayout.setHorizontalGroup(
-            optionPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(optionPanelLayout.createSequentialGroup()
-                .add(jLabel1)
-                .add(20, 20, 20))
-            .add(jSlider1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
-            .add(optionPanelLayout.createSequentialGroup()
-                .add(ShaderButton)
-                .addContainerGap())
-            .add(optionPanelLayout.createSequentialGroup()
-                .add(jButton1)
-                .addContainerGap())
-        );
-        optionPanelLayout.setVerticalGroup(
-            optionPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(optionPanelLayout.createSequentialGroup()
-                .add(jLabel1)
-                .add(8, 8, 8)
-                .add(jSlider1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(ShaderButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jButton1)
-                .add(93, 93, 93))
-        );
+        renderGroup.add(renderCustom);
+        renderCustom.setSelected(true);
+        renderCustom.setText("Custom");
+        renderCustom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                renderCustomActionPerformed(evt);
+            }
+        });
+        panelRender.add(renderCustom);
+
+        optionPanel.add(panelRender);
 
         previewPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Preview"));
+
+        FileMenu.setText("File");
+
+        OpenMenuItem.setText("Open Model...");
+        OpenMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                OpenMenuItemActionPerformed(evt);
+            }
+        });
+        FileMenu.add(OpenMenuItem);
+
+        openTextureMenuItem.setText("Open Texture...");
+        openTextureMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openTextureMenuItemActionPerformed(evt);
+            }
+        });
+        FileMenu.add(openTextureMenuItem);
+
+        Menu.add(FileMenu);
+
+        jMenu2.setText("Edit");
+        Menu.add(jMenu2);
+
+        setJMenuBar(Menu);
+
+        editors.setLayout(new java.awt.BorderLayout());
+
+        jSplitPane1.setDividerLocation(399);
+        jSplitPane1.setDividerSize(4);
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane1.setResizeWeight(1.0);
+
+        jSplitPane2.setDividerLocation(200);
+        jSplitPane2.setResizeWeight(0.5);
+        jSplitPane2.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                jSplitPane2ComponentResized(evt);
+            }
+        });
+
+        vertexPane.setLayout(new javax.swing.BoxLayout(vertexPane, javax.swing.BoxLayout.PAGE_AXIS));
+
+        vertexOnOff.setSelected(true);
+        vertexOnOff.setText("Vertex shader enabled");
+        vertexPane.add(vertexOnOff);
+
+        jScrollPane2.setViewportView(vertexEditor);
+
+        vertexPane.add(jScrollPane2);
+
+        jSplitPane2.setLeftComponent(vertexPane);
+
+        fragmentPane.setLayout(new javax.swing.BoxLayout(fragmentPane, javax.swing.BoxLayout.PAGE_AXIS));
+
+        fragmentOnOff.setSelected(true);
+        fragmentOnOff.setText("Fragment shader enabled");
+        fragmentPane.add(fragmentOnOff);
+
+        jScrollPane3.setViewportView(fragmentEditor);
+
+        fragmentPane.add(jScrollPane3);
+
+        jSplitPane2.setRightComponent(fragmentPane);
+
+        jSplitPane1.setLeftComponent(jSplitPane2);
+
+        status.setColumns(20);
+        status.setRows(5);
+        jScrollPane1.setViewportView(status);
+
+        jSplitPane1.setRightComponent(jScrollPane1);
+
+        editors.add(jSplitPane1, java.awt.BorderLayout.CENTER);
 
         FileMenu.setText("File");
 
@@ -196,15 +377,21 @@ public class MainWindow extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(previewPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 245, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(optionPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, previewPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, optionPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 145, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(editors, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(optionPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .add(previewPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .add(previewPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 166, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(optionPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 381, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(69, Short.MAX_VALUE))
+            .add(editors, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE)
         );
 
         pack();
@@ -216,12 +403,13 @@ private void OpenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     if (dir != null) {
         modelChooser.setCurrentDirectory(new File(dir));
     }
+    modelChooser.setDialogTitle("Open Model");
     int returnVal = modelChooser.showOpenDialog(this);
     if (returnVal == JFileChooser.APPROVE_OPTION) {
         File f = modelChooser.getSelectedFile();
 
         p.put("ModelDir", f.getParent());
-        
+
         XImporter i;
         try {
             i = new XImporter(f.toURL());
@@ -245,11 +433,12 @@ private void openTextureMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
     if (dir != null) {
         textureChooser.setCurrentDirectory(new File(dir));
     }
-     int returnVal = textureChooser.showOpenDialog(this);
+    textureChooser.setDialogTitle("Open Texture");
+    int returnVal = textureChooser.showOpenDialog(this);
     if (returnVal == JFileChooser.APPROVE_OPTION) {
         File f = textureChooser.getSelectedFile();
         p.put("TextureDir", f.getParent());
-        try{
+        try {
             mp.setTexture(f.toURL());
         } catch (MalformedURLException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
@@ -258,34 +447,69 @@ private void openTextureMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
 
 }//GEN-LAST:event_openTextureMenuItemActionPerformed
 
-private void ShaderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ShaderButtonActionPerformed
+private void renderFixedFunctionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_renderFixedFunctionActionPerformed
 // TODO add your handling code here:
-vertexShaderEditor.setVisible(true);//GEN-LAST:event_ShaderButtonActionPerformed
-fragmentShaderEditor.setVisible(true);
-}
+    mp.setPipeline(PreviewPanel.Pipeline.FIXED);
+}//GEN-LAST:event_renderFixedFunctionActionPerformed
 
-private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+private void renderDefaultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_renderDefaultActionPerformed
+// TODO add your handling code here:
+    mp.setPipeline(PreviewPanel.Pipeline.DEFAULT);
 
-playerColor = JColorChooser.showDialog(//GEN-LAST:event_jButton1ActionPerformed
-                     this,
-                     "Choose Player Color",
-                     playerColor);
+}//GEN-LAST:event_renderDefaultActionPerformed
 
-}
+private void renderCustomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_renderCustomActionPerformed
+// TODO add your handling code here:
+    mp.setPipeline(PreviewPanel.Pipeline.CUSTOM);
 
+}//GEN-LAST:event_renderCustomActionPerformed
 
+private void jSplitPane2ComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jSplitPane2ComponentResized
+// TODO add your handling code here:
+}//GEN-LAST:event_jSplitPane2ComponentResized
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu FileMenu;
     private javax.swing.JMenuBar Menu;
     private javax.swing.JMenuItem OpenMenuItem;
-    private javax.swing.JButton ShaderButton;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JSlider alphaSlider;
+    private javax.swing.JSlider blueSlider;
+    private javax.swing.JPanel editors;
+    private javax.swing.JEditorPane fragmentEditor;
+    private javax.swing.JToggleButton fragmentOnOff;
+    private javax.swing.JPanel fragmentPane;
+    private javax.swing.JSlider greenSlider;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSlider jSlider1;
+    private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JMenuItem openTextureMenuItem;
     private javax.swing.JPanel optionPanel;
+    private javax.swing.JPanel panelColour;
+    private javax.swing.JPanel panelRender;
+    private javax.swing.JPanel panelZoom;
     private javax.swing.JPanel previewPanel;
+    private javax.swing.JSlider redSlider;
+    private javax.swing.JRadioButton renderCustom;
+    private javax.swing.JRadioButton renderDefault;
+    private javax.swing.JRadioButton renderFixedFunction;
+    private javax.swing.ButtonGroup renderGroup;
+    private javax.swing.JTextArea status;
+    private javax.swing.JEditorPane vertexEditor;
+    private javax.swing.JToggleButton vertexOnOff;
+    private javax.swing.JPanel vertexPane;
     // End of variables declaration//GEN-END:variables
-
 }
