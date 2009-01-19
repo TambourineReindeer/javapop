@@ -24,7 +24,8 @@ public class Model {
     private ModelData data;
     private URL textureURL;
     private Texture tex;
-    private int shader;
+    private int shader,  defaultShader;
+    private boolean customShader;
     private int[] vbos;
     private static Plane3 left,  right,  top,  bottom;
     private static Vector3 tl,  tr,  bl,  br,  ftl,  fbr;
@@ -32,6 +33,7 @@ public class Model {
     private static boolean clip = false;
     private boolean newTexture = false;
     private int[] is = new int[1];
+    private float[] colour = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
     
 
     static {
@@ -46,7 +48,6 @@ public class Model {
         top = new Plane3();
         bottom = new Plane3();
     }
-    private boolean customShader;
 
     public Model(ModelData model) {
         data = model;
@@ -64,7 +65,6 @@ public class Model {
         textureURL = texture;
         customShader = true;
         shader = shaderProgram;
-
     }
 
     public void setTextureURL(URL u) {
@@ -93,6 +93,38 @@ public class Model {
         clip = true;
     }
 
+    /* Call to set the color that will be used after the next prepare()
+     * Does not have to be called in an OpenGL thread
+     */
+    public void setColor(float r, float g, float b, float a) {
+        colour[0] = r;
+        colour[1] = g;
+        colour[2] = b;
+        colour[3] = a;
+
+    }
+
+    /* Call to set the color that will be used in the next display()
+     * Has to be called in an OpenGL thread
+     * Can be called after prepare()
+     */
+    public void setColor(GL gl, float r, float g, float b, float a) {
+        setColor(r, g, b, a);
+        gl.glValidateProgram(shader);
+        gl.glGetProgramiv(shader, GL_VALIDATE_STATUS, is, 0);
+        if (is[0] == GL_TRUE) {
+            int l = gl.glGetUniformLocation(shader, "color");
+            if (l != -1) {
+                gl.glUniform4fv(l, 1, colour, 0);
+            }
+        } else {
+            gl.glColor4fv(colour, 0);
+        }
+    }
+
+    /* Call before display()
+     * Has to be called in an OpenGL thread
+     */
     public void prepare(GL gl) {
         if (!initialised) {
             init(gl);
@@ -108,10 +140,17 @@ public class Model {
             gl.glDisable(GL_TEXTURE_2D);
         }
 
-        gl.glValidateProgram(shader);
-        gl.glGetProgramiv(shader, GL_VALIDATE_STATUS, is, 0);
+        if (shader != 0) {
+            gl.glValidateProgram(shader);
+            gl.glGetProgramiv(shader, GL_VALIDATE_STATUS, is, 0);
+        }
 
-        if (is[0] == GL_TRUE) {
+        if (shader == 0 || is[0] == GL_FALSE) {
+            gl.glUseProgram(0);
+            gl.glEnable(GL_LIGHTING);
+            gl.glColor4fv(colour, 0);
+            gl.glShadeModel(GL.GL_SMOOTH);
+        } else {
             gl.glUseProgram(shader);
             int l;
             l = gl.glGetUniformLocation(shader, "tex1");
@@ -120,15 +159,10 @@ public class Model {
             }
             l = gl.glGetUniformLocation(shader, "color");
             if (l != -1) {
-                gl.glUniform4f(l, 1, 0, 0, 0.0f);
+                gl.glUniform4fv(l, 1, colour, 0);
             }
             gl.glDisable(GL_LIGHTING);
-        } else {
-            gl.glUseProgram(0);
-            gl.glEnable(GL_LIGHTING);
-            gl.glShadeModel(GL.GL_SMOOTH);
         }
-
         gl.glEnable(GL.GL_BLEND);
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glMatrixMode(GL.GL_TEXTURE);
@@ -148,6 +182,10 @@ public class Model {
         }
     }
 
+    /* Displays the model
+     * Has to be called in an OpenGL thread
+     * Must be called after prepare()
+     */
     public void display(Vector3 position, Matrix4 basis, GL gl) {
 
         if (clip) {
@@ -172,6 +210,10 @@ public class Model {
         }
     }
 
+    /* Initialises the model. Loads texture, compiles shaders etc.
+     * If not called before prepare(), it will be called automatically from there.
+     * Has to be called in an OpenGL thread
+     */
     public void init(GL gl) {
         GLHelper glh = GLHelper.glHelper;
         if (vbos != null) {
@@ -186,21 +228,21 @@ public class Model {
         gl.glBufferData(GL.GL_ARRAY_BUFFER,
                 data.vertices.capacity() * BufferUtil.SIZEOF_FLOAT, data.vertices,
                 GL.GL_STATIC_DRAW);
-
-        if (customShader == false) {
-            try {
-                if (shader != 0) {
-                    gl.glDeleteProgram(shader);
-                }
-                shader = glh.LoadShaderProgram(gl, "/com/novusradix/JavaPop/Client/Shaders/ModelVertex.shader", "/com/novusradix/JavaPop/Client/Shaders/ModelFragment.shader");
-            } catch (IOException ex) {
-                Logger.getLogger(Model.class.getName()).log(Level.INFO, null, ex);
-            } catch (GLHelperException ex) {
-                Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (GLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+        try {
+            if (defaultShader != 0) {
+                gl.glDeleteProgram(defaultShader);
             }
+            defaultShader = glh.LoadShaderProgram(gl, "/com/novusradix/JavaPop/Client/Shaders/ModelVertex.shader", "/com/novusradix/JavaPop/Client/Shaders/ModelFragment.shader");
+        } catch (IOException ex) {
+            Logger.getLogger(Model.class.getName()).log(Level.INFO, null, ex);
+        } catch (GLHelperException ex) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (GLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        if (!customShader) {
+            shader = defaultShader;
         }
         try {
             glh.checkGL(gl);
@@ -213,6 +255,11 @@ public class Model {
     public void setShader(int newshader) {
         shader = newshader;
         customShader = true;
+    }
+
+    public void setDefaultShader() {
+        shader = defaultShader;
+        customShader = false;
     }
 
     private void texInit(GL gl) {

@@ -19,7 +19,7 @@ import static javax.media.opengl.GL.*;
  *
  * @author gef
  */
-public class MainPanel extends GLCanvas implements GLEventListener {
+public class PreviewPanel extends GLCanvas implements GLEventListener {
 
     private static final float fHeightScale = 0.4082f;
     private Model model;
@@ -33,12 +33,32 @@ public class MainPanel extends GLCanvas implements GLEventListener {
     private String vertexShaderSource,  fragmentShaderSource;
     private int vertexShader,  fragmentShader,  shaderProgram;
     private boolean initShaders = true;
+    private boolean vertexShaderEnabled,  fragmentShaderEnabled;
+    private Pipeline pipe = Pipeline.CUSTOM;
 
-    public MainPanel(GLCapabilities caps, MainWindow mainWindow) {
+    public enum Pipeline {
+
+        FIXED, DEFAULT, CUSTOM
+    };
+
+    public PreviewPanel(GLCapabilities caps, MainWindow mainWindow) {
         super(caps);
         addGLEventListener(this);
         startTime = System.nanoTime();
         mw = mainWindow;
+    }
+
+    void setPipeline(Pipeline p) {
+        pipe = p;
+    }
+
+    private void setColor() {
+        float r, g, b, a;
+        r = mw.getRed();
+        g = mw.getGreen();
+        b = mw.getBlue();
+        a = mw.getAlpha();
+        model.setColor(r, g, b, a);
     }
 
     public void setData(ModelData d) {
@@ -76,7 +96,8 @@ public class MainPanel extends GLCanvas implements GLEventListener {
         shaderProgram = gl.glCreateProgram();
         gl.glAttachShader(shaderProgram, vertexShader);
         gl.glAttachShader(shaderProgram, fragmentShader);
-
+        vertexShaderEnabled = true;
+        fragmentShaderEnabled = true;
     }
 
     public void display(GLAutoDrawable glAD) {
@@ -91,12 +112,15 @@ public class MainPanel extends GLCanvas implements GLEventListener {
             fragmentShaderSource = mw.getFragmentShader();
             initShaders = true;
         }
+        if (mw.isVertexShaderEnabled() != vertexShaderEnabled || mw.isFragmentShaderEnabled() != fragmentShaderEnabled) {
+            initShaders = true;
+        }
         if (initShaders) {
             initializeShaders(gl);
         }
+        setColor();
         gl.glClearColor(0, 0, 0.8f, 0);
         gl.glEnable(GL.GL_LIGHTING);
-        gl.glColor4f(0.5f,0.5f,0.5f,0.5f);
         gl.glEnable(GL.GL_DEPTH_TEST);
 
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
@@ -112,7 +136,17 @@ public class MainPanel extends GLCanvas implements GLEventListener {
         gl.glRotatef(time * 20.f, 0, 0, 1);
 
         if (model != null) {
-            model.setShader(shaderProgram);
+            switch (pipe) {
+                case CUSTOM:
+                    model.setShader(shaderProgram);
+                    break;
+                case DEFAULT:
+                    model.setDefaultShader();
+                    break;
+                case FIXED:
+                    model.setShader(0);
+                    break;
+            }
             model.prepare(gl);
             model.display(modelPosition, modelBasis, gl);
         }
@@ -148,30 +182,38 @@ public class MainPanel extends GLCanvas implements GLEventListener {
     }
 
     private void initializeShaders(final GL gl) {
-        initShaders = false;
-        gl.glUseProgram(0);
-        mw.setVertexStatus("Compile:\n");
-        mw.setFragmentStatus("Compile:\n");
-        mw.appendVertexStatus(GLHelper.glHelper.CompileShader(gl, vertexShader, new String[]{vertexShaderSource}));
-        mw.appendFragmentStatus(GLHelper.glHelper.CompileShader(gl, fragmentShader, new String[]{fragmentShaderSource}));
         int[] is = new int[1];
         byte[] chars;
-        mw.appendVertexStatus("Link:\n");
-        mw.appendFragmentStatus("Link:\n");
+        initShaders = false;
+        gl.glUseProgram(0);
+        detachAllShaders(gl);
+        vertexShaderEnabled = false;
+        fragmentShaderEnabled = false;
+        mw.setStatus("");
+        if (mw.isVertexShaderEnabled()) {
+            mw.appendStatus("Compile Vertex Shader:\n");
+            mw.appendStatus(GLHelper.glHelper.CompileShader(gl, vertexShader, new String[]{vertexShaderSource}));
+            gl.glAttachShader(shaderProgram, vertexShader);
+            vertexShaderEnabled = true;
+        }
+        if (mw.isFragmentShaderEnabled()) {
+            mw.appendStatus("Compile Fragment Shader:\n");
+            mw.appendStatus(GLHelper.glHelper.CompileShader(gl, fragmentShader, new String[]{fragmentShaderSource}));
+            gl.glAttachShader(shaderProgram, fragmentShader);
+            fragmentShaderEnabled = true;
+        }
+        mw.appendStatus("Link:\n");
         gl.glLinkProgram(shaderProgram);
         gl.glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, is, 0);
         if (is[0] > 0) {
             chars = new byte[is[0]];
             gl.glGetProgramInfoLog(shaderProgram, is[0], is, 0, chars, 0);
             String s = new String(chars);
-            mw.appendFragmentStatus(s);
-            mw.appendVertexStatus(s);
+            mw.appendStatus(s);
         } else {
-            mw.appendFragmentStatus("OK\n");
-            mw.appendVertexStatus("OK\n");
+            mw.appendStatus("OK\n");
         }
-        mw.appendVertexStatus("Validate:\n");
-        mw.appendFragmentStatus("Validate:\n");
+        mw.appendStatus("Validate:\n");
 
         gl.glValidateProgram(shaderProgram);
         gl.glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, is, 0);
@@ -179,11 +221,29 @@ public class MainPanel extends GLCanvas implements GLEventListener {
             chars = new byte[is[0]];
             gl.glGetProgramInfoLog(shaderProgram, is[0], is, 0, chars, 0);
             String s = new String(chars);
-            mw.appendFragmentStatus(s);
-            mw.appendVertexStatus(s);
+            mw.appendStatus(s);
+
         } else {
-            mw.appendFragmentStatus("OK");
-            mw.appendVertexStatus("OK");
+            mw.appendStatus("OK");
+        }
+        try {
+            GLHelper.glHelper.checkGL(gl);
+        } catch (GLHelperException ex) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void detachAllShaders(GL gl) {
+        int is[] = new int[1];
+        int shaders[] = new int[2];
+        gl.glGetAttachedShaders(shaderProgram, 2, is, 0, shaders, 0);
+        for (int i = 0; i < is[0]; i++) {
+            gl.glDetachShader(shaderProgram, shaders[i]);
+        }
+        try {
+            GLHelper.glHelper.checkGL(gl);
+        } catch (GLHelperException ex) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
