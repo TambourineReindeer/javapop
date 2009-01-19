@@ -6,12 +6,15 @@
 package javapoptools;
 
 import com.sun.opengl.util.Animator;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import javax.media.opengl.GLCapabilities;
+import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 
 /**
@@ -23,15 +26,22 @@ public class MainWindow extends javax.swing.JFrame {
     MainPanel mp;
     final JFileChooser modelChooser = new JFileChooser();
     final JFileChooser textureChooser = new JFileChooser();
-
+    final TextEditorForm vertexShaderEditor, fragmentShaderEditor;
+    Color playerColor=Color.RED;
+    
     /** Creates new form MainWindow */
     public MainWindow() {
         initComponents();
-
+        vertexShaderEditor = new TextEditorForm();
+        vertexShaderEditor.setTitle("Vertex Shader");
+        fragmentShaderEditor = new TextEditorForm();
+        fragmentShaderEditor.setTitle("Fragment Shader");
+        
+        
         GLCapabilities caps = new GLCapabilities();
         caps.setSampleBuffers(true);
         caps.setNumSamples(8);
-        mp = new MainPanel(caps);
+        mp = new MainPanel(caps, this);
 
 
         mp.setPreferredSize(new Dimension(128, 128));
@@ -43,6 +53,34 @@ public class MainWindow extends javax.swing.JFrame {
         a.start();
     }
 
+    public void setVertexStatus(String s)
+    {
+        vertexShaderEditor.setStatus(s);
+    }
+
+    public void setFragmentStatus(String s){
+        fragmentShaderEditor.setStatus(s);
+    }
+      
+    public void appendVertexStatus(String s)
+    {
+        vertexShaderEditor.appendStatus(s);
+    }
+
+    public void appendFragmentStatus(String s){
+        fragmentShaderEditor.appendStatus(s);
+    }
+    
+    public String getVertexShader()
+    {
+        return vertexShaderEditor.getText();
+    }
+    
+    public String getFragmentShader()
+    {
+        return fragmentShaderEditor.getText();
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -53,7 +91,10 @@ public class MainWindow extends javax.swing.JFrame {
     private void initComponents() {
 
         optionPanel = new javax.swing.JPanel();
-        jRadioButton1 = new javax.swing.JRadioButton();
+        jLabel1 = new javax.swing.JLabel();
+        jSlider1 = new javax.swing.JSlider();
+        ShaderButton = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         previewPanel = new javax.swing.JPanel();
         Menu = new javax.swing.JMenuBar();
         FileMenu = new javax.swing.JMenu();
@@ -66,8 +107,63 @@ public class MainWindow extends javax.swing.JFrame {
 
         optionPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Options"));
 
-        jRadioButton1.setText("jRadioButton1");
-        optionPanel.add(jRadioButton1);
+        jLabel1.setText("Zoom");
+
+        jSlider1.setMajorTickSpacing(1);
+        jSlider1.setMaximum(4);
+        jSlider1.setMinimum(1);
+        jSlider1.setPaintLabels(true);
+        jSlider1.setPaintTicks(true);
+        jSlider1.setSnapToTicks(true);
+        jSlider1.setValue(1);
+        jSlider1.setPreferredSize(new java.awt.Dimension(170, 54));
+        jSlider1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSlider1StateChanged(evt);
+            }
+        });
+
+        ShaderButton.setText("Edit shaders");
+        ShaderButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ShaderButtonActionPerformed(evt);
+            }
+        });
+
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        org.jdesktop.layout.GroupLayout optionPanelLayout = new org.jdesktop.layout.GroupLayout(optionPanel);
+        optionPanel.setLayout(optionPanelLayout);
+        optionPanelLayout.setHorizontalGroup(
+            optionPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(optionPanelLayout.createSequentialGroup()
+                .add(jLabel1)
+                .add(20, 20, 20))
+            .add(jSlider1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
+            .add(optionPanelLayout.createSequentialGroup()
+                .add(ShaderButton)
+                .addContainerGap())
+            .add(optionPanelLayout.createSequentialGroup()
+                .add(jButton1)
+                .addContainerGap())
+        );
+        optionPanelLayout.setVerticalGroup(
+            optionPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(optionPanelLayout.createSequentialGroup()
+                .add(jLabel1)
+                .add(8, 8, 8)
+                .add(jSlider1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 54, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(ShaderButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jButton1)
+                .add(93, 93, 93))
+        );
 
         previewPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Preview"));
 
@@ -103,11 +199,11 @@ public class MainWindow extends javax.swing.JFrame {
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .add(previewPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 245, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(optionPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 173, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(optionPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(optionPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
+            .add(optionPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(previewPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
         );
 
@@ -115,10 +211,17 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
 private void OpenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OpenMenuItemActionPerformed
-
+    Preferences p = Preferences.userNodeForPackage(this.getClass());
+    String dir = p.get("ModelDir", null);
+    if (dir != null) {
+        modelChooser.setCurrentDirectory(new File(dir));
+    }
     int returnVal = modelChooser.showOpenDialog(this);
     if (returnVal == JFileChooser.APPROVE_OPTION) {
         File f = modelChooser.getSelectedFile();
+
+        p.put("ModelDir", f.getParent());
+        
         XImporter i;
         try {
             i = new XImporter(f.toURL());
@@ -129,12 +232,23 @@ private void OpenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     }
 }//GEN-LAST:event_OpenMenuItemActionPerformed
 
+private void jSlider1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider1StateChanged
+// TODO add your handling code here:
+    mp.setZoom(jSlider1.getValue());
+}//GEN-LAST:event_jSlider1StateChanged
+
 private void openTextureMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openTextureMenuItemActionPerformed
 // TODO add your handling code here:
-//GEN-LAST:event_openTextureMenuItemActionPerformed
-    int returnVal = textureChooser.showOpenDialog(this);
+
+    Preferences p = Preferences.userNodeForPackage(this.getClass());
+    String dir = p.get("TextureDir", null);
+    if (dir != null) {
+        textureChooser.setCurrentDirectory(new File(dir));
+    }
+     int returnVal = textureChooser.showOpenDialog(this);
     if (returnVal == JFileChooser.APPROVE_OPTION) {
         File f = textureChooser.getSelectedFile();
+        p.put("TextureDir", f.getParent());
         try{
             mp.setTexture(f.toURL());
         } catch (MalformedURLException ex) {
@@ -142,25 +256,33 @@ private void openTextureMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
         }
     }
 
+}//GEN-LAST:event_openTextureMenuItemActionPerformed
+
+private void ShaderButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ShaderButtonActionPerformed
+// TODO add your handling code here:
+vertexShaderEditor.setVisible(true);//GEN-LAST:event_ShaderButtonActionPerformed
+fragmentShaderEditor.setVisible(true);
 }
 
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainWindow().setVisible(true);
-            }
-        });
-    }
+private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+
+playerColor = JColorChooser.showDialog(//GEN-LAST:event_jButton1ActionPerformed
+                     this,
+                     "Choose Player Color",
+                     playerColor);
+
+}
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu FileMenu;
     private javax.swing.JMenuBar Menu;
     private javax.swing.JMenuItem OpenMenuItem;
+    private javax.swing.JButton ShaderButton;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu2;
-    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JSlider jSlider1;
     private javax.swing.JMenuItem openTextureMenuItem;
     private javax.swing.JPanel optionPanel;
     private javax.swing.JPanel previewPanel;

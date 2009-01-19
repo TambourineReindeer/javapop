@@ -31,6 +31,7 @@ public class Model {
     private boolean initialised = false;
     private static boolean clip = false;
     private boolean newTexture = false;
+    private int[] is = new int[1];
     
 
     static {
@@ -45,15 +46,25 @@ public class Model {
         top = new Plane3();
         bottom = new Plane3();
     }
+    private boolean customShader;
 
     public Model(ModelData model) {
         data = model;
-
+        customShader = false;
     }
 
     public Model(ModelData model, URL texture) {
         data = model;
         textureURL = texture;
+        customShader = false;
+    }
+
+    public Model(ModelData model, URL texture, int shaderProgram) {
+        data = model;
+        textureURL = texture;
+        customShader = true;
+        shader = shaderProgram;
+
     }
 
     public void setTextureURL(URL u) {
@@ -93,17 +104,32 @@ public class Model {
         if (tex != null) {
             tex.enable();
             tex.bind();
-            gl.glUseProgram(shader);
-            gl.glUniform1i(gl.glGetUniformLocation(shader, "tex1"), 0);
-            gl.glUniform4f(gl.glGetUniformLocation(shader, "color"), 1,0,0,0.5f);
         } else {
             gl.glDisable(GL_TEXTURE_2D);
-            gl.glUseProgram(0);
         }
 
-        gl.glDisable(GL_LIGHTING);
-        gl.glDisable(GL.GL_BLEND);
-        gl.glShadeModel(GL.GL_SMOOTH);
+        gl.glValidateProgram(shader);
+        gl.glGetProgramiv(shader, GL_VALIDATE_STATUS, is, 0);
+
+        if (is[0] == GL_TRUE) {
+            gl.glUseProgram(shader);
+            int l;
+            l = gl.glGetUniformLocation(shader, "tex1");
+            if (l != -1) {
+                gl.glUniform1i(l, 0);
+            }
+            l = gl.glGetUniformLocation(shader, "color");
+            if (l != -1) {
+                gl.glUniform4f(l, 1, 0, 0, 0.0f);
+            }
+            gl.glDisable(GL_LIGHTING);
+        } else {
+            gl.glUseProgram(0);
+            gl.glEnable(GL_LIGHTING);
+            gl.glShadeModel(GL.GL_SMOOTH);
+        }
+
+        gl.glEnable(GL.GL_BLEND);
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glMatrixMode(GL.GL_TEXTURE);
         gl.glLoadIdentity();
@@ -116,13 +142,14 @@ public class Model {
         gl.glNormalPointer(GL.GL_FLOAT, data.getVertexStride() * 4, data.getNormalOffset() * 4);
         gl.glTexCoordPointer(2, GL.GL_FLOAT, data.getVertexStride() * 4, data.getTexCoordOffset() * 4);
         try {
-            GLHelper.getHelper().checkGL(gl);
+            GLHelper.glHelper.checkGL(gl);
         } catch (GLHelperException ex) {
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public void display(Vector3 position, Matrix4 basis, GL gl) {
+
         if (clip) {
             if (left.distance(position) + data.radius < 0 || right.distance(position) + data.radius < 0 || top.distance(position) + data.radius < 0 || bottom.distance(position) + data.radius < 0) {
                 return;
@@ -139,14 +166,14 @@ public class Model {
         gl.glDrawArrays(GL.GL_TRIANGLES, 0, data.triangleCount * 3);
         gl.glPopMatrix();
         try {
-            GLHelper.getHelper().checkGL(gl);
+            GLHelper.glHelper.checkGL(gl);
         } catch (GLHelperException ex) {
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public void init(GL gl) {
-        GLHelper glh = GLHelper.getHelper();
+        GLHelper glh = GLHelper.glHelper;
         if (vbos != null) {
             gl.glDeleteBuffers(1, vbos, 0);
         }
@@ -160,18 +187,20 @@ public class Model {
                 data.vertices.capacity() * BufferUtil.SIZEOF_FLOAT, data.vertices,
                 GL.GL_STATIC_DRAW);
 
-        try {
-            if (shader == 0) {
-                gl.glDeleteProgram(shader);
+        if (customShader == false) {
+            try {
+                if (shader != 0) {
+                    gl.glDeleteProgram(shader);
+                }
+                shader = glh.LoadShaderProgram(gl, "/com/novusradix/JavaPop/Client/Shaders/ModelVertex.shader", "/com/novusradix/JavaPop/Client/Shaders/ModelFragment.shader");
+            } catch (IOException ex) {
+                Logger.getLogger(Model.class.getName()).log(Level.INFO, null, ex);
+            } catch (GLHelperException ex) {
+                Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (GLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
-            shader = glh.LoadShaderProgram(gl, "/com/novusradix/JavaPop/Client/Shaders/ModelVertex.shader", "/com/novusradix/JavaPop/Client/Shaders/ModelFragment.shader");
-        } catch (IOException ex) {
-            Logger.getLogger(Model.class.getName()).log(Level.INFO, null, ex);
-        } catch (GLHelperException ex) {
-            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (GLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
         try {
             glh.checkGL(gl);
@@ -181,9 +210,14 @@ public class Model {
         initialised = true;
     }
 
+    public void setShader(int newshader) {
+        shader = newshader;
+        customShader = true;
+    }
+
     private void texInit(GL gl) {
         try {
-            tex = GLHelper.getHelper().getTexture(gl, textureURL);
+            tex = GLHelper.glHelper.getTexture(gl, textureURL);
         } catch (IOException ex) {
             //no problem , just no texture.
         }
