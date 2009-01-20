@@ -2,6 +2,7 @@ package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
 import com.novusradix.JavaPop.Messaging.Tools.Earthquake;
+import java.awt.Cursor;
 import java.awt.Point;
 
 /**
@@ -28,4 +29,8 @@ public class EarthquakeTool extends Tool {
         return "Earthquake";
     }
 
+    @Override
+    public Cursor getCursor(){
+        return getDirectionalCursor();
+    }
 }
