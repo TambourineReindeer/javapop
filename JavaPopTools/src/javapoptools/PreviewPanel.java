@@ -68,6 +68,10 @@ public class PreviewPanel extends GLCanvas implements GLEventListener {
         modelBasis = new Matrix4(Matrix4.identity);
     }
 
+    public ModelData getModelData() {
+        return data;
+    }
+
     public void setTexture(URL u) {
         textureURL = u;
         if (model != null) {

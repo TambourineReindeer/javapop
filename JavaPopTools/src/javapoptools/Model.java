@@ -126,56 +126,75 @@ public class Model {
      * Has to be called in an OpenGL thread
      */
     public void prepare(GL gl) {
-        if (!initialised) {
-            init(gl);
-        }
-        if (tex == null || newTexture) {
-            texInit(gl);
-        }
-        gl.glActiveTexture(GL.GL_TEXTURE0);
-        if (tex != null) {
-            tex.enable();
-            tex.bind();
-        } else {
-            gl.glDisable(GL_TEXTURE_2D);
-        }
-
-        if (shader != 0) {
-            gl.glValidateProgram(shader);
-            gl.glGetProgramiv(shader, GL_VALIDATE_STATUS, is, 0);
-        }
-
-        if (shader == 0 || is[0] == GL_FALSE) {
-            gl.glUseProgram(0);
-            gl.glEnable(GL_LIGHTING);
-            gl.glColor4fv(colour, 0);
-            gl.glShadeModel(GL.GL_SMOOTH);
-        } else {
-            gl.glUseProgram(shader);
-            int l;
-            l = gl.glGetUniformLocation(shader, "tex1");
-            if (l != -1) {
-                gl.glUniform1i(l, 0);
-            }
-            l = gl.glGetUniformLocation(shader, "color");
-            if (l != -1) {
-                gl.glUniform4fv(l, 1, colour, 0);
-            }
-            gl.glDisable(GL_LIGHTING);
-        }
-        gl.glEnable(GL.GL_BLEND);
-        gl.glEnable(GL.GL_DEPTH_TEST);
-        gl.glMatrixMode(GL.GL_TEXTURE);
-        gl.glLoadIdentity();
-        gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
-        gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
-        gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
-
-        gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbos[0]);
-        gl.glVertexPointer(3, GL.GL_FLOAT, data.getVertexStride() * 4, 0);
-        gl.glNormalPointer(GL.GL_FLOAT, data.getVertexStride() * 4, data.getNormalOffset() * 4);
-        gl.glTexCoordPointer(2, GL.GL_FLOAT, data.getVertexStride() * 4, data.getTexCoordOffset() * 4);
         try {
+            if (!initialised) {
+                init(gl);
+            }
+            if (tex == null || newTexture) {
+                texInit(gl);
+            }
+            gl.glActiveTexture(GL.GL_TEXTURE0);
+            if (tex != null) {
+                tex.enable();
+                tex.bind();
+            } else {
+                gl.glDisable(GL_TEXTURE_2D);
+            }
+            GLHelper.glHelper.checkGL(gl);
+            boolean useShader = false;
+            if (shader != 0) {
+                gl.glValidateProgram(shader);
+                gl.glGetProgramiv(shader, GL_VALIDATE_STATUS, is, 0);
+                if(is[0]==GL_TRUE)
+                    useShader = true;
+                gl.glGetProgramiv(shader, GL_INFO_LOG_LENGTH, is, 0);
+                if (is[0] > 0) {
+                    byte[] chars = new byte[is[0]];
+                    gl.glGetProgramInfoLog(shader, is[0], is, 0, chars, 0);
+                    String info = new String(chars);
+                    if(info.toUpperCase().contains("ERROR"))
+                        useShader = false;
+                }
+
+        
+            }
+            GLHelper.glHelper.checkGL(gl);
+            if (!useShader) {
+                gl.glUseProgram(0);
+                gl.glEnable(GL_LIGHTING);
+                gl.glColor4fv(colour, 0);
+                gl.glShadeModel(GL.GL_SMOOTH);
+            } else {
+                gl.glUseProgram(shader);
+            GLHelper.glHelper.checkGL(gl);
+                int l;
+                l = gl.glGetUniformLocation(shader, "tex1");
+            GLHelper.glHelper.checkGL(gl);
+                if (l != -1) {
+                    gl.glUniform1i(l, 0);
+                }
+                l = gl.glGetUniformLocation(shader, "color");
+            GLHelper.glHelper.checkGL(gl);
+                if (l != -1) {
+                    gl.glUniform4fv(l, 1, colour, 0);
+                }
+                gl.glDisable(GL_LIGHTING);
+            GLHelper.glHelper.checkGL(gl);
+            }
+            GLHelper.glHelper.checkGL(gl);
+            gl.glEnable(GL.GL_BLEND);
+            gl.glEnable(GL.GL_DEPTH_TEST);
+            gl.glMatrixMode(GL.GL_TEXTURE);
+            gl.glLoadIdentity();
+            gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
+            gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
+            gl.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY);
+
+            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbos[0]);
+            gl.glVertexPointer(3, GL.GL_FLOAT, data.getVertexStride() * 4, 0);
+            gl.glNormalPointer(GL.GL_FLOAT, data.getVertexStride() * 4, data.getNormalOffset() * 4);
+            gl.glTexCoordPointer(2, GL.GL_FLOAT, data.getVertexStride() * 4, data.getTexCoordOffset() * 4);
+
             GLHelper.glHelper.checkGL(gl);
         } catch (GLHelperException ex) {
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
