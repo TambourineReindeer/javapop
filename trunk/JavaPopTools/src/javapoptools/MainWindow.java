@@ -5,6 +5,7 @@
  */
 package javapoptools;
 
+import com.novusradix.JavaPop.Client.ModelData;
 import com.sun.opengl.util.Animator;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -443,14 +444,9 @@ private void OpenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
             }
         } else if (ext.equals("model")) {
             try {
-                ModelData md;
-                ObjectInputStream in = new ObjectInputStream(new FileInputStream(f));
-                md = (ModelData) in.readObject();
-                in.close();
+                ModelData md=ModelData.fromURL(f.toURL());
                 mp.setData(md);
             } catch (IOException ex) {
-                Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
                 Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
             }
 

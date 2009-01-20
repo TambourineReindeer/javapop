@@ -1,5 +1,6 @@
 package javapoptools;
 
+import com.novusradix.JavaPop.Client.ModelData;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.sun.opengl.util.BufferUtil;
 import java.io.BufferedReader;
