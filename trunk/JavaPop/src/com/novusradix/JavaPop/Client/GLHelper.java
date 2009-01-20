@@ -16,7 +16,7 @@ public class GLHelper {
 
     private Map<URL, Texture> textures;
 
-    public GLHelper() {
+    private GLHelper() {
     }
 
     public String CompileShader(GL gl, int shader, String[] source) {

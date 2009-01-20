@@ -5,18 +5,20 @@ import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Messaging.PeonUpdate.Detail;
 import com.novusradix.JavaPop.Server.Peons.State;
 import java.awt.Point;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.media.opengl.GL;
-
 import static java.lang.Math.*;
 
 public class Peons implements GLObject {
 
     public Game game;
     private Map<Integer, Peon> peons;
-    private XModel peonModel,  ankhModel;
+    private Model peonModel,  ankhModel;
     private boolean firstPeon = true;
     Map<Player, Peon> leaders;
 
@@ -25,8 +27,12 @@ public class Peons implements GLObject {
         peons = new HashMap<Integer, Peon>();
         leaders = new HashMap<Player, Peon>();
         if (g.getClass() == com.novusradix.JavaPop.Client.Game.class) {
-            peonModel = new XModel("/com/novusradix/JavaPop/models/peon5.x", "/com/novusradix/JavaPop/textures/peon.png");
-            ankhModel = new XModel("/com/novusradix/JavaPop/models/ankh.x", "/com/novusradix/JavaPop/textures/marble.png");
+            try {
+                peonModel = new Model(ModelData.fromURL(getClass().getResource("/com/novusradix/JavaPop/models/peon5.model")), getClass().getResource("/com/novusradix/JavaPop/textures/peon.png"));
+                ankhModel = new Model(ModelData.fromURL(getClass().getResource("/com/novusradix/JavaPop/models/ankh.model")), getClass().getResource("/com/novusradix/JavaPop/textures/marble.png"));
+            } catch (IOException ex) {
+                Logger.getLogger(Peons.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
@@ -62,25 +68,20 @@ public class Peons implements GLObject {
                 if (p.state == State.DROWNING) {
                     v.z += (float) abs((float) sin(t * 4.0f) / 2.0f + 0.1f);
                 }
-                gl.glColor3fv(p.player.colour, 0);
+                peonModel.setColor(gl, p.player.colour);
                 peonModel.display(v, p.basis, gl);
             }
         }
-
         ankhModel.prepare(gl);
-               
         synchronized (leaders) {
             for (Peon p : leaders.values()) {
                 if (p != null) {
                     Vector3 pos = new Vector3();
-                    
                     pos.x = p.posx + 0.5f;
                     pos.y = p.posy + 0.5f;
                     pos.z = game.heightMap.getHeight(pos.x, pos.y) + 1.0f;
-
                     ankhModel.display(pos, Matrix4.identity, gl);
                 }
-
             }
         }
     }
@@ -96,7 +97,6 @@ public class Peons implements GLObject {
             for (Entry<Integer, Integer> e : leadermap.entrySet()) {
                 leaders.put(game.players.get(e.getKey()), peons.get(e.getValue()));
             }
-
         }
     }
 
@@ -110,7 +110,8 @@ public class Peons implements GLObject {
 
     private class Peon {
 
-        float posx, posy;
+        float posx,
+                posy;
         private int destx,  desty;
         private float dx,  dy;
         State state;
@@ -168,14 +169,12 @@ public class Peons implements GLObject {
             left = new Vector3();
             left.cross(front, up);
             basis.setBasis(front, left, up);
-
         }
 
         private boolean reachedDest() {
             float ex = posx - (destx + 0.5f);
             float ey = posy - (desty + 0.5f);
             return ((abs(ex) < 0.1 && abs(ey) < 0.1));
-
         }
     }
 }
