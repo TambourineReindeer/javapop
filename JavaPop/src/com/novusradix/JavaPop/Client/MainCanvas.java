@@ -58,7 +58,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     public MainCanvas(GLCapabilities caps, Game g) {
         super(caps);
-        glHelper = new GLHelper();
+        glHelper = GLHelper.glHelper;
         keys = new boolean[0x20e];
         startMillis = System.currentTimeMillis();
         this.game = g;
@@ -138,7 +138,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glEnable(GL.GL_LIGHT1);
 
         float time = (System.currentTimeMillis() - startMillis) / 1000.0f;
-        XModel.setRenderVolume(mvpInverse);
+        Model.setRenderVolume(mvpInverse);
         for (GLObject glo : game.objects) {
             glo.display(gl, time);
         }

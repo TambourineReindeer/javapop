@@ -130,28 +130,28 @@ public class Peons {
             Point nearestPeon = nearestPeon(getPoint(), enemies, 8);
             Point nearestHouse = game.houses.nearestHouse(getPoint(), enemies);
             Point nearest;
-            float dp, dh;
             if (nearestHouse == null && nearestPeon == null) {
                 return findFlatLand(getPoint());
             }
             if (nearestPeon == null) {
-                nearest= nearestHouse;
-            }
-            if (nearestHouse == null) {
-                nearest= nearestPeon;
-            }
-            dp = (pos.x - nearestPeon.x) * (pos.x - nearestPeon.x) + (pos.y - nearestPeon.y) * (pos.y - nearestPeon.y);
-            dh = (pos.x - nearestHouse.x) * (pos.x - nearestHouse.x) + (pos.y - nearestHouse.y) * (pos.y - nearestHouse.y);
-            if (dp < dh) {
+                nearest = nearestHouse;
+            } else if (nearestHouse == null) {
                 nearest = nearestPeon;
+            } else {
+                float dp, dh;
+                dp = (pos.x - nearestPeon.x) * (pos.x - nearestPeon.x) + (pos.y - nearestPeon.y) * (pos.y - nearestPeon.y);
+                dh = (pos.x - nearestHouse.x) * (pos.x - nearestHouse.x) + (pos.y - nearestHouse.y) * (pos.y - nearestHouse.y);
+                if (dp < dh) {
+                    nearest = nearestPeon;
+                } else {
+                    nearest = nearestHouse;
+                }
             }
-            else
-            { nearest= nearestHouse;
-        }
-            if((p.x-nearest.x)*(p.x-nearest.x)+(p.y-nearest.y)+(p.y-nearest.y)>100)
+            if ((p.x - nearest.x) * (p.x - nearest.x) + (p.y - nearest.y) + (p.y - nearest.y) > 100) {
                 return findFlatLand(getPoint());
+            }
             return nearest;
-                
+
         }
 
         private Point findFriend() {

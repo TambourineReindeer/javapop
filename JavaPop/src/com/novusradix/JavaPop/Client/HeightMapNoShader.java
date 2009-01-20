@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.media.opengl.*;
 import static javax.media.opengl.GL.*;
 
@@ -50,14 +52,17 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     private boolean[] changed;
     private int displaylist;
     private static float[] tempFloats;
-    private XModel rock,  tree;
+    private Model rock,  tree;
     private Map<Point, MutableFloat> rocks;
-    
     float lastTime;
 
     public void initialise(HeightMap h) {
-        rock = new XModel("/com/novusradix/JavaPop/models/rock.x", "/com/novusradix/JavaPop/textures/marble.png");
-        tree = new XModel("/com/novusradix/JavaPop/models/tree.x", "/com/novusradix/JavaPop/textures/tree.png");
+        try {
+            rock = new Model(ModelData.fromURL(getClass().getResource("/com/novusradix/JavaPop/models/rock.model")), getClass().getResource("/com/novusradix/JavaPop/textures/marble.png"));
+            tree = new Model(ModelData.fromURL(getClass().getResource("/com/novusradix/JavaPop/models/tree.model")), getClass().getResource("/com/novusradix/JavaPop/textures/tree.png"));
+        } catch (IOException ex) {
+            Logger.getLogger(HeightMapNoShader.class.getName()).log(Level.SEVERE, null, ex);
+        }
         rocks = new HashMap<Point, MutableFloat>();
         heightMap = h;
         vertexstride = 8;
@@ -445,9 +450,9 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
             }
 
         }
-        stepRocks(time-lastTime);
+        stepRocks(time - lastTime);
         renderRocks(gl);
-lastTime = time;
+        lastTime = time;
     }
 
     public void applyUpdate(HeightMapUpdate u) {
@@ -517,7 +522,7 @@ lastTime = time;
             for (Entry<Point, MutableFloat> e : rocks.entrySet()) {
                 x = e.getKey().x;
                 y = e.getKey().y;
-                p.set(x, y, e.getValue().f + heightMap.getHeight(x+0.5f, y+0.5f)-1.0f);
+                p.set(x, y, e.getValue().f + heightMap.getHeight(x + 0.5f, y + 0.5f) - 1.0f);
                 rock.display(p, Matrix4.identity, gl);
             }
         }

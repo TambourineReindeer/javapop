@@ -8,5 +8,4 @@ void main(void)
 {
     vec4 c = texture2D(tex1, gl_TexCoord[0].xy);  
     gl_FragColor.rgba = c.rgba * c.a + color.rgba*(1.0-c.a);
-    gl_FragDepth = gl_FragCoord.z;
 }

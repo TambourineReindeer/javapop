@@ -2,10 +2,13 @@ package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.media.opengl.GL;
 
 public class Houses implements AbstractHouses, GLObject {
@@ -18,16 +21,20 @@ public class Houses implements AbstractHouses, GLObject {
     private static final int FARM = EMPTY + 1;
     private static final int HOUSE = FARM + TEAMS;
     private static final int NEXT = HOUSE + TEAMS;
-    private XModel houseModel;
-    private XModel ankhModel;
+    private Model houseModel;
+    private Model ankhModel;
     private Map<Player, House> leaderHouses;
 
     public Houses(Game g) {
         game = g;
         map = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
         houses = new HashMap<Integer, House>();
-        houseModel = new XModel("/com/novusradix/JavaPop/models/house1.x", "/com/novusradix/JavaPop/textures/house1.png");
-        ankhModel = new XModel("/com/novusradix/JavaPop/models/ankh.x", "/com/novusradix/JavaPop/textures/marble.png");
+        try {
+            houseModel = new Model(ModelData.fromURL(getClass().getResource("/com/novusradix/JavaPop/models/house1.model")), getClass().getResource("/com/novusradix/JavaPop/textures/house1.png"));
+            ankhModel = new Model(ModelData.fromURL(getClass().getResource("/com/novusradix/JavaPop/models/ankh.model")), getClass().getResource("/com/novusradix/JavaPop/textures/marble.png"));
+        } catch (IOException ex) {
+            Logger.getLogger(Houses.class.getName()).log(Level.SEVERE, null, ex);
+        }
         leaderHouses = new HashMap<Player, House>();
     }
 
@@ -118,7 +125,7 @@ public class Houses implements AbstractHouses, GLObject {
 
     public class House {
 
-        private final  int x,  y;
+        private final int x,  y;
         private int level;
         private Player player;
 
