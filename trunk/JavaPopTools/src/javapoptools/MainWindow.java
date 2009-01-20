@@ -9,12 +9,18 @@ import com.sun.opengl.util.Animator;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.media.opengl.GLCapabilities;
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -23,14 +29,14 @@ import javax.swing.JFileChooser;
 public class MainWindow extends javax.swing.JFrame {
 
     PreviewPanel mp;
-    final JFileChooser modelChooser = new JFileChooser();
-    final JFileChooser textureChooser = new JFileChooser();
+    final JFileChooser chooser;
     Color playerColor = Color.RED;
-
+    private String modelName;
+    
     /** Creates new form MainWindow */
     public MainWindow() {
         initComponents();
-
+        chooser = new JFileChooser();
         GLCapabilities caps = new GLCapabilities();
         caps.setSampleBuffers(true);
         caps.setNumSamples(8);
@@ -41,6 +47,7 @@ public class MainWindow extends javax.swing.JFrame {
         previewPanel.add(mp);
 
         XImporter i = new XImporter(getClass().getResource("/com/novusradix/JavaPop/models/peon5.x"));
+        modelName = "peon5";
         mp.setData(i.getModel());
         Animator a = new Animator(mp);
         a.start();
@@ -120,11 +127,6 @@ public class MainWindow extends javax.swing.JFrame {
         renderDefault = new javax.swing.JRadioButton();
         renderCustom = new javax.swing.JRadioButton();
         previewPanel = new javax.swing.JPanel();
-        Menu = new javax.swing.JMenuBar();
-        FileMenu = new javax.swing.JMenu();
-        OpenMenuItem = new javax.swing.JMenuItem();
-        openTextureMenuItem = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
         editors = new javax.swing.JPanel();
         jSplitPane1 = new javax.swing.JSplitPane();
         jSplitPane2 = new javax.swing.JSplitPane();
@@ -138,11 +140,17 @@ public class MainWindow extends javax.swing.JFrame {
         fragmentEditor = new javax.swing.JEditorPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         status = new javax.swing.JTextArea();
-        Menu = new javax.swing.JMenuBar();
-        FileMenu = new javax.swing.JMenu();
-        OpenMenuItem = new javax.swing.JMenuItem();
-        openTextureMenuItem = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
+        Menu1 = new javax.swing.JMenuBar();
+        FileMenu1 = new javax.swing.JMenu();
+        OpenModel = new javax.swing.JMenuItem();
+        SaveModel = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        OpenTexture = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        OpenVertex = new javax.swing.JMenuItem();
+        OpenFragment = new javax.swing.JMenuItem();
+        SaveVertex = new javax.swing.JMenuItem();
+        SaveFragment = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setName("JavaPop tools"); // NOI18N
@@ -274,31 +282,6 @@ public class MainWindow extends javax.swing.JFrame {
 
         previewPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Preview"));
 
-        FileMenu.setText("File");
-
-        OpenMenuItem.setText("Open Model...");
-        OpenMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                OpenMenuItemActionPerformed(evt);
-            }
-        });
-        FileMenu.add(OpenMenuItem);
-
-        openTextureMenuItem.setText("Open Texture...");
-        openTextureMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                openTextureMenuItemActionPerformed(evt);
-            }
-        });
-        FileMenu.add(openTextureMenuItem);
-
-        Menu.add(FileMenu);
-
-        jMenu2.setText("Edit");
-        Menu.add(jMenu2);
-
-        setJMenuBar(Menu);
-
         editors.setLayout(new java.awt.BorderLayout());
 
         jSplitPane1.setDividerLocation(399);
@@ -306,7 +289,7 @@ public class MainWindow extends javax.swing.JFrame {
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane1.setResizeWeight(1.0);
 
-        jSplitPane2.setDividerLocation(200);
+        jSplitPane2.setDividerLocation(300);
         jSplitPane2.setResizeWeight(0.5);
         jSplitPane2.addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent evt) {
@@ -348,30 +331,58 @@ public class MainWindow extends javax.swing.JFrame {
 
         editors.add(jSplitPane1, java.awt.BorderLayout.CENTER);
 
-        FileMenu.setText("File");
+        FileMenu1.setText("Model");
 
-        OpenMenuItem.setText("Open Model...");
-        OpenMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        OpenModel.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.META_MASK));
+        OpenModel.setText("Open Model...");
+        OpenModel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 OpenMenuItemActionPerformed(evt);
             }
         });
-        FileMenu.add(OpenMenuItem);
+        FileMenu1.add(OpenModel);
 
-        openTextureMenuItem.setText("Open Texture...");
-        openTextureMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        SaveModel.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.META_MASK));
+        SaveModel.setText("Save Model As...");
+        SaveModel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SaveModelActionPerformed(evt);
+            }
+        });
+        FileMenu1.add(SaveModel);
+
+        Menu1.add(FileMenu1);
+
+        jMenu3.setText("Texture");
+
+        OpenTexture.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.META_MASK));
+        OpenTexture.setText("Open Texture...");
+        OpenTexture.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 openTextureMenuItemActionPerformed(evt);
             }
         });
-        FileMenu.add(openTextureMenuItem);
+        jMenu3.add(OpenTexture);
 
-        Menu.add(FileMenu);
+        Menu1.add(jMenu3);
 
-        jMenu2.setText("Edit");
-        Menu.add(jMenu2);
+        jMenu1.setText("Menu");
 
-        setJMenuBar(Menu);
+        OpenVertex.setText("Open Vertex Shader");
+        jMenu1.add(OpenVertex);
+
+        OpenFragment.setText("Open Fragment Shader");
+        jMenu1.add(OpenFragment);
+
+        SaveVertex.setText("Save Vertex Shader");
+        jMenu1.add(SaveVertex);
+
+        SaveFragment.setText("Save Fragment Shader");
+        jMenu1.add(SaveFragment);
+
+        Menu1.add(jMenu1);
+
+        setJMenuBar(Menu1);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -382,7 +393,7 @@ public class MainWindow extends javax.swing.JFrame {
                     .add(org.jdesktop.layout.GroupLayout.LEADING, previewPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, optionPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 145, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(editors, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE))
+                .add(editors, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 637, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -390,8 +401,8 @@ public class MainWindow extends javax.swing.JFrame {
                 .add(previewPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 166, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(optionPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 381, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(69, Short.MAX_VALUE))
-            .add(editors, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE)
+                .addContainerGap(44, Short.MAX_VALUE))
+            .add(editors, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 591, Short.MAX_VALUE)
         );
 
         pack();
@@ -401,21 +412,49 @@ private void OpenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     Preferences p = Preferences.userNodeForPackage(this.getClass());
     String dir = p.get("ModelDir", null);
     if (dir != null) {
-        modelChooser.setCurrentDirectory(new File(dir));
+        chooser.setCurrentDirectory(new File(dir));
     }
-    modelChooser.setDialogTitle("Open Model");
-    int returnVal = modelChooser.showOpenDialog(this);
+    chooser.setDialogTitle("Open Model");
+    chooser.setFileFilter(null);
+    chooser.resetChoosableFileFilters();
+    FileFilter ffAll, ffX, ffModel;
+    ffAll = FileFilterFactory.getFilter("All models", new String[]{"x", "model"});
+    ffX = FileFilterFactory.getFilter("DirectX Models", new String[]{"x"});
+    ffModel = FileFilterFactory.getFilter("JavaPop Models", new String[]{"model"});
+    chooser.addChoosableFileFilter(ffAll);
+    chooser.addChoosableFileFilter(ffX);
+    chooser.addChoosableFileFilter(ffModel);
+    chooser.setFileFilter(ffAll);
+    int returnVal = chooser.showOpenDialog(this);
     if (returnVal == JFileChooser.APPROVE_OPTION) {
-        File f = modelChooser.getSelectedFile();
-
+        File f = chooser.getSelectedFile();
         p.put("ModelDir", f.getParent());
+        String ext = FileFilterFactory.getExtension(f);
+        modelName = f.getName();
+        modelName = modelName.substring(0, modelName.length() - ext.length()-1);
+        if (ext.equals("x")) {
 
-        XImporter i;
-        try {
-            i = new XImporter(f.toURL());
-            mp.setData(i.getModel());
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            XImporter i;
+            try {
+                i = new XImporter(f.toURL());
+                mp.setData(i.getModel());
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else if (ext.equals("model")) {
+            try {
+                ModelData md;
+                ObjectInputStream in = new ObjectInputStream(new FileInputStream(f));
+                md = (ModelData) in.readObject();
+                in.close();
+                mp.setData(md);
+            } catch (IOException ex) {
+                Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+
         }
     }
 }//GEN-LAST:event_OpenMenuItemActionPerformed
@@ -431,12 +470,14 @@ private void openTextureMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
     Preferences p = Preferences.userNodeForPackage(this.getClass());
     String dir = p.get("TextureDir", null);
     if (dir != null) {
-        textureChooser.setCurrentDirectory(new File(dir));
+        chooser.setCurrentDirectory(new File(dir));
     }
-    textureChooser.setDialogTitle("Open Texture");
-    int returnVal = textureChooser.showOpenDialog(this);
+    chooser.setDialogTitle("Open Texture");
+    chooser.resetChoosableFileFilters();
+    chooser.setFileFilter(FileFilterFactory.getFilter("PNG images", new String[]{"png"}));
+    int returnVal = chooser.showOpenDialog(this);
     if (returnVal == JFileChooser.APPROVE_OPTION) {
-        File f = textureChooser.getSelectedFile();
+        File f = chooser.getSelectedFile();
         p.put("TextureDir", f.getParent());
         try {
             mp.setTexture(f.toURL());
@@ -467,10 +508,43 @@ private void renderCustomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 private void jSplitPane2ComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jSplitPane2ComponentResized
 // TODO add your handling code here:
 }//GEN-LAST:event_jSplitPane2ComponentResized
+
+private void SaveModelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveModelActionPerformed
+// TODO add your handling code here:
+    Preferences p = Preferences.userNodeForPackage(this.getClass());
+    String dir = p.get("ModelSaveDir", null);
+    if (dir != null) {
+        chooser.setCurrentDirectory(new File(dir));
+    }
+    chooser.setDialogTitle("Save Model");
+    chooser.resetChoosableFileFilters();
+    chooser.setFileFilter(FileFilterFactory.getFilter("Model Files", new String[]{"model"}));
+    chooser.setSelectedFile(new File(modelName.concat(".model")));
+    int returnVal = chooser.showSaveDialog(this);
+    ObjectOutputStream oo;
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+        File f = chooser.getSelectedFile();
+        p.put("ModelSaveDir", f.getParent());
+
+        try {
+            oo = new ObjectOutputStream(new FileOutputStream(f));
+            oo.writeObject(mp.getModelData());
+            oo.close();
+        } catch (IOException ex) {
+            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+}//GEN-LAST:event_SaveModelActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JMenu FileMenu;
-    private javax.swing.JMenuBar Menu;
-    private javax.swing.JMenuItem OpenMenuItem;
+    private javax.swing.JMenu FileMenu1;
+    private javax.swing.JMenuBar Menu1;
+    private javax.swing.JMenuItem OpenFragment;
+    private javax.swing.JMenuItem OpenModel;
+    private javax.swing.JMenuItem OpenTexture;
+    private javax.swing.JMenuItem OpenVertex;
+    private javax.swing.JMenuItem SaveFragment;
+    private javax.swing.JMenuItem SaveModel;
+    private javax.swing.JMenuItem SaveVertex;
     private javax.swing.JSlider alphaSlider;
     private javax.swing.JSlider blueSlider;
     private javax.swing.JPanel editors;
@@ -485,7 +559,8 @@ private void jSplitPane2ComponentResized(java.awt.event.ComponentEvent evt) {//G
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -496,7 +571,6 @@ private void jSplitPane2ComponentResized(java.awt.event.ComponentEvent evt) {//G
     private javax.swing.JSlider jSlider1;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
-    private javax.swing.JMenuItem openTextureMenuItem;
     private javax.swing.JPanel optionPanel;
     private javax.swing.JPanel panelColour;
     private javax.swing.JPanel panelRender;
