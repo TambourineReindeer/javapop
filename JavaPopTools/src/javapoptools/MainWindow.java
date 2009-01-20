@@ -9,13 +9,15 @@ import com.novusradix.JavaPop.Client.ModelData;
 import com.sun.opengl.util.Animator;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -33,7 +35,7 @@ public class MainWindow extends javax.swing.JFrame {
     final JFileChooser chooser;
     Color playerColor = Color.RED;
     private String modelName;
-    
+
     /** Creates new form MainWindow */
     public MainWindow() {
         initComponents();
@@ -48,10 +50,35 @@ public class MainWindow extends javax.swing.JFrame {
         previewPanel.add(mp);
 
         XImporter i = new XImporter(getClass().getResource("/com/novusradix/JavaPop/models/peon5.x"));
+        vertexEditor.setText(loadText(getClass().getResource("/com/novusradix/JavaPop/Client/Shaders/ModelVertex.shader")));
+        fragmentEditor.setText(loadText(getClass().getResource("/com/novusradix/JavaPop/Client/Shaders/ModelFragment.shader")));
         modelName = "peon5";
         mp.setData(i.getModel());
         Animator a = new Animator(mp);
         a.start();
+    }
+
+    private String loadText(URL u) {
+        try {
+            BufferedReader br;
+            StringBuffer sb;
+
+            br = new BufferedReader(new InputStreamReader(u.openStream()));
+
+            sb = new StringBuffer();
+            char[] buffer = new char[1024];
+            int count;
+            do {
+                count = br.read(buffer);
+                if (count > 0) {
+                    sb.append(buffer, 0, count);
+                }
+            } while (count > 0);
+            return sb.toString();
+        } catch (IOException ex) {
+            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     public void setStatus(String s) {
@@ -418,7 +445,7 @@ private void OpenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     chooser.setDialogTitle("Open Model");
     chooser.setFileFilter(null);
     chooser.resetChoosableFileFilters();
-    FileFilter ffAll, ffX, ffModel;
+    FileFilter ffAll,ffX ,ffModel ;
     ffAll = FileFilterFactory.getFilter("All models", new String[]{"x", "model"});
     ffX = FileFilterFactory.getFilter("DirectX Models", new String[]{"x"});
     ffModel = FileFilterFactory.getFilter("JavaPop Models", new String[]{"model"});
@@ -432,7 +459,7 @@ private void OpenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
         p.put("ModelDir", f.getParent());
         String ext = FileFilterFactory.getExtension(f);
         modelName = f.getName();
-        modelName = modelName.substring(0, modelName.length() - ext.length()-1);
+        modelName = modelName.substring(0, modelName.length() - ext.length() - 1);
         if (ext.equals("x")) {
 
             XImporter i;
@@ -444,7 +471,7 @@ private void OpenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
             }
         } else if (ext.equals("model")) {
             try {
-                ModelData md=ModelData.fromURL(f.toURL());
+                ModelData md = ModelData.fromURL(f.toURL());
                 mp.setData(md);
             } catch (IOException ex) {
                 Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
