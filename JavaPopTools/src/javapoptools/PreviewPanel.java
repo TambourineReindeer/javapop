@@ -2,6 +2,8 @@ package javapoptools;
 
 import com.novusradix.JavaPop.Client.GLHelper;
 import com.novusradix.JavaPop.Client.GLHelper.GLHelperException;
+import com.novusradix.JavaPop.Client.Model;
+import com.novusradix.JavaPop.Client.ModelData;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
 import java.net.URL;
