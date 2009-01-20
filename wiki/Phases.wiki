@@ -6,15 +6,16 @@
 High level plan
 
 == To Do ==
-  #  add a couple of spells (volcano?) for fun
+  #  add more spells
   #  design some house and better people models
   #  mana
   #  peon routefinding
   #  AI
-  #  Startup menu - single player, multiplayer etc.
+  #  Improve startup menu - single player, multiplayer etc.
 
 == Done ==
-
+ 
+  #  added volcano, basalt and batholith effects
   #  add more behaviour modes - fight, group
   #  enable fighting for houses
   #  design some people models
