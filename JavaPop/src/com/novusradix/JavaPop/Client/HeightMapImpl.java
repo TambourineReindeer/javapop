@@ -8,7 +8,7 @@ import java.util.Set;
  *
  * @author gef
  */
-interface HeightMapImpl {
+interface HeightMapImpl{
 
     void initialise(HeightMap h);
     void setHeight(int x, int y, byte height);

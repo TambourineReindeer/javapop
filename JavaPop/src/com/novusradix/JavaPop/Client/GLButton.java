@@ -61,7 +61,6 @@ public abstract class GLButton implements GLObject, GLClickable {
         gl.glDisable(GL.GL_LIGHTING);
         gl.glEnable(GL.GL_BLEND);
         gl.glShadeModel(GL.GL_FLAT);
-        gl.glDisable(GL.GL_DEPTH_TEST);
         gl.glEnable(GL.GL_TEXTURE_2D);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR_MIPMAP_LINEAR);
         gl.glUseProgram(0);
@@ -83,7 +82,7 @@ public abstract class GLButton implements GLObject, GLClickable {
 
         for (int n = 0; n < buttonShape.npoints; n++) {
             gl.glTexCoord2f(n / 2, (n + n / 2 + 1) % 2);
-            gl.glVertex2f(buttonShape.xpoints[n], buttonShape.ypoints[n]);
+            gl.glVertex3f(buttonShape.xpoints[n], buttonShape.ypoints[n],-0.5f);
         }
         gl.glEnd();
         gl.glPopMatrix();
@@ -94,7 +93,7 @@ public abstract class GLButton implements GLObject, GLClickable {
 
         for (int n = 0; n < buttonShape.npoints; n++) {
             gl.glTexCoord2f(n / 2, (n + n / 2 + 1) % 2);
-            gl.glVertex2f(buttonShape.xpoints[n], buttonShape.ypoints[n]);
+            gl.glVertex3f(buttonShape.xpoints[n], buttonShape.ypoints[n],-1.0f);
         }
         gl.glEnd();
         gl.glPopMatrix();

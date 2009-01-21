@@ -6,16 +6,17 @@ package com.novusradix.JavaPop;
  */
 public enum Tile {
 //The numerical values must be continuous from zero in the order declared so that the values[] array can be used
-    SEA((byte) 0, true, false, false, true),
-    EMPTY_FLAT((byte) 1, false, false, true, false),
-    EMPTY_SLOPE((byte) 2, false, true, false, false),
-    BURNT((byte) 3, false, false, false, false),
-    FARM((byte) 4, false, false, true, false),
-    SWAMP((byte) 5, false, false, false, false),
-    ROCK((byte) 6, false, true, false, true),
-    TREE((byte) 7, false, false, true, false),
-    BASALT((byte) 8, true, true, false, false),
-    LAVA((byte) 9, false, true, false, false);
+    SEA(true, false, false, true),
+    EMPTY_FLAT(false, false, true, false),
+    EMPTY_SLOPE(false, true, false, false),
+    BURNT(false, false, false, false),
+    FARM(false, false, true, false),
+    SWAMP(false, false, false, false),
+    ROCK(false, true, false, true),
+    TREE(false, false, true, false),
+    BASALT(true, true, false, false),
+    LAVA(false, true, false, false),
+    EARTHQUAKE(false, false, false, false);
     public final byte id;
     public final boolean canExistAtSeaLevel;
     public final boolean canExistOnSlope;
@@ -23,12 +24,13 @@ public enum Tile {
     public final boolean isObstruction;
     public final static Tile[] tiles;
     
+
     static {
         tiles = values();
     }
 
-    private Tile(byte id, boolean sealevel, boolean slope, boolean fertile, boolean obstruction) {
-        this.id = id;
+    private Tile(boolean sealevel, boolean slope, boolean fertile, boolean obstruction) {
+        this.id = (byte) ordinal();
         canExistAtSeaLevel = sealevel;
         canExistOnSlope = slope;
         isFertile = fertile;

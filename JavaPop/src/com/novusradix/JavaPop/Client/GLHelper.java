@@ -6,6 +6,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import static javax.media.opengl.GL.*;
@@ -13,7 +15,6 @@ import static javax.media.opengl.GL.*;
 public class GLHelper {
 
     final static public GLHelper glHelper = new GLHelper();
-
     private Map<URL, Texture> textures;
 
     private GLHelper() {
@@ -28,7 +29,7 @@ public class GLHelper {
         if (is[0] > 0) {
             chars = new byte[is[0]];
             gl.glGetShaderInfoLog(shader, is[0], is, 0, chars, 0);
-            return new String(chars);           
+            return new String(chars);
         }
         return "OK\n";
     }
@@ -60,7 +61,7 @@ public class GLHelper {
             chars = new byte[is[0]];
             gl.glGetProgramInfoLog(shaderprogram, is[0], is, 0, chars, 0);
             sb.append("Link:");
-            sb.append(new String(chars));   
+            sb.append(new String(chars));
         }
         gl.glValidateProgram(shaderprogram);
         gl.glGetProgramiv(shaderprogram, GL_INFO_LOG_LENGTH, is, 0);
@@ -70,11 +71,12 @@ public class GLHelper {
             sb.append("Validate:");
             sb.append(new String(chars));
         }
-        gl.glGetProgramiv(shaderprogram,GL_VALIDATE_STATUS,is,0);
-        if(is[0] == GL_FALSE)
-            throw new GLHelperException(0,sb.toString());
-            
+        gl.glGetProgramiv(shaderprogram, GL_VALIDATE_STATUS, is, 0);
+        if (is[0] == GL_FALSE || sb.toString().contains("ERROR")) {
+            throw new GLHelperException(0, sb.toString());
+        }
         checkGL(gl);
+       
         return shaderprogram;
     }
 
@@ -85,17 +87,23 @@ public class GLHelper {
     }
 
     public Texture getTexture(GL gl, URL textureURL) throws IOException {
-        if (textures.containsKey(textureURL)) {
-            return textures.get(textureURL);
+        Texture tex = null;
+        try {
+            checkGL(gl);
+            if (textures.containsKey(textureURL)) {
+                return textures.get(textureURL);
+            }
+            tex = TextureIO.newTexture(textureURL, true, "png");
+            tex.bind();
+            tex.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
+            tex.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
+            textures.put(textureURL, tex);
+
+            checkGL(gl);
+        } catch (GLHelperException ex) {
+            Logger.getLogger(GLHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        Texture tex;
-
-        tex = TextureIO.newTexture(textureURL, true, "png");
-        tex.bind();
-        tex.setTexParameteri(GL_TEXTURE_WRAP_S, GL_REPEAT);
-        tex.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
-        textures.put(textureURL, tex);
         return tex;
     }
 
