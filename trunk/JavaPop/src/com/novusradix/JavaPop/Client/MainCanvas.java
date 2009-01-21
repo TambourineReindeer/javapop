@@ -3,6 +3,7 @@
  */
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Client.GLHelper.GLHelperException;
 import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Client.Tools.ToolGroup;
 import com.novusradix.JavaPop.Math.Matrix4;
@@ -29,6 +30,7 @@ import javax.media.opengl.GLEventListener;
 import java.awt.event.MouseWheelListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.media.opengl.DebugGL;
 import static java.lang.Math.*;
 import static java.awt.event.KeyEvent.*;
 import static javax.media.opengl.GL.*;
@@ -92,73 +94,85 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     public void display(final GLAutoDrawable glAD) {
-        if (mouseIsOver) {
-            setCursor(GLToolButton.getSelected().getCursor());
-        // TODO Auto-generated method stub
-        }
-        final GL gl = glAD.getGL();
-        gl.glClearColor(0, 0, 0, 0);
-        gl.glEnable(GL.GL_LIGHTING);
-
-        gl.glShadeModel(GL.GL_FLAT);
-        gl.glEnable(GL.GL_DEPTH_TEST);
-
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-        gl.glMatrixMode(GL.GL_MODELVIEW);
-        gl.glPushMatrix();
-
-        gl.glTranslatef(0, 0, -50);
-        gl.glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
-        gl.glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
-        gl.glTranslatef((0.70711f * xPos - yPos / 0.70711f), -(yPos / 0.70711f) - xPos * 0.70711f, 0);
-
-        gl.glScalef(1.0f, 1.0f, fHeightScale);
-
-        float[] buf = new float[16];
-        gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, buf, 0);
-
-        Matrix4 m_mvn, m_pn;
-        m_mvn = new Matrix4();
-        m_pn = new Matrix4();
-        gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, buf, 0);
-
-        m_mvn.set(buf);
-        m_mvn.transpose();
-        gl.glGetFloatv(GL.GL_PROJECTION_MATRIX, buf, 0);
-        m_pn.set(buf);
-        m_pn.transpose();
-        mvpInverse.mul(m_pn, m_mvn);
-        mvpInverse.invert();
-
-        gl.glEnable(GL.GL_BLEND);
-        gl.glEnable(GL.GL_MULTISAMPLE);
-        Vector3 l = new Vector3(-9, -5, 10);
-        l.normalize();
-        gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 0.0f}));
-        gl.glEnable(GL.GL_LIGHT1);
-
-        float time = (System.currentTimeMillis() - startMillis) / 1000.0f;
-        Model.setRenderVolume(mvpInverse);
-        for (GLObject glo : game.objects) {
-            glo.display(gl, time);
-        }
-        synchronized (game.effects) {
-            for (Effect e : game.effects.values()) {
-                e.display(gl, time, game);
-            }
-        }
-        displayCursor(gl);
-
-        gl.glMatrixMode(GL.GL_MODELVIEW);
-        gl.glPopMatrix();
-
-        flush(gl);
-        handleKeys();
-        //printFPS();
         try {
+            if (mouseIsOver) {
+                setCursor(GLToolButton.getSelected().getCursor());
+            // TODO Auto-generated method stub
+            }
+            final GL gl = glAD.getGL();
             glHelper.checkGL(gl);
-        } catch (GLHelper.GLHelperException e) {
-            Logger.getLogger(MainCanvas.class.getName()).log(Level.SEVERE, null, e);
+
+            gl.glClearColor(0, 0, 0, 0);
+            gl.glEnable(GL.GL_LIGHTING);
+
+            gl.glShadeModel(GL.GL_FLAT);
+            gl.glEnable(GL.GL_DEPTH_TEST);
+
+            gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+            gl.glMatrixMode(GL.GL_MODELVIEW);
+            gl.glPushMatrix();
+
+            gl.glTranslatef(0, 0, -50);
+            gl.glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
+            gl.glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
+            gl.glTranslatef((0.70711f * xPos - yPos / 0.70711f), -(yPos / 0.70711f) - xPos * 0.70711f, 0);
+
+            gl.glScalef(1.0f, 1.0f, fHeightScale);
+
+            float[] buf = new float[16];
+            gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, buf, 0);
+
+            Matrix4 m_mvn, m_pn;
+            m_mvn = new Matrix4();
+            m_pn = new Matrix4();
+            gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, buf, 0);
+
+            m_mvn.set(buf);
+            m_mvn.transpose();
+            gl.glGetFloatv(GL.GL_PROJECTION_MATRIX, buf, 0);
+            m_pn.set(buf);
+            m_pn.transpose();
+            mvpInverse.mul(m_pn, m_mvn);
+            mvpInverse.invert();
+
+            gl.glEnable(GL.GL_BLEND);
+            gl.glEnable(GL.GL_MULTISAMPLE);
+            Vector3 l = new Vector3(-9, -5, 10);
+            l.normalize();
+            gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 0.0f}));
+            gl.glEnable(GL.GL_LIGHT1);
+
+            float time = (System.currentTimeMillis() - startMillis) / 1000.0f;
+            Model.setRenderVolume(mvpInverse);
+
+            glHelper.checkGL(gl);
+
+            for (GLObject glo : game.objects) {
+                glo.display(gl, time);
+            }
+            glHelper.checkGL(gl);
+            for (GLObject glo : game.transparentObjects) {
+                glo.display(gl, time);
+            }
+            glHelper.checkGL(gl);
+            synchronized (game.effects) {
+                for (Effect e : game.effects.values()) {
+                    e.display(gl, time, game);
+                }
+            }
+            displayCursor(gl);
+
+            gl.glMatrixMode(GL.GL_MODELVIEW);
+            gl.glPopMatrix();
+
+            flush(gl);
+            handleKeys();
+            //printFPS();
+
+            glHelper.checkGL(gl);
+
+        } catch (GLHelperException ex) {
+            Logger.getLogger(MainCanvas.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -174,7 +188,9 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     private void displayCursor(final GL gl) {
         if (mouseIsOver) {
-            float cW,   cH;
+
+
+            float cW, cH;
             cW = 0.02f;
             cH = 0.1f;
             gl.glDisable(GL.GL_LIGHTING);
@@ -227,24 +243,36 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     public void init(final GLAutoDrawable glDrawable) {
         //Called before first display and on fullscreen/mode changes
+        glDrawable.setGL(new DebugGL(glDrawable.getGL()));
+
         final GL gl = glDrawable.getGL();
         Logger.getLogger(MainCanvas.class.getName()).log(Level.INFO, "GL Init");
         glHelper.init(gl);
-        gl.setSwapInterval(1);
-        gl.glEnable(GL.GL_LIGHTING);
-        float global_ambient[] = {0.1f, 0.1f, 0.1f, 1.0f};
-        gl.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, FloatBuffer.wrap(global_ambient));
+        try {
+            gl.setSwapInterval(1);
+            gl.glEnable(GL.GL_LIGHTING);
+            float global_ambient[] = {0.1f, 0.1f, 0.1f, 1.0f};
+            gl.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, FloatBuffer.wrap(global_ambient));
 
-        gl.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, FloatBuffer.wrap(new float[]{0.8f, 0.8f, 0.8f, 1.0f}));
+            gl.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, FloatBuffer.wrap(new float[]{0.8f, 0.8f, 0.8f, 1.0f}));
 
-        gl.glEnable(GL.GL_LIGHT1);
-        gl.glEnable(GL.GL_COLOR_MATERIAL);
-        gl.glColorMaterial(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT_AND_DIFFUSE);
-        gl.glEnable(GL.GL_DEPTH_TEST);
-        gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+            gl.glEnable(GL.GL_LIGHT1);
+            gl.glEnable(GL.GL_COLOR_MATERIAL);
+            gl.glColorMaterial(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT_AND_DIFFUSE);
+            gl.glEnable(GL.GL_DEPTH_TEST);
+            gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
 
-        for (GLObject glo : game.objects) {
-            glo.init(gl);
+            for (GLObject glo : game.objects) {
+                glo.init(gl);
+            }
+            glHelper.checkGL(gl);
+
+            for (GLObject glo : game.transparentObjects) {
+                glo.init(gl);
+            }
+            glHelper.checkGL(gl);
+        } catch (GLHelperException ex) {
+            Logger.getLogger(MainCanvas.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -311,16 +339,17 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private void mousePick() {
         float l;
 
-        Vector3 z0,z1 ,s ;
+        Vector3 z0, z1, s;
         z0 = new Vector3(xMouse, yMouse, 10);
         z1 = new Vector3(xMouse, yMouse, 11);
 
         mvpInverse.transform(z0);
         mvpInverse.transform(z1);
 
-        Vector3 v0n,v1n ;
+        Vector3 v0n, v1n;
         v0n = new Vector3(z0);
-        v1n = new Vector3(z1);
+        v1n = new Vector3(
+                z1);
 
         z1.sub(z0);
         l = -z0.z / z1.z;
@@ -362,12 +391,19 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Point iterateSelection(Point current, Vector3 v0, Vector3 v1) {
         Vector3 p;
 
-        float d,   oldD;
+
+
+
+
+
+
+
+        float d, oldD;
         p = new Vector3(current.x, current.y, game.heightMap.getHeight(current.x, current.y));
         d = Helpers.PointLineDistance(v0, v1, p);
         oldD = d;
 
-        int x,   y;
+        int x, y;
         for (Point offset : Helpers.rings[1]) {
             x = current.x + offset.x;
             y = current.y + offset.y;

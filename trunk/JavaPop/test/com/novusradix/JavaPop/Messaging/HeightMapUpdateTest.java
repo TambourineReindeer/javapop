@@ -1,11 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.novusradix.JavaPop.Messaging;
 
+import com.novusradix.JavaPop.Tile;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -21,7 +17,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author erinhowie
+ * @author gef
  */
 public class HeightMapUpdateTest {
 
@@ -52,23 +48,23 @@ public class HeightMapUpdateTest {
         serverh = new com.novusradix.JavaPop.Server.HeightMap(new Dimension(128, 128));
         clienth = new com.novusradix.JavaPop.Client.HeightMap(new Dimension(128, 128));
 
-        serverh.up(new Point(0, 0));
-        serverh.up(new Point(0, 0));
-        serverh.up(new Point(5, 5));
-        serverh.up(new Point(106, 7));
-        serverh.up(new Point(106, 7));
-        serverh.up(new Point(106, 7));
-        serverh.up(new Point(106, 7));
+        serverh.up(0, 0);
+        serverh.up(0, 0);
+        serverh.up(5, 5);
+        serverh.up(106, 7);
+        serverh.up(106, 7);
+        serverh.up(106, 7);
+        serverh.up(106, 7);
 
-        serverh.up(new Point(112, 25));
-        serverh.up(new Point(112, 25));
+        serverh.up(112, 25);
+        serverh.up(112, 25);
 
-        serverh.up(new Point(112, 125));
-        serverh.up(new Point(112, 125));
-        serverh.up(new Point(127, 127));
-        serverh.up(new Point(127, 127));
-        serverh.setTile(new Point(0, 0), (byte)7);
-        serverh.setTile(new Point(126, 126), (byte)7);
+        serverh.up(112, 125);
+        serverh.up(112, 125);
+        serverh.up(127, 127);
+        serverh.up(127, 127);
+        serverh.setTile(0, 0, Tile.BASALT);
+        serverh.setTile(126, 126, Tile.BURNT);
 
 
         instance = serverh.GetUpdate();
@@ -102,15 +98,14 @@ public class HeightMapUpdateTest {
         }
 
         instance.clientMap = clienth;
-        assertTrue(instance.texture.get(new Point(0, 0)) == 7);
-        assertTrue(instance.texture.get(new Point(126, 126)) == 7);
-        instance.texture = new HashMap<Point, Byte>();
+        
+        instance.texture = new HashMap<Integer, Byte>();
         instance.execute();
-        assertTrue(clienth.getHeight(new Point(0, 0)) == 2);
-        assertTrue(clienth.getHeight(new Point(5, 5)) == 1);
-        assertTrue(clienth.getHeight(new Point(106, 7)) == 4);
-        assertTrue(clienth.getHeight(new Point(112, 25)) == 2);
-        assertTrue(clienth.getHeight(new Point(112, 125)) == 2);
+        assertTrue(clienth.getHeight(0, 0) == 2);
+        assertTrue(clienth.getHeight(5, 5) == 1);
+        assertTrue(clienth.getHeight(106, 7) == 4);
+        assertTrue(clienth.getHeight(112, 25) == 2);
+        assertTrue(clienth.getHeight(112, 125) == 2);
         
 
     }

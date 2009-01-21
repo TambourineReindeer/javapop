@@ -56,7 +56,6 @@ public class Player implements GLObject {
         gl.glMatrixMode(GL.GL_PROJECTION);
         gl.glPushMatrix();
         gl.glLoadIdentity();
-        gl.glDisable(GL.GL_DEPTH_TEST);
         gl.glBegin(GL.GL_QUADS);
 
         gl.glVertex3f(-0.95f + index * 0.1f, 0.85f, 0.0f);

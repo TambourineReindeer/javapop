@@ -18,7 +18,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObj
     public HeightMap(Dimension mapSize) {
         super(mapSize);
 
-        HeightMapNoShader h = new HeightMapNoShader();
+        HeightMapGLSL h = new HeightMapGLSL();
         implementation = h;
         renderer = h;
         implementation.initialise(this);

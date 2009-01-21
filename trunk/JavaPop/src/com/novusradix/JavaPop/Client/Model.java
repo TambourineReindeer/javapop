@@ -146,12 +146,16 @@ public class Model {
             if (tex == null || newTexture) {
                 texInit(gl);
             }
+            GLHelper.glHelper.checkGL(gl);
             gl.glActiveTexture(GL.GL_TEXTURE0);
+            GLHelper.glHelper.checkGL(gl);
             if (tex != null) {
                 tex.enable();
                 tex.bind();
+            GLHelper.glHelper.checkGL(gl);
             } else {
                 gl.glDisable(GL_TEXTURE_2D);
+            GLHelper.glHelper.checkGL(gl);
             }
             GLHelper.glHelper.checkGL(gl);
             boolean useShader = false;

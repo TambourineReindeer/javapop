@@ -32,6 +32,8 @@ public class Game extends TimerTask {
     public Player me;
     GameFrame frame;
     Collection<GLObject> objects;
+    Collection<GLObject> transparentObjects;
+    
     public Map<Integer, Effect> effects;
     public Collection<ToolGroup> toolGroups;
 
@@ -41,9 +43,11 @@ public class Game extends TimerTask {
     public Game(GameStarted g, Client c) {
         client = c;
         objects = new ArrayList<GLObject>();
+        transparentObjects = new ArrayList<GLObject>();
+        
         HeightMap hm1 = new HeightMap(g.gi.mapSize);
         heightMap = hm1;
-        objects.add(hm1);
+        transparentObjects.add(hm1);
         Peons p1 = new Peons(this);
         peons = p1;
         objects.add(p1);

@@ -290,10 +290,11 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 texid = 7;
                 break;
             case BASALT:
-                texid = 8;
+                texid = 63;
                 break;
+            case EARTHQUAKE:
             default:
-                texid = 9;
+                texid = 63;
                 break;
         }
 
@@ -410,16 +411,20 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
 
     public void display(GL gl, float time) {
 
+        stepRocks(time - lastTime);
+        renderRocks(gl);
+        lastTime = time;
+        tex.enable();
+
         gl.glEnable(GL_LIGHTING);
         gl.glEnable(GL.GL_LIGHT1);
-
         gl.glColor3f(1, 1, 1);
         gl.glMatrixMode(GL.GL_TEXTURE);
         gl.glLoadIdentity();
         gl.glScalef(1.0f / 255.0f, 1.0f / 255.0f, 1.0f);
         gl.glMatrixMode(GL_MODELVIEW);
-
-        tex.enable();
+        gl.glEnable(GL.GL_BLEND);
+        gl.glEnable(GL.GL_DEPTH_TEST);
         tex.bind();
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         boolean firstChange = true;
@@ -450,9 +455,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
             }
 
         }
-        stepRocks(time - lastTime);
-        renderRocks(gl);
-        lastTime = time;
+
     }
 
     public void applyUpdate(HeightMapUpdate u) {
