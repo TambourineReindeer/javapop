@@ -49,6 +49,8 @@ public class BasaltEffect extends Effect {
         gl.glPushMatrix();
         gl.glTranslatef(pos.x, pos.y, 0);
         gl.glColor4f(1.0f, 1.0f, 1.0f, 0.3f);
+        gl.glActiveTexture(GL.GL_TEXTURE0);
+        gl.glUseProgram(0);
         gl.glDisable(GL.GL_TEXTURE_2D);
         gl.glDisable(GL.GL_LIGHTING);
         gl.glEnable(GL.GL_BLEND);

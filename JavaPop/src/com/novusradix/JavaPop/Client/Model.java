@@ -174,8 +174,6 @@ public class Model {
                         useShader = false;
                     }
                 }
-
-
             }
             GLHelper.glHelper.checkGL(gl);
             if (!useShader) {
