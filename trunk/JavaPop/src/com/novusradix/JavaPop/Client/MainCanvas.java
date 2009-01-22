@@ -57,6 +57,8 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private ClickableHandler clickables;
     private boolean mouseIsOver;
     public static GLHelper glHelper;
+    private float tileSize = 64;
+    private boolean zoomChanged = false;
 
     public MainCanvas(GLCapabilities caps, Game g) {
         super(caps);
@@ -102,6 +104,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             final GL gl = glAD.getGL();
             glHelper.checkGL(gl);
 
+            if (zoomChanged) {
+                gl.glMatrixMode(GL.GL_PROJECTION);
+                gl.glLoadIdentity();
+                gl.glOrtho(-width / tileSize, width / tileSize, -height / tileSize, height / tileSize, 1, 100);
+                zoomChanged = false;
+            }
             gl.glClearColor(0, 0, 0, 0);
             gl.glEnable(GL.GL_LIGHTING);
 
@@ -109,8 +117,14 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             gl.glEnable(GL.GL_DEPTH_TEST);
 
             gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+            gl.glMatrixMode(GL.GL_PROJECTION);
+
             gl.glMatrixMode(GL.GL_MODELVIEW);
             gl.glPushMatrix();
+            
+            Vector3 l = new Vector3(-1,0,3);
+            l.normalize();
+            gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 1.0f}));
 
             gl.glTranslatef(0, 0, -50);
             gl.glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
@@ -118,6 +132,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             gl.glTranslatef((0.70711f * xPos - yPos / 0.70711f), -(yPos / 0.70711f) - xPos * 0.70711f, 0);
 
             gl.glScalef(1.0f, 1.0f, fHeightScale);
+
 
             float[] buf = new float[16];
             gl.glGetFloatv(GL.GL_MODELVIEW_MATRIX, buf, 0);
@@ -137,10 +152,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
             gl.glEnable(GL.GL_BLEND);
             gl.glEnable(GL.GL_MULTISAMPLE);
-            Vector3 l = new Vector3(-9, -5, 10);
-            l.normalize();
-            gl.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 0.0f}));
-            gl.glEnable(GL.GL_LIGHT1);
+            gl.glEnable(GL.GL_LIGHT0);
 
             float time = (System.currentTimeMillis() - startMillis) / 1000.0f;
             Model.setRenderVolume(mvpInverse);
@@ -198,6 +210,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             gl.glShadeModel(GL.GL_SMOOTH);
             gl.glDisable(GL.GL_DEPTH_TEST);
             gl.glUseProgram(0);
+            gl.glActiveTexture(GL.GL_TEXTURE0);
             gl.glDisable(GL_TEXTURE_2D);
             gl.glMatrixMode(GL.GL_MODELVIEW);
             gl.glPushMatrix();
@@ -251,12 +264,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         try {
             gl.setSwapInterval(1);
             gl.glEnable(GL.GL_LIGHTING);
-            float global_ambient[] = {0.1f, 0.1f, 0.1f, 1.0f};
-            gl.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, FloatBuffer.wrap(global_ambient));
+            gl.glEnable(GL.GL_LIGHT0);
 
-            gl.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, FloatBuffer.wrap(new float[]{0.8f, 0.8f, 0.8f, 1.0f}));
+            gl.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, FloatBuffer.wrap(new float[]{0.1f, 0.1f, 0.1f, 1.0f}));
 
-            gl.glEnable(GL.GL_LIGHT1);
+            gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, FloatBuffer.wrap(new float[]{1.0f, 1.0f, 1.0f, 1.0f}));
+
             gl.glEnable(GL.GL_COLOR_MATERIAL);
             gl.glColorMaterial(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT_AND_DIFFUSE);
             gl.glEnable(GL.GL_DEPTH_TEST);
@@ -288,7 +301,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glViewport(0, 0, width, height); //strictly unneccesary as the component calls this automatically
         gl.glMatrixMode(GL.GL_PROJECTION);
         gl.glLoadIdentity();
-        gl.glOrtho(-width / 64.0f, width / 64.0f, -height / 64.0f, height / 64.0f, 1, 100);
+        gl.glOrtho(-width / tileSize, width / tileSize, -height / tileSize, height / tileSize, 1, 100);
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glLoadIdentity();
     }
@@ -320,8 +333,8 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     public void mouseDragged(MouseEvent e) {
         // TODO Auto-generated method stub
         if ((e.getModifiersEx() & MouseEvent.BUTTON2_DOWN_MASK) != 0) {
-            xPos = xOrig + (e.getX() - dragOrigin.x) / 32.0f;
-            yPos = yOrig + (e.getY() - dragOrigin.y) / 32.0f;
+            xPos = xOrig + (e.getX() - dragOrigin.x) / (tileSize / 2.0f);
+            yPos = yOrig + (e.getY() - dragOrigin.y) / (tileSize / 2.0f);
         }
     }
 
@@ -383,6 +396,15 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             xPos -= 0.2f;
             bPick = true;
         }
+        if (keys[VK_EQUALS]) {
+            tileSize *= 1.05;
+            zoomChanged = true;
+        }
+        if (keys[VK_MINUS]) {
+            tileSize /= 1.05;
+            zoomChanged = true;
+        }
+
         if (bPick) {
             mousePick();
         }
@@ -390,14 +412,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     private Point iterateSelection(Point current, Vector3 v0, Vector3 v1) {
         Vector3 p;
-
-
-
-
-
-
-
-
         float d, oldD;
         p = new Vector3(current.x, current.y, game.heightMap.getHeight(current.x, current.y));
         d = Helpers.PointLineDistance(v0, v1, p);

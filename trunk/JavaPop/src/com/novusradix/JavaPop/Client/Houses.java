@@ -85,6 +85,7 @@ public class Houses implements AbstractHouses, GLObject {
 
                 }
                 gl.glDisable(GL.GL_LIGHTING);
+                gl.glActiveTexture(GL.GL_TEXTURE0);
                 gl.glDisable(GL.GL_TEXTURE_2D);
                 gl.glUseProgram(0);
                 for (House h : houses.values()) {
@@ -125,7 +126,7 @@ public class Houses implements AbstractHouses, GLObject {
 
     public class House {
 
-        private final int x,  y;
+        private final  int x,    y;
         private int level;
         private Player player;
 

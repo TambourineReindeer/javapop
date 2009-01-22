@@ -64,6 +64,7 @@ public abstract class HeightMap {
         if (hb < ha || hc < ha || hd < ha) {
             hm = ha - 0.5f;
         }
+
         if (y > x) {
             if (y > 1 - x) {
                 // BMD

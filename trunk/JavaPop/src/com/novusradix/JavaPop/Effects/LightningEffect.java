@@ -91,6 +91,7 @@ public class LightningEffect extends Effect {
             nextStrike = (nextStrike + 1) % maxStrikes;
         }
         lastTime = time;
+        gl.glActiveTexture(GL.GL_TEXTURE0);
         gl.glDisable(GL.GL_TEXTURE_2D);
         gl.glDisable(GL.GL_LIGHTING);
         gl.glEnable(GL.GL_BLEND);

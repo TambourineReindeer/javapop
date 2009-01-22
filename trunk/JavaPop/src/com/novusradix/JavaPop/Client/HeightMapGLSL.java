@@ -177,7 +177,6 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-
             }
         }
         b.flip();
@@ -284,7 +283,7 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
                 texid = 7;
                 break;
             case BASALT:
-                texid = 63;
+                texid = 8;
                 break;
             case EARTHQUAKE:
             default:
@@ -292,11 +291,11 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
                 break;
         }
 
-        tiles[3 * (x + y * (heightMap.width))] = (byte) ((texid % 8) * 32);
-        tiles[3 * (x + y * (heightMap.width)) + 1] = (byte) (32 * (texid / 8));
+        tiles[3 * (x + y * (heightMap.width))] = (byte) (texid % 8);
+        tiles[3 * (x + y * (heightMap.width)) + 1] = (byte) (texid / 8);
         tiles[3 * (x + y * (heightMap.width)) + 2] = 0;
         dirtyTiles = true;
-    //changed[y] = true;
+    //changed[y] = true; //no need to re generate the display list 
     }
 
     private void setNormals(int x, int y) {
@@ -312,7 +311,8 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
     }
 
     private void setNormals(int x, int y, int vertA, int vertB, int vertC, float[] tileData) {
-        float ax, ay, az, bx, by, bz, cx, cy, cz;
+        float ax, ay, az,
+                bx, by, bz, cx, cy, cz;
         float nx, ny, nz;
         ax = tileData[bufPos(0, 0, vertA, VX)];
         ay = tileData[bufPos(0, 0, vertA, VY)];
@@ -383,7 +383,6 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
         gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
-
     }
 
     public void display(GL gl, float time) {
@@ -404,13 +403,13 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glActiveTexture(GL.GL_TEXTURE0);
         tex.bind();
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         gl.glActiveTexture(GL.GL_TEXTURE1);
         gl.glBindTexture(GL_TEXTURE_2D, textures[0]);
         gl.glActiveTexture(GL.GL_TEXTURE1);
         if (dirtyTiles) {
-            //gl.glTexSubImage2D(GL_TEXTURE_2D, 0, dirtyTiles.x, dirtyTiles.y, dirtyTiles.width, dirtyTiles.height, GL_RED, GL_BYTE, tiles);
-            gl.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, heightMap.width , heightMap.breadth, GL_RGB, GL_UNSIGNED_BYTE, ByteBuffer.wrap(tiles));
+            gl.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, heightMap.width, heightMap.breadth, GL_RGB, GL_UNSIGNED_BYTE, ByteBuffer.wrap(tiles));
             dirtyTiles = false;
         }
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -440,19 +439,16 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
                     gl.glNewList(displaylist + n, GL_COMPILE_AND_EXECUTE);
                     gl.glDrawArrays(GL.GL_TRIANGLES, n * (heightMap.width - 1) * 4 * 3, (heightMap.width - 1) * 4 * 3);
                 }
-
                 gl.glEndList();
                 changed[n] = false;
             } else {
                 gl.glCallList(displaylist + n);
             }
-
         }
-
     }
 
     public void applyUpdate(HeightMapUpdate u) {
-        int x,  y;
+        int x, y;
         synchronized (this) {
             if (!u.dirtyRegion.isEmpty()) {
                 for (y = 0; y < u.dirtyRegion.height; y++) {
@@ -476,7 +472,6 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
         synchronized (rocks) {
             for (Point p : r) {
                 rocks.put(p, new MutableFloat(0));
-
             }
         }
     }
@@ -506,14 +501,13 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
                 f.f = Math.min(1.0f, f.f + elapsedTime / 2.0f);
             }
         }
-
     }
 
     private void renderRocks(GL gl) {
+        int x, y;
         rock.prepare(gl);
         Vector3 p = new Vector3();
         gl.glUseProgram(0);
-        int x,  y;
         synchronized (rocks) {
             for (Entry<Point, MutableFloat> e : rocks.entrySet()) {
                 x = e.getKey().x;
@@ -522,6 +516,5 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
                 rock.display(p, Matrix4.identity, gl);
             }
         }
-
     }
 }
