@@ -48,7 +48,10 @@ public class EarthquakeRenderer implements GLObject {
     }
 
     public void removeTile(int x, int y) {
-        QuakeTile t = tiles.remove(x + y * stride);
+        QuakeTile t;
+        synchronized (tiles) {
+            t = tiles.remove(x + y * stride);
+        }
         if (t != null) {
             t.removeNeighbourCuts();
         }
@@ -56,12 +59,16 @@ public class EarthquakeRenderer implements GLObject {
 
     public void display(GL gl, float time) {
         side.prepare(gl);
-        for (QuakeTile t : tiles.values()) {
-            t.displaysides(gl, time);
+        synchronized (tiles) {
+            for (QuakeTile t : tiles.values()) {
+                t.displaysides(gl, time);
+            }
         }
         corner.prepare(gl);
-        for (QuakeTile t : tiles.values()) {
-            t.displaycorners(gl, time);
+        synchronized (tiles) {
+            for (QuakeTile t : tiles.values()) {
+                t.displaycorners(gl, time);
+            }
         }
     }
 

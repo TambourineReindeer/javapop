@@ -112,10 +112,10 @@ public class EarthquakeEffect extends Effect {
                     }
                     g.heightMap.earthquakeRenderer.addTile(px, py, in, out);
                 }
-                if (newd == null) {
+               
+            } if (newd == null) {
                     break;
                 }
-            }
             px += newd.dx;
             py += newd.dy;
             d = newd;

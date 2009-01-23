@@ -21,10 +21,15 @@ public class Peons {
 
     public Game game;
 
+    public enum Action {
+
+        DROWN, BURN, FALL, NONE;
+    }
+
     public enum State {
 
-        ALIVE, DEAD, SETTLED, WALKING, DROWNING, MERGING, WANDER
-    };
+        ALIVE, DEAD, SETTLED, WALKING, DROWNING, MERGING, WANDER, FALLING
+    }
     private Vector<Peon> peons;
     private MultiMap<Point, Peon> map;
     private int nextId = 1;
@@ -97,7 +102,7 @@ public class Peons {
         private State state;
         private float dx,  dy;
         Player player;
-        private float walkingTime;
+        private float stateTimer;
         private int wanderCount;
         private Point p;
 
@@ -185,36 +190,50 @@ public class Peons {
 
         private PeonUpdate.Detail changeState(State s) {
             state = s;
+            stateTimer = 0;
             return new PeonUpdate.Detail(id, state, pos.x, pos.y, destx, desty, dx, dy, player.getId());
         }
 
         private PeonUpdate.Detail step(float seconds) {
-            float dist;
             Point oldPos = getPoint();
             strength -= seconds;
             player.info.mana -= seconds;
+            stateTimer += seconds;
 
             if (strength < 0) {
                 player.info.mana -= this.strength;
                 return changeState(State.DEAD);
             }
-            if (game.heightMap.getTile(oldPos.x, oldPos.y) == Tile.SEA) {
-                return changeState(State.DROWNING);
-            }
-            if (game.heightMap.getTile(oldPos.x, oldPos.y) == Tile.LAVA) {
-                return changeState(State.DEAD);
-            }
-            if (game.heightMap.getTile(oldPos.x, oldPos.y) == Tile.SWAMP) {
-                return changeState(State.DEAD);
-            }
-            if (state != state.MERGING) {
-                if (map.size(oldPos) > 1) {
-                    return changeState(State.MERGING);
+
+            {
+                State newstate = state;
+                switch (game.heightMap.getTile(oldPos.x, oldPos.y).action) {
+                    case DROWN:
+                        newstate = State.DROWNING;
+                        break;
+                    case BURN:
+                        newstate = State.DEAD;
+                        break;
+                    case FALL:
+                        newstate = State.FALLING;
+                        break;
+                    default:
+                        if (map.size(oldPos) > 1) {
+                            newstate = State.MERGING;
+                        }
+                        break;
+                }
+
+                if (state != newstate) {
+                    return changeState(newstate);
                 }
             }
+
+
+
             switch (state) {
                 case WALKING:
-                    if (reachedDest() || walkingTime > 2.0f) {
+                    if (reachedDest() || stateTimer > 2.0f) {
                         //Yay we're here! Or we're taking a breather.
                         return changeState(State.ALIVE);
                     }
@@ -239,7 +258,6 @@ public class Peons {
                         }
                     }
 
-                    walkingTime += seconds;
                     return null;
 
                 case ALIVE:
@@ -288,8 +306,7 @@ public class Peons {
                         setDest(oldPos);
                         return changeState(State.WANDER);
                     }
-
-                    walkingTime = 0;
+                   
                     return changeState(State.WALKING);
 
 
@@ -364,14 +381,21 @@ public class Peons {
                         }
                         return null;
                     }
+                case FALLING: {
+                    if (stateTimer > 1.0f) {
+                        return changeState(State.DEAD);
+                    }
+                    return null;
+                }
                 default:
                     throw new UnsupportedOperationException("Unsupported state" + state);
             }
         }
 
         private Point findFlatLand(Point start) {
-            // TODO Auto-generated method stub
-            int px, py;
+             
+             
+                int px, py;
 
             for (Collection<Point> ring : Helpers.shuffledRings.subList(0, 15)) {
                 for (Point offset : ring) {

@@ -99,7 +99,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         try {
             if (mouseIsOver) {
                 setCursor(GLToolButton.getSelected().getCursor());
-            // TODO Auto-generated method stub
             }
             final GL gl = glAD.getGL();
             glHelper.checkGL(gl);
@@ -251,7 +250,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     public void displayChanged(final GLAutoDrawable arg0, final boolean arg1, final boolean arg2) {
-        // TODO Auto-generated method stub
     }
 
     public void init(final GLAutoDrawable glDrawable) {
@@ -327,11 +325,9 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     public void keyTyped(final KeyEvent e) {
-        // TODO Auto-generated method stub
     }
 
     public void mouseDragged(MouseEvent e) {
-        // TODO Auto-generated method stub
         if ((e.getModifiersEx() & MouseEvent.BUTTON2_DOWN_MASK) != 0) {
             xPos = xOrig + (e.getX() - dragOrigin.x) / (tileSize / 2.0f);
             yPos = yOrig + (e.getY() - dragOrigin.y) / (tileSize / 2.0f);
@@ -339,7 +335,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     public void mouseMoved(MouseEvent e) {
-        // TODO Auto-generated method stub
 
         if (width > 0 && height > 0) {
             xMouse = (2.0f * e.getX() / width - 1.0f);
@@ -434,7 +429,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     public void mouseClicked(MouseEvent e) {
-        // TODO Auto-generated method stub
     }
 
     public void mouseEntered(MouseEvent e) {
@@ -446,7 +440,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     public void mousePressed(MouseEvent e) {
-        // TODO Auto-generated method stub
         dragOrigin = e.getPoint();
         if ((e.getModifiersEx() & MouseEvent.BUTTON2_DOWN_MASK) != 0) {
             xOrig = xPos;
@@ -458,7 +451,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     public void mouseReleased(MouseEvent e) {
-        // TODO Auto-generated method stub
         if (e.getButton() == MouseEvent.BUTTON1) {
             GLToolButton.getSelected().ButtonUp(selected);
         }
