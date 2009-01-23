@@ -140,25 +140,24 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
                 return;
             }
 
-            if (!bseaLevel && dynamicRocks.containsKey(new Point(x, y))) {
-                //Rock beats scissors
-                t = Tile.ROCK;
+            Point p = new Point(x, y);
+            if (!bseaLevel) {
+                if (staticRocks.contains(p) || dynamicRocks.containsKey(p)) { //Rock beats scissors          
+                    t = Tile.ROCK;
+                }
             }
-
             if (t.isFertile != oldTile.isFertile) {
                 synchronized (houseChanges) {
                     houseChanges.add(x + y * width);
                 }
             }
             if (oldTile == Tile.ROCK) {
-                Point p = new Point(x, y);
                 if (!dynamicRocks.containsKey(p)) {
                     dynamicRocks.put(p, new MutableFloat(1.0f));
                 }
                 staticRocks.remove(p);
             }
             if (t == Tile.ROCK) {
-                Point p = new Point(x, y);
                 if (!dynamicRocks.containsKey(p)) {
                     dynamicRocks.put(p, new MutableFloat(0.0f));
                     newRocks.add(p);
@@ -166,7 +165,6 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
                 staticRocks.remove(p);
             }
             tex[x][y] = t.id;
-
         }
     }
 

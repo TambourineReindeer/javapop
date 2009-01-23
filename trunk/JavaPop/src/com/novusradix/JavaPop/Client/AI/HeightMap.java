@@ -12,13 +12,13 @@ import java.awt.Point;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class HeightMap extends com.novusradix.JavaPop.HeightMap {
+public class HeightMap extends com.novusradix.JavaPop.Client.HeightMap {
 
     byte[][] heights;
     byte[][] tiles;
 
-    public HeightMap(Dimension mapSize) {
-        super(mapSize);
+    public HeightMap(Dimension mapSize, Game g) {
+        super(mapSize, g);
         heights = new byte[mapSize.width][mapSize.height];
         tiles = new byte[mapSize.width - 1][mapSize.height - 1];
     }

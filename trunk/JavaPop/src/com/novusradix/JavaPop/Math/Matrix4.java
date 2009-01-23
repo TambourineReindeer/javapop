@@ -191,7 +191,13 @@ public class Matrix4 implements Serializable {
 
     public void scale(float x, float y, float z) {
         m[0] *= x;
+        m[4] *= x;
+        m[8] *= x;
+        m[1] *= y;
         m[5] *= y;
+        m[9] *= y;
+        m[2] *= z;
+        m[6] *= z;
         m[10] *= z;
     }
 
@@ -201,7 +207,7 @@ public class Matrix4 implements Serializable {
 
     public void transform(Vector3 v) {
 
-        float x, y, z, w;
+        float x,  y,  z,  w;
         x = m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3];
         y = m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7];
         z = m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11];
