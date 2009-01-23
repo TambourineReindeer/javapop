@@ -64,7 +64,7 @@ public class Peons implements GLObject {
         synchronized (peons) {
             for (Peon p : peons.values()) {
                 t = time + hashCode() % 10000;
-                v.set(p.posx, p.posy, game.heightMap.getHeight(p.posx, p.posy));
+                v.set(p.posx, p.posy, game.heightMap.getHeight(p.posx, p.posy)+p.posz);
                 if (p.state == State.DROWNING) {
                     v.z += (float) abs((float) sin(t * 4.0f) / 2.0f + 0.1f);
                 }
@@ -110,8 +110,7 @@ public class Peons implements GLObject {
 
     private class Peon {
 
-        float posx,
-                posy;
+        float posx, posy, posz;
         private int destx,  desty;
         private float dx,  dy;
         State state;
@@ -152,6 +151,9 @@ public class Peons implements GLObject {
                     }
                     posx += seconds * dx;
                     posy += seconds * dy;
+                    break;
+                case FALLING:
+                    posz=(float) ((-9.81f / 2.0f) * pow(sqrt(posz * 2.0f / -9.81f) + seconds, 2.0f));
                     break;
             }
         }

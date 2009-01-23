@@ -393,7 +393,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
 
         
         tex.enable();
-
+        gl.glUseProgram(0);
         gl.glEnable(GL_LIGHTING);
         gl.glEnable(GL.GL_LIGHT1);
         gl.glColor3f(1, 1, 1);

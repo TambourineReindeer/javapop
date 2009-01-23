@@ -133,7 +133,7 @@ public class Player implements Runnable {
         public double mana;
         public int leaderPeonId,  leaderHouseId;
 
-        public Info() {//todo move externalization into this class and privatise this constructor.
+        public Info() {
         }
 
         private Info(int id, String name, Point ankh, float[] colour, double mana) {
