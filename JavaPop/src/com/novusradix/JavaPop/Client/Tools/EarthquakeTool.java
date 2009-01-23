@@ -18,7 +18,7 @@ public class EarthquakeTool extends Tool {
     
     @Override
     public void PrimaryAction(Point p) {
-        client.sendMessage(new Earthquake(p));
+        client.sendMessage(new Earthquake(p, getDirection()));
     }
 
     public String getIconName() {

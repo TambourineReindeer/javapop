@@ -1,22 +1,12 @@
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Math.Matrix4;
-import com.novusradix.JavaPop.Math.MutableFloat;
-import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.novusradix.JavaPop.Tile;
 import com.sun.opengl.util.BufferUtil;
-import java.awt.Point;
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.media.opengl.*;
 import static javax.media.opengl.GL.*;
 
@@ -52,18 +42,9 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     private boolean[] changed;
     private int displaylist;
     private static float[] tempFloats;
-    private Model rock,  tree;
-    private Map<Point, MutableFloat> rocks;
-    float lastTime;
 
     public void initialise(HeightMap h) {
-        try {
-            rock = new Model(ModelData.fromURL(getClass().getResource("/com/novusradix/JavaPop/models/rock.model")), getClass().getResource("/com/novusradix/JavaPop/textures/marble.png"));
-            tree = new Model(ModelData.fromURL(getClass().getResource("/com/novusradix/JavaPop/models/tree.model")), getClass().getResource("/com/novusradix/JavaPop/textures/tree.png"));
-        } catch (IOException ex) {
-            Logger.getLogger(HeightMapNoShader.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        rocks = new HashMap<Point, MutableFloat>();
+        
         heightMap = h;
         vertexstride = 8;
         tilestride = 12 * vertexstride;
@@ -298,7 +279,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 break;
         }
 
-
+//todo: offset texcoords to half pixel in from border
         int tx, ty;
         tx = texid % 8;
         ty = texid / 8;
@@ -405,15 +386,12 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 heightMap.breadth - 1; n++) {
             changed[n] = true;
         }
-        tree.init(gl);
-        rock.init(gl);
+       
     }
 
     public void display(GL gl, float time) {
 
-        stepRocks(time - lastTime);
-        renderRocks(gl);
-        lastTime = time;
+        
         tex.enable();
 
         gl.glEnable(GL_LIGHTING);
@@ -474,61 +452,10 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 }
             }
             for (Entry<Integer, Byte> e : u.texture.entrySet()) {
-                setTile(e.getKey() % heightMap.width, e.getKey() / heightMap.width, e.getValue());
+                heightMap.setTile(e.getKey() % heightMap.width, e.getKey() / heightMap.width, e.getValue());
             }
         }
     }
 
-    public void addRocks(Set<Point> r) {
-        synchronized (rocks) {
-            for (Point p : r) {
-                rocks.put(p, new MutableFloat(0));
-
-            }
-        }
-    }
-
-    public void removeRocks(Set<Point> r) {
-        synchronized (rocks) {
-            for (Point p : r) {
-                rocks.remove(p);
-            }
-        }
-    }
-
-    private void stepRocks(float elapsedTime) {
-        Entry<Point, MutableFloat> e;
-        MutableFloat f;
-        Point p;
-        Boolean sea;
-        Iterator<Entry<Point, MutableFloat>> i = rocks.entrySet().iterator();
-        while (i.hasNext()) {
-            e = i.next();
-            f = e.getValue();
-            p = e.getKey();
-            sea = heightMap.isSeaLevel(p.x, p.y);
-            if (sea) {
-                f.f = Math.max(0.0f, f.f - elapsedTime / 2.0f);
-            } else {
-                f.f = Math.min(1.0f, f.f + elapsedTime / 2.0f);
-            }
-        }
-
-    }
-
-    private void renderRocks(GL gl) {
-        rock.prepare(gl);
-        Vector3 p = new Vector3();
-        gl.glUseProgram(0);
-        int x, y;
-        synchronized (rocks) {
-            for (Entry<Point, MutableFloat> e : rocks.entrySet()) {
-                x = e.getKey().x;
-                y = e.getKey().y;
-                p.set(x, y, e.getValue().f + heightMap.getHeight(x + 0.5f, y + 0.5f) - 1.0f);
-                rock.display(p, Matrix4.identity, gl);
-            }
-        }
-
-    }
+    
 }

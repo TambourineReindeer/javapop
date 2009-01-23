@@ -16,7 +16,7 @@ public class Game extends com.novusradix.JavaPop.Client.Game {
     AI ai;
     public Game(GameStarted g, Client c) {
       
-        heightMap = new HeightMap(g.gi.mapSize);
+        heightMap = new HeightMap(g.gi.mapSize, this);
         client = c;
         peons = new Peons(this);
         AIHouses =  new Houses(this);

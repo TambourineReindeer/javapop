@@ -22,7 +22,7 @@ import java.util.TimerTask;
  */
 public class Game extends TimerTask {
 
-    public com.novusradix.JavaPop.HeightMap heightMap;
+    public com.novusradix.JavaPop.Client.HeightMap heightMap;
     public Client client;
     public Peons peons;
     public AbstractHouses houses;
@@ -33,9 +33,9 @@ public class Game extends TimerTask {
     GameFrame frame;
     Collection<GLObject> objects;
     Collection<GLObject> transparentObjects;
-    
     public Map<Integer, Effect> effects;
     public Collection<ToolGroup> toolGroups;
+    public ModelFactory modelFactory;
 
     protected Game() {
     }
@@ -44,13 +44,15 @@ public class Game extends TimerTask {
         client = c;
         objects = new ArrayList<GLObject>();
         transparentObjects = new ArrayList<GLObject>();
-        
-        HeightMap hm1 = new HeightMap(g.gi.mapSize);
+        modelFactory = new ModelFactory();
+
+        HeightMap hm1 = new HeightMap(g.gi.mapSize, this);
         heightMap = hm1;
         transparentObjects.add(hm1);
-        Peons p1 = new Peons(this);
-        peons = p1;
-        objects.add(p1);
+
+        peons = new Peons(this);
+        objects.add(peons);
+
         Houses h1 = new Houses(this);
         houses = h1;
         objects.add(h1);
@@ -115,13 +117,15 @@ public class Game extends TimerTask {
         water.addTool(new TidalWaveTool(water, client));
         water.addTool(new HelenOfTroyTool(water, client));
 
+
         startTimer();
+
         frame = new GameFrame(this);
     }
 
     public void startTimer() {
         timer = new Timer("Client Game Animator");
-        seconds = 1.0f / 20.0f;
+        seconds = 1.0f / 30.0f;
         timer.scheduleAtFixedRate(this, 0, (int) (seconds * 1000.0f));
     }
 

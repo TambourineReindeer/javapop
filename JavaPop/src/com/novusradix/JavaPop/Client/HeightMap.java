@@ -4,31 +4,58 @@
  */
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Math.Matrix4;
+import com.novusradix.JavaPop.Math.MutableFloat;
+import com.novusradix.JavaPop.Math.Vector3;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.util.Set;
 import javax.media.opengl.GL;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
+import com.novusradix.JavaPop.Tile;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.logging.*;
 
 public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObject {
 
     HeightMapImpl implementation;
     GLObject renderer;
-
-    public HeightMap(Dimension mapSize) {
+    private Map<Point, MutableFloat> rocks;
+    private Model rock,  tree;
+    private float lastTime;
+    public EarthquakeRenderer earthquakeRenderer;
+    
+    public HeightMap(Dimension mapSize, Game g) {
         super(mapSize);
-
+        try {
+            rock = new Model(ModelData.fromURL(getClass().getResource("/com/novusradix/JavaPop/models/rock.model")), getClass().getResource("/com/novusradix/JavaPop/textures/marble.png"));
+            tree = new Model(ModelData.fromURL(getClass().getResource("/com/novusradix/JavaPop/models/tree.model")), getClass().getResource("/com/novusradix/JavaPop/textures/tree.png"));
+        } catch (IOException ex) {
+            Logger.getLogger(HeightMapGLSL.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        earthquakeRenderer = new EarthquakeRenderer(g, this);
         HeightMapGLSL h = new HeightMapGLSL();
         implementation = h;
         renderer = h;
         implementation.initialise(this);
+
+        rocks = new HashMap<Point, MutableFloat>();
+
     }
 
     public void display(GL gl, float time) {
+        stepRocks(time - lastTime);
+        renderRocks(gl);
+        earthquakeRenderer.display(gl, time);
+        lastTime = time;
         renderer.display(gl, time);
     }
 
     public void init(GL gl) {
+        tree.init(gl);
+        rock.init(gl);
+        earthquakeRenderer.init(gl);
         renderer.init(gl);
     }
 
@@ -47,13 +74,61 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObj
         implementation.setHeight(x, y, b);
     }
 
-    @Override
-    public void addRocks(Set<Point> newRocks) {
-        implementation.addRocks(newRocks);
+    //Implementations MUST call this method to set the tile rather than their own setTile directly.
+    public void setTile(int x, int y, byte t)
+    {
+        implementation.setTile(x, y, t);
+        if(t!=Tile.EARTHQUAKE.ordinal())
+            earthquakeRenderer.removeTile(x, y);
+    }
+    
+    public void addRocks(Set<Point> r) {
+        synchronized (rocks) {
+            for (Point p : r) {
+                rocks.put(p, new MutableFloat(0));
+            }
+        }
     }
 
-    @Override
-    public void removeRocks(Set<Point> deadRocks) {
-        implementation.removeRocks(deadRocks);
+    public void removeRocks(Set<Point> r) {
+        synchronized (rocks) {
+            for (Point p : r) {
+                rocks.remove(p);
+            }
+        }
+    }
+
+    private void stepRocks(float elapsedTime) {
+        Entry<Point, MutableFloat> e;
+        MutableFloat f;
+        Point p;
+        Boolean sea;
+        Iterator<Entry<Point, MutableFloat>> i = rocks.entrySet().iterator();
+        while (i.hasNext()) {
+            e = i.next();
+            f = e.getValue();
+            p = e.getKey();
+            sea = isSeaLevel(p.x, p.y);
+            if (sea) {
+                f.f = Math.max(0.0f, f.f - elapsedTime / 2.0f);
+            } else {
+                f.f = Math.min(1.0f, f.f + elapsedTime / 2.0f);
+            }
+        }
+    }
+
+    private void renderRocks(GL gl) {
+        int x, y;
+        rock.prepare(gl);
+        Vector3 p = new Vector3();
+        gl.glUseProgram(0);
+        synchronized (rocks) {
+            for (Entry<Point, MutableFloat> e : rocks.entrySet()) {
+                x = e.getKey().x;
+                y = e.getKey().y;
+                p.set(x, y, e.getValue().f + getHeight(x + 0.5f, y + 0.5f) - 1.0f);
+                rock.display(p, Matrix4.identity, gl);
+            }
+        }
     }
 }
