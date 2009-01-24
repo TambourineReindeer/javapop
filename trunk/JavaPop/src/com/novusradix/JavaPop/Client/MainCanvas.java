@@ -123,7 +123,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             
             Vector3 l = new Vector3(-1,0,3);
             l.normalize();
-            gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 1.0f}));
+            gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 0.0f}));
 
             gl.glTranslatef(0, 0, -50);
             gl.glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);

@@ -1,8 +1,11 @@
 package com.novusradix.JavaPop.Client;
 
+import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.*;
 import java.io.*;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -99,12 +102,62 @@ public class GLHelper {
             tex.setTexParameteri(GL_TEXTURE_WRAP_T, GL_REPEAT);
             textures.put(textureURL, tex);
 
+            if(textureURL.getFile().contains("tex.png"))
+                SimpleMipMap(gl, tex);
+            
             checkGL(gl);
         } catch (GLHelperException ex) {
             Logger.getLogger(GLHelper.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return tex;
+    }
+    
+    public void SimpleMipMap(GL gl, Texture t)
+    {
+        gl.glActiveTexture(GL.GL_TEXTURE0);
+        t.bind();
+        t.enable();
+        FloatBuffer buf = BufferUtil.newFloatBuffer(t.getWidth()*t.getHeight()*4);
+   
+        int levels = (int) Math.floor(Math.log(Math.max(t.getWidth(), t.getHeight()))/Math.log(2.0));
+        
+        gl.glGetTexImage(GL_TEXTURE_2D,0, GL_RGBA,GL_FLOAT, buf);
+        
+        FloatBuffer mipbuf;
+        int width, height, mipwidth, mipheight;
+        width = t.getWidth();
+        height = t.getHeight();
+        
+        for(int n=1;n<levels;n++)
+        {
+            mipwidth = width/2;
+            mipheight = height/2;
+            mipbuf = BufferUtil.newFloatBuffer(mipwidth*mipheight*4);
+            float[] colors;
+            colors = new float[16]; //two pixels - RGBARGBA
+
+            for(int y=0;y<mipwidth;y++)
+            {
+                for(int x=0;x<mipheight;x++)
+                {
+                    buf.position((x*2+y*2*width)*4);
+                    buf.get(colors, 0, 8);
+                    buf.position((x*2+(y*2+1)*width)*4);
+                    buf.get(colors, 8, 8);
+                    float alpha = (colors[3] +colors[7] +colors[11] + colors[15]);
+                    for(int z=0;z<4;z++)
+                        colors[z]= (colors[z]*colors[3] + colors[z + 4]*colors[7] + colors[z + 8]*colors[11] + colors[z + 12]*colors[15])/alpha;
+                    colors[3]=alpha/4.0f;
+                    mipbuf.put(colors, 0, 4);
+                }
+            }
+            mipbuf.flip();
+            gl.glTexImage2D(GL_TEXTURE_2D, n, GL_RGBA, mipwidth, mipheight, 0, GL_RGBA, GL_FLOAT, mipbuf);
+            buf=mipbuf;
+            width = mipwidth;
+            height = mipheight;
+        }
     }
 
     public void init(GL gl) {

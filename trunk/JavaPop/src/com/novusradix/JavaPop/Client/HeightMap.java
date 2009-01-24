@@ -36,7 +36,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObj
         }
         earthquakeRenderer = new EarthquakeRenderer(g, this);
         HeightMapGLSL h = new HeightMapGLSL();
-       // HeightMapNoShader h = new HeightMapNoShader();
+        //HeightMapNoShader h = new HeightMapNoShader();
         implementation = h;
         renderer = h;
         implementation.initialise(this);
