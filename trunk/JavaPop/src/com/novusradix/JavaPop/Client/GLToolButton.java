@@ -70,7 +70,7 @@ public class GLToolButton extends GLButton {
     @Override
     public void select() {
         selected = this;
-        groupButton.select();
+        //groupButton.select();
         tool.Select();
     }
 

@@ -23,7 +23,7 @@ public class BatholithEffect extends Effect {
 
     @Override
     public void execute(Game g) {
-        if (age % 5 == 0) {
+        if (age % 2 == 0) {
 
             int px, py;
             px = target.x + r.nextInt(9) - 4;
@@ -31,6 +31,9 @@ public class BatholithEffect extends Effect {
             if (g.heightMap.inBounds(px, py)) {
                 g.heightMap.up(px, py);
             }
+        }
+        if (age % 5 == 0) {
+            int px, py;
             px = target.x + r.nextInt(9) - 4;
             py = target.y + r.nextInt(9) - 4;
             if (g.heightMap.tileInBounds(px, py)) {

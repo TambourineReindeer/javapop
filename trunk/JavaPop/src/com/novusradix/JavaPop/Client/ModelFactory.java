@@ -48,7 +48,7 @@ public class ModelFactory {
 
         @Override
         public int hashCode() {
-            return model.hashCode() ^ texture.hashCode();
+            return (model==null?0:model.hashCode()^1) ^ (texture==null?0:texture.hashCode());
         }
     }
 }

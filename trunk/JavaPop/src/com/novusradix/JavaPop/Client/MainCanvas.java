@@ -83,6 +83,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         for (ToolGroup tg : game.toolGroups) {
             GLToolGroupButton tgb = new GLToolGroupButton(tg, clickables, game.objects);
         }
+        GLToolGroupButton.selectVisibleToolGroupButton(1);
         GLToolButton.selectDefault();
 
         for (PeonMode m : PeonMode.values()) {
@@ -199,8 +200,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     private void displayCursor(final GL gl) {
         if (mouseIsOver) {
-
-
             float cW, cH;
             cW = 0.02f;
             cH = 0.1f;
@@ -356,21 +355,17 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         Vector3 v0n, v1n;
         v0n = new Vector3(z0);
-        v1n = new Vector3(
-                z1);
+        v1n = new Vector3(z1);
 
         z1.sub(z0);
         l = -z0.z / z1.z;
         s = new Vector3();
         s.scaleAdd(l, z1, z0);
 
-
         selected.x = max(min((int) Math.round(s.x), game.heightMap.getWidth() - 1), 0);
         selected.y = max(min((int) Math.round(s.y), game.heightMap.getBreadth() - 1), 0);
 
-
         selected = iterateSelection(selected, v0n, v1n);
-
     }
 
     private void handleKeys() {
@@ -391,6 +386,17 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             xPos -= 0.2f;
             bPick = true;
         }
+
+        for (int n = 0; n < 6; n++) {
+            if (keys[VK_1 + n]) {
+                if (keys[VK_SHIFT]) {
+                    GLToolGroupButton.selectVisibleToolGroupButton(n + 1);
+                } else {
+                    GLToolGroupButton.selectVisibleToolButton(n + 1);
+                }
+            }
+        }
+
         if (keys[VK_EQUALS]) {
             tileSize *= 1.05;
             zoomChanged = true;
@@ -400,6 +406,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             zoomChanged = true;
         }
 
+
         if (bPick) {
             mousePick();
         }
@@ -407,6 +414,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     private Point iterateSelection(Point current, Vector3 v0, Vector3 v1) {
         Vector3 p;
+
         float d, oldD;
         p = new Vector3(current.x, current.y, game.heightMap.getHeight(current.x, current.y));
         d = Helpers.PointLineDistance(v0, v1, p);

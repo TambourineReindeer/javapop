@@ -31,7 +31,6 @@ public abstract class Tool {
         directionalCursors[1] = tk.createCustomCursor(tk.getImage(getClass().getResource("/com/novusradix/JavaPop/cursors/east.png")), new Point(0, 0), "east");
         directionalCursors[2] = tk.createCustomCursor(tk.getImage(getClass().getResource("/com/novusradix/JavaPop/cursors/south.png")), new Point(0, 0), "south");
         directionalCursors[3] = tk.createCustomCursor(tk.getImage(getClass().getResource("/com/novusradix/JavaPop/cursors/west.png")), new Point(0, 0), "west");
-
     }
 
     public void PrimaryAction(Point p) {
