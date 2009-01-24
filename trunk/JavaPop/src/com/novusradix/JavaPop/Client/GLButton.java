@@ -23,9 +23,11 @@ public abstract class GLButton implements GLObject, GLClickable {
     String texname;
     Texture tex, marble;
     boolean flipx, flipy;
+    private static int[] view = new int[4];
 
-    private GLButton(){}
-    
+    private GLButton() {
+    }
+
     protected GLButton(ClickableHandler ch, Collection<GLObject> objects) {
         enabled = true;
         visible = false;
@@ -39,9 +41,9 @@ public abstract class GLButton implements GLObject, GLClickable {
 
     public void display(GL gl, float time) {
         //TODO: most of this only needs to be done once per frame, not per button.
-        if(!visible)
+        if (!visible) {
             return;
-        int[] view = new int[4];
+        }
         gl.glGetIntegerv(GL.GL_VIEWPORT, view, 0);
         gl.glMatrixMode(GL.GL_PROJECTION);
         gl.glPushMatrix();
@@ -82,7 +84,7 @@ public abstract class GLButton implements GLObject, GLClickable {
 
         for (int n = 0; n < buttonShape.npoints; n++) {
             gl.glTexCoord2f(n / 2, (n + n / 2 + 1) % 2);
-            gl.glVertex3f(buttonShape.xpoints[n], buttonShape.ypoints[n],-0.5f);
+            gl.glVertex3f(buttonShape.xpoints[n], buttonShape.ypoints[n], -0.5f);
         }
         gl.glEnd();
         gl.glPopMatrix();
@@ -93,7 +95,7 @@ public abstract class GLButton implements GLObject, GLClickable {
 
         for (int n = 0; n < buttonShape.npoints; n++) {
             gl.glTexCoord2f(n / 2, (n + n / 2 + 1) % 2);
-            gl.glVertex3f(buttonShape.xpoints[n], buttonShape.ypoints[n],-1.0f);
+            gl.glVertex3f(buttonShape.xpoints[n], buttonShape.ypoints[n], -1.0f);
         }
         gl.glEnd();
         gl.glPopMatrix();
@@ -106,7 +108,7 @@ public abstract class GLButton implements GLObject, GLClickable {
     }
 
     public void init(GL gl) {
-        
+
         try {
             tex = MainCanvas.glHelper.getTexture(gl, texname);
             marble = MainCanvas.glHelper.getTexture(gl, "/com/novusradix/JavaPop/textures/marble.png");
@@ -148,7 +150,7 @@ public abstract class GLButton implements GLObject, GLClickable {
     public boolean anchorTop() {
         return !flipy;
     }
-    
+
     public boolean isVisible() {
         return visible;
     }

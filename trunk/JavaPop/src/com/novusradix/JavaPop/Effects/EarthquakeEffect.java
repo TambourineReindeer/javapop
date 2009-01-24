@@ -102,7 +102,7 @@ public class EarthquakeEffect extends Effect {
                 newd = Direction.directions[path[n]];
             }
             if (g.heightMap.tileInBounds(px, py)) {
-                if (g.heightMap.isFlat(px, py)) {
+                if (g.heightMap.isFlat(px, py) && !g.heightMap.isSeaLevel(px, py)) {
                     Direction in = null, out = null;
                     if (d != null && (!g.heightMap.inBounds(px - d.dx, py - d.dy) || g.heightMap.isFlat(px - d.dx, py - d.dy))) {
                         in = d;

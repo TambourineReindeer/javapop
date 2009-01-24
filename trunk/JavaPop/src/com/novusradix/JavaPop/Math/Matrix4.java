@@ -202,7 +202,8 @@ public class Matrix4 implements Serializable {
     }
 
     public void set(float[] buf) {
-        m = buf.clone();
+        System.arraycopy(buf, 0, m, 0, buf.length);
+       // m = buf.clone();
     }
 
     public void transform(Vector3 v) {

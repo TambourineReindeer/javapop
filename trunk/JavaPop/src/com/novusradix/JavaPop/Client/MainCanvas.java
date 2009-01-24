@@ -121,10 +121,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
             gl.glMatrixMode(GL.GL_MODELVIEW);
             gl.glPushMatrix();
-            
-            Vector3 l = new Vector3(-1,0,3);
-            l.normalize();
-            gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 0.0f}));
+
 
             gl.glTranslatef(0, 0, -50);
             gl.glRotatef(-60.0f, 1.0f, 0.0f, 0.0f);
@@ -253,7 +250,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     public void init(final GLAutoDrawable glDrawable) {
         //Called before first display and on fullscreen/mode changes
-        glDrawable.setGL(new DebugGL(glDrawable.getGL()));
+        //glDrawable.setGL(new DebugGL(glDrawable.getGL()));
 
         final GL gl = glDrawable.getGL();
         Logger.getLogger(MainCanvas.class.getName()).log(Level.INFO, "GL Init");
@@ -271,6 +268,9 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             gl.glColorMaterial(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT_AND_DIFFUSE);
             gl.glEnable(GL.GL_DEPTH_TEST);
             gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+            Vector3 l = new Vector3(-1, 0, 3);
+            l.normalize();
+            gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, FloatBuffer.wrap(new float[]{l.x, l.y, l.z, 0.0f}));
 
             for (GLObject glo : game.objects) {
                 glo.init(gl);

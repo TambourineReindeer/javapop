@@ -15,7 +15,7 @@ import java.util.Set;
  * @author gef
  */
 public abstract class HeightMap {
-
+ 
     public final int width,  breadth;
 
     public HeightMap(Dimension mapSize) {

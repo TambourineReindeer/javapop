@@ -108,13 +108,13 @@ public class Player implements Runnable {
             oos.writeObject(m);
             oos.flush();
             oos.reset();
-            System.out.println("Server sent " + m.getClass().getName());
+            //System.out.println("Server sent " + m.getClass().getName());
         } catch (IOException ex) {
             Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public synchronized void sendMessage(byte[] bytes) {
+    synchronized void sendMessage(byte[] bytes) {
         try {
             socket.getOutputStream().write(bytes);
             socket.getOutputStream().flush();
