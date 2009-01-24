@@ -44,7 +44,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
     private static float[] tempFloats;
 
     public void initialise(HeightMap h) {
-        
+
         heightMap = h;
         vertexstride = 8;
         tilestride = 12 * vertexstride;
@@ -63,8 +63,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(0);
-                b.put(0);
+                b.put(0.5f);
+                b.put(0.5f);
                 // 1
                 b.put((float) x + 1);
                 b.put(y);
@@ -72,8 +72,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(31.0f);
-                b.put(0);
+                b.put(31.5f);
+                b.put(0.5f);
                 // 2
                 b.put(x + 0.5f);
                 b.put(y + 0.5f);
@@ -81,8 +81,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(15.5f);
-                b.put(15.5f);
+                b.put(16.0f);
+                b.put(16.0f);
                 // 3
                 b.put((float) x + 1);
                 b.put(y);
@@ -90,8 +90,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(31.0f);
-                b.put(0);
+                b.put(31.5f);
+                b.put(0.5f);
                 // 4
                 b.put((float) x + 1);
                 b.put((float) y + 1);
@@ -99,8 +99,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(31.0f);
-                b.put(31.0f);
+                b.put(31.5f);
+                b.put(31.5f);
                 // 5
                 b.put(x + 0.5f);
                 b.put(y + 0.5f);
@@ -108,8 +108,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(15.5f);
-                b.put(15.5f);
+                b.put(16f);
+                b.put(16f);
                 // 6
                 b.put((float) x + 1);
                 b.put((float) y + 1);
@@ -117,8 +117,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(31.0f);
-                b.put(31.0f);
+                b.put(31.5f);
+                b.put(31.5f);
                 // 7
                 b.put(x);
                 b.put((float) y + 1);
@@ -126,8 +126,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(0);
-                b.put(31.0f);
+                b.put(0.5f);
+                b.put(31.5f);
                 // 8
                 b.put(x + 0.5f);
                 b.put(y + 0.5f);
@@ -135,8 +135,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(15.5f);
-                b.put(15.5f);
+                b.put(16f);
+                b.put(16f);
                 // 9
                 b.put(x);
                 b.put((float) y + 1);
@@ -144,8 +144,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(0);
-                b.put(31.0f);
+                b.put(0.5f);
+                b.put(31.5f);
                 // 10
                 b.put(x);
                 b.put(y);
@@ -153,8 +153,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(0);
-                b.put(0);
+                b.put(0.5f);
+                b.put(0.5f);
                 // 11
                 b.put(x + 0.5f);
                 b.put(y + 0.5f);
@@ -162,8 +162,8 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 b.put(0);
                 b.put(0);
                 b.put(1);
-                b.put(15.5f);
-                b.put(15.5f);
+                b.put(16f);
+                b.put(16f);
             }
         }
         b.flip();
@@ -283,12 +283,13 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
         int tx, ty;
         tx = texid % 8;
         ty = texid / 8;
-        left = tx * 32.0f;
+        left = tx * 32.0f + 0.5f;
         right = left + 31.0f;
         xmid = (left + right) / 2.0f;
-        top = ty * 32.0f;
+        top = ty * 32.0f + 0.5f;
         bottom = top + 31.0f;
         ymid = (top + bottom) / 2.0f;
+
 //Todo: bulk update??
         b.put(bufPos(x, y, 0, TX), left);
         b.put(bufPos(x, y, 1, TX), right);
@@ -386,12 +387,12 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 heightMap.breadth - 1; n++) {
             changed[n] = true;
         }
-       
+
     }
 
     public void display(GL gl, float time) {
 
-        
+
         tex.enable();
         gl.glUseProgram(0);
         gl.glEnable(GL_LIGHTING);
@@ -399,12 +400,14 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
         gl.glColor3f(1, 1, 1);
         gl.glMatrixMode(GL.GL_TEXTURE);
         gl.glLoadIdentity();
-        gl.glScalef(1.0f / 255.0f, 1.0f / 255.0f, 1.0f);
+        gl.glScalef(1.0f / 256.0f, 1.0f / 256.0f, 1.0f);
         gl.glMatrixMode(GL_MODELVIEW);
         gl.glEnable(GL.GL_BLEND);
         gl.glEnable(GL.GL_DEPTH_TEST);
         tex.bind();
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST_MIPMAP_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAX_LEVEL, 0);
         boolean firstChange = true;
         for (int n = 0; n < heightMap.breadth - 1; n++) { //todo - if this ever gets slow, limit to visible rows only
             if (changed[n]) {
@@ -433,11 +436,12 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
             }
 
         }
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAX_LEVEL, 1000);
 
     }
 
     public void applyUpdate(HeightMapUpdate u) {
-        int x, y;
+        int x,  y;
         synchronized (this) {
             if (!u.dirtyRegion.isEmpty()) {
                 for (y = 0; y < u.dirtyRegion.height; y++) {
@@ -456,6 +460,4 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
             }
         }
     }
-
-    
 }
