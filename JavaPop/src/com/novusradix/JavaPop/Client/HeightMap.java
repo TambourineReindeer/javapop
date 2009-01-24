@@ -25,7 +25,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObj
     private Model rock,  tree;
     private float lastTime;
     public EarthquakeRenderer earthquakeRenderer;
-    
+
     public HeightMap(Dimension mapSize, Game g) {
         super(mapSize);
         try {
@@ -76,13 +76,13 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObj
     }
 
     //Implementations MUST call this method to set the tile rather than their own setTile directly.
-    public void setTile(int x, int y, byte t)
-    {
+    public void setTile(int x, int y, byte t) {
         implementation.setTile(x, y, t);
-        if(t!=Tile.EARTHQUAKE.ordinal())
+        if (t != Tile.EARTHQUAKE.ordinal()) {
             earthquakeRenderer.removeTile(x, y);
+        }
     }
-    
+
     public void addRocks(Set<Point> r) {
         synchronized (rocks) {
             for (Point p : r) {
@@ -117,11 +117,11 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObj
             }
         }
     }
+    Vector3 p = new Vector3();
 
     private void renderRocks(GL gl) {
         int x, y;
         rock.prepare(gl);
-        Vector3 p = new Vector3();
         gl.glUseProgram(0);
         synchronized (rocks) {
             for (Entry<Point, MutableFloat> e : rocks.entrySet()) {

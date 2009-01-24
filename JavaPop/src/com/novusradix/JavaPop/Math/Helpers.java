@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class Helpers {
+public static final int radius = 32;
 
     public static Point[][] rings;
     public static ArrayList<ArrayList<Point>> shuffledRings;
@@ -13,13 +14,13 @@ public class Helpers {
     
 
     static {
-        rings = new Point[64][];
-        smallRings = new Point[64][];
+        rings = new Point[radius][];
+        smallRings = new Point[radius][];
         shuffledRings = new ArrayList<ArrayList<Point>>();
 
         rings[0] = new Point[1];
         rings[0][0] = new Point(0, 0);
-        for (int i = 1; i < 64; i++) {
+        for (int i = 1; i < radius; i++) {
             rings[i] = new Point[8 * i];
             for (int n = 0; n < i * 2; n++) {
                 rings[i][n] = new Point(n - i, i);
@@ -36,7 +37,7 @@ public class Helpers {
             shuffledRings.add(a);
         }
 
-        for (int i = 0; i < 64; i++) {
+        for (int i = 0; i < radius; i++) {
             smallRings[i] = new Point[8 * i + 4];
             for (int n = 0; n < 2 * i + 1; n++) {
                 smallRings[i][n] = new Point(i, i - n);
@@ -47,6 +48,7 @@ public class Helpers {
         }
     }
 
+    //todo: rewrite to avoid object creation
     public static float PointLineDistance(Vector3 line1, Vector3 line2, Vector3 point) {
         Vector3 a, b;
 

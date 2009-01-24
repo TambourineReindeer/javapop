@@ -55,16 +55,17 @@ public class Peons implements GLObject {
             }
         }
     }
+    
+    private Vector3 v = new Vector3();
 
     public void display(GL gl, float time) {
         float t;
-        Vector3 v = new Vector3();
         gl.glDisable(GL.GL_LIGHTING);
         peonModel.prepare(gl);
         synchronized (peons) {
             for (Peon p : peons.values()) {
                 t = time + hashCode() % 10000;
-                v.set(p.posx, p.posy, game.heightMap.getHeight(p.posx, p.posy)+p.posz);
+                v.set(p.posx, p.posy, game.heightMap.getHeight(p.posx, p.posy) + p.posz);
                 if (p.state == State.DROWNING) {
                     v.z += (float) abs((float) sin(t * 4.0f) / 2.0f + 0.1f);
                 }
@@ -75,12 +76,11 @@ public class Peons implements GLObject {
         ankhModel.prepare(gl);
         synchronized (leaders) {
             for (Peon p : leaders.values()) {
-                if (p != null) {
-                    Vector3 pos = new Vector3();
-                    pos.x = p.posx + 0.5f;
-                    pos.y = p.posy + 0.5f;
-                    pos.z = game.heightMap.getHeight(pos.x, pos.y) + 1.0f;
-                    ankhModel.display(pos, Matrix4.identity, gl);
+                if (p != null) {                    
+                    v.x = p.posx + 0.5f;
+                    v.y = p.posy + 0.5f;
+                    v.z = game.heightMap.getHeight(p.posx, p.posy) + 1.0f;
+                    ankhModel.display(v, Matrix4.identity, gl);
                 }
             }
         }
@@ -107,6 +107,8 @@ public class Peons implements GLObject {
             }
         }
     }
+    
+    private Vector3 front = new Vector3(),  up = new Vector3(),  left = new Vector3();
 
     private class Peon {
 
@@ -153,22 +155,20 @@ public class Peons implements GLObject {
                     posy += seconds * dy;
                     break;
                 case FALLING:
-                    posz=(float) ((-9.81f / 2.0f) * pow(sqrt(posz * 2.0f / -9.81f) + seconds, 2.0f));
+                    posz = (float) ((-9.81f / 2.0f) * pow(sqrt(posz * 2.0f / -9.81f) + seconds, 2.0f));
                     break;
             }
         }
 
         private void calcBasis() {
-            Vector3 front = new Vector3(dx, dy, 0);
+            front.set(dx, dy, 0);
             if (front.length() == 0) {
                 front.x = -1;
                 front.y = -1;
             }
             front.normalize();
-            Vector3 up,
-                    left;
-            up = new Vector3(0, 0, 1);
-            left = new Vector3();
+
+            up.set(0, 0, 1);
             left.cross(front, up);
             basis.setBasis(front, left, up);
         }

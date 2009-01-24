@@ -59,12 +59,13 @@ public class Houses implements AbstractHouses, GLObject {
         return false;
     }
 
+    Vector3 p = new Vector3();
+    Matrix4 basis = new Matrix4();
+
     public void display(GL gl, float time) {
         synchronized (houses) {
             if (houses != null) {
                 gl.glUseProgram(0);
-                Vector3 p = new Vector3();
-                Matrix4 basis = new Matrix4();
                 houseModel.prepare(gl);
                 for (House h : houses.values()) {
 
@@ -112,13 +113,12 @@ public class Houses implements AbstractHouses, GLObject {
             ankhModel.prepare(gl);
             for (House h : leaderHouses.values()) {
                 if (h != null) {
-                    Vector3 pos = new Vector3();
-                    Matrix4 basis = new Matrix4(Matrix4.identity);
-                    pos.x = h.x + 0.5f;
-                    pos.y = h.y + 0.5f;
-                    pos.z = game.heightMap.getHeight(pos.x, pos.y) + 1.0f;
+                    basis.set(Matrix4.identity);
+                    p.x = h.x + 0.5f;
+                    p.y = h.y + 0.5f;
+                    p.z = game.heightMap.getHeight(p.x, p.y) + 1.0f;
 
-                    ankhModel.display(pos, basis, gl);
+                    ankhModel.display(p, basis, gl);
                 }
             }
         }
@@ -126,7 +126,7 @@ public class Houses implements AbstractHouses, GLObject {
 
     public class House {
 
-        private final  int x,    y;
+        private final int x,  y;
         private int level;
         private Player player;
 

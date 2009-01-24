@@ -66,10 +66,17 @@ public class Houses {
 
     private Collection<House> affectedHouses(SortedSet<Integer> mapChanges) {
         Collection<House> hs = new ArrayList<House>();
-        for (House h : allHouses.values()) {
-            int max, min, y;
+        if (mapChanges.size() == 0) {
+            return hs;
+        }
+        int firstChange, lastChange;
+        firstChange = mapChanges.first() - 3 - 3 * game.heightMap.width;
+        lastChange = mapChanges.last() + 3 + 3 * game.heightMap.width + 1;
+        for (House h : allHouses.subMap(firstChange, lastChange).values()) {
+            int y;
+            Integer max, min;
             min = h.pos.x - 3 + (h.pos.y - 3) * game.heightMap.width; //subset from here (inclusive)
-            max = h.pos.x + 3 + (h.pos.y + 4) * game.heightMap.width; //to here (exclusive)
+            max = h.pos.x + 3 + (h.pos.y + 3) * game.heightMap.width + 1; //to here (exclusive)
             for (int p : mapChanges.subSet(min, max)) {
                 y = p / game.heightMap.width;
                 if ((y <= h.pos.y + 3) && (y >= h.pos.y - 3)) {
@@ -151,7 +158,7 @@ public class Houses {
     }
 
     private void repaint() {
-        int x, y;
+        int x,   y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (newmap[x][y] != map[x][y]) {
@@ -169,7 +176,7 @@ public class Houses {
 
     public int countFlatLand(int x, int y) {
         int flat = 0;
-        int px, py;
+        int px,   py;
         for (int radius = 0; radius <= 3; radius++) {
             for (Point offset : Helpers.rings[radius]) {
                 px = x + offset.x;
@@ -286,7 +293,7 @@ public class Houses {
                 if (level == 49) {
                     radiuslimit = 3;
                 }
-                int px, py;
+                int px,   py;
                 for (int radius = 1; radius <= radiuslimit; radius++) {
                     for (Point offset : Helpers.rings[radius]) {
                         px = pos.x + offset.x;
