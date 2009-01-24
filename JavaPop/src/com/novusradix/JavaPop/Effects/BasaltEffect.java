@@ -35,7 +35,11 @@ public class BasaltEffect extends Effect {
                 g.heightMap.setTile(pos.x, pos.y, Tile.BASALT);
                 pos.x += direction.dx;
                 pos.y += direction.dy;
-                g.addEffect(this); //update on the client
+                if (g.heightMap.tileInBounds(pos.x, pos.y)) {
+                    g.addEffect(this); //update on the client
+                } else {
+                    g.deleteEffect(this);
+                }
             } else {
                 g.deleteEffect(this);
             }
@@ -52,6 +56,7 @@ public class BasaltEffect extends Effect {
         gl.glActiveTexture(GL.GL_TEXTURE0);
         gl.glUseProgram(0);
         gl.glDisable(GL.GL_TEXTURE_2D);
+        gl.glUseProgram(0);
         gl.glDisable(GL.GL_LIGHTING);
         gl.glEnable(GL.GL_BLEND);
         gl.glBegin(GL.GL_TRIANGLES);

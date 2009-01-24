@@ -154,6 +154,7 @@ public class Model {
                 tex.bind();
             GLHelper.glHelper.checkGL(gl);
             } else {
+                gl.glActiveTexture(GL.GL_TEXTURE0); 
                 gl.glDisable(GL_TEXTURE_2D);
             GLHelper.glHelper.checkGL(gl);
             }
