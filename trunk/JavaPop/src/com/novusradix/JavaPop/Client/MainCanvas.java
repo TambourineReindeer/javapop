@@ -9,7 +9,7 @@ import com.novusradix.JavaPop.Client.Tools.ToolGroup;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Effects.Effect;
-import com.novusradix.JavaPop.Server.Player.PeonMode;
+import com.novusradix.JavaPop.Server.ServerPlayer.PeonMode;
 import java.awt.Point;
 
 import java.awt.event.KeyEvent;
@@ -49,7 +49,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Point selected;
     private Matrix4 mvpInverse;
     private Game game;
-    private long startMillis;
+    private long startMillis,  lastMillis;
     private boolean[] keys;
     float xMouse, yMouse;
     private int frameCount = 0;
@@ -64,7 +64,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         super(caps);
         glHelper = GLHelper.glHelper;
         keys = new boolean[0x20e];
-        startMillis = System.currentTimeMillis();
+        startMillis = lastMillis = System.currentTimeMillis();
         this.game = g;
         mvpInverse = new Matrix4();
 
@@ -97,6 +97,11 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     }
 
     public void display(final GLAutoDrawable glAD) {
+        long now = System.currentTimeMillis();
+        game.step((now - lastMillis) / 1000.0f);
+        lastMillis = now;
+        float time = (now - startMillis) / 1000.0f;
+
         try {
             if (mouseIsOver) {
                 setCursor(GLToolButton.getSelected().getCursor());
@@ -151,7 +156,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             gl.glEnable(GL.GL_MULTISAMPLE);
             gl.glEnable(GL.GL_LIGHT0);
 
-            float time = (System.currentTimeMillis() - startMillis) / 1000.0f;
             Model.setRenderVolume(mvpInverse);
 
             glHelper.checkGL(gl);

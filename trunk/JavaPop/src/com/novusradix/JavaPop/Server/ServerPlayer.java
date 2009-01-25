@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  *
  * @author gef
  */
-public class Player implements Runnable {
+public class ServerPlayer implements Runnable, com.novusradix.JavaPop.Player {
 
     private static float[][] defaultColors = {{0, 0, 1}, {1, 0, 0}, {0, 1, 0}};
     boolean human;
@@ -32,7 +32,7 @@ public class Player implements Runnable {
     }
     public Server s;
     public Socket socket;
-    public Game currentGame;
+    public ServerGame currentGame;
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
     private static int nextId = 1;
@@ -41,7 +41,7 @@ public class Player implements Runnable {
     Info info;
     public PeonMode peonMode;
 
-    public Player(Server s, Socket sock) {
+    public ServerPlayer(Server s, Socket sock) {
         this.s = s;
         this.socket = sock;
         id = nextId++;
@@ -58,7 +58,7 @@ public class Player implements Runnable {
             (new Thread(this, "Server Player")).start();
             sendMessage(new GameList(s.getGames()));
         } catch (IOException ioe) {
-            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ioe);
+            Logger.getLogger(ServerPlayer.class.getName()).log(Level.SEVERE, null, ioe);
         }
     }
 
@@ -99,7 +99,7 @@ public class Player implements Runnable {
             socket.close();
         //Disconnect
         } catch (IOException ex) {
-            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServerPlayer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -108,9 +108,9 @@ public class Player implements Runnable {
             oos.writeObject(m);
             oos.flush();
             oos.reset();
-            //System.out.println("Server sent " + m.getClass().getName());
+        //System.out.println("Server sent " + m.getClass().getName());
         } catch (IOException ex) {
-            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServerPlayer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -120,10 +120,26 @@ public class Player implements Runnable {
             socket.getOutputStream().flush();
             oos.reset();
         } catch (IOException ex) {
-            Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServerPlayer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    public String getName() {
+        return info.name;
+    }
+
+    public float[] getColour() {
+        return info.colour;
+    }
+
+    public Point getPapalMagnet() {
+        return info.ankh;
+    }
+
+    public double getMana() {
+        return info.mana;
+    }
+    
     public static class Info implements Externalizable {
 
         public int id;

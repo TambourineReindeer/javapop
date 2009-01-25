@@ -1,6 +1,6 @@
 package com.novusradix.JavaPop.Effects;
 
-import com.novusradix.JavaPop.Server.Game;
+import com.novusradix.JavaPop.Server.ServerGame;
 import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 import java.util.Random;
@@ -19,7 +19,7 @@ public class SwampEffect extends Effect {
     }
 
     @Override
-    public void execute(Game g) {
+    public void execute(ServerGame g) {
         Random r = new Random();
         int n = r.nextInt(5) + 1;
         int px, py;

@@ -4,7 +4,6 @@ import com.novusradix.JavaPop.Math.*;
 import com.novusradix.JavaPop.Messaging.HeightMapUpdate;
 import com.novusradix.JavaPop.Messaging.RockUpdate;
 import com.novusradix.JavaPop.Tile;
-import com.sun.opengl.impl.mipmap.HalveImage;
 import java.util.Random;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -27,21 +26,22 @@ import static java.lang.Math.*;
 public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
     //private ByteBuffer b;
-    private byte[] heights;
-    private static int rowstride;
+    private final byte[] heights;
+    private final int rowstride;
     private Rectangle dirty;
     public final Rectangle bounds;
-    private Map<Integer, Byte> textureChanges;
-    private byte[][] tex;
-    private byte[][] oldTex;
-    private boolean[][] flat;
-    private SortedSet<Integer> houseChanges;
-    private Set<Point> staticRocks;
-    private Map<Point, MutableFloat> dynamicRocks;
-    private Set<Point> newRocks;
+    private final Map<Integer, Byte> textureChanges;
+    private final byte[][] tex;
+    private final byte[][] oldTex;
+    private final boolean[][] flat;
+    private final SortedSet<Integer> houseChanges;
+    private final Set<Point> staticRocks;
+    private final Map<Point, MutableFloat> dynamicRocks;
+    private final Set<Point> newRocks;
 
     public HeightMap(Dimension mapSize) {
         super(mapSize);
+        rowstride = width;
         staticRocks = new HashSet<Point>();
         newRocks = new HashSet<Point>();
         dynamicRocks = new HashMap<Point, MutableFloat>();
@@ -49,7 +49,6 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
         heights = new byte[width * breadth];
         textureChanges = new HashMap<Integer, Byte>();
-        rowstride = width;
         bounds = new Rectangle(0, 0, width, breadth);
         tex = new byte[width - 1][breadth - 1];
         oldTex = new byte[width - 1][breadth - 1];
@@ -65,7 +64,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         }
     }
 
-    private static int bufPos(int x, int y) {
+    private int bufPos(int x, int y) {
         return y * rowstride + x;
     }
 
@@ -119,8 +118,9 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
     public SortedSet<Integer> takeHouseChanges() {
         synchronized (houseChanges) {
-            SortedSet<Integer> temp = houseChanges;
-            houseChanges = new TreeSet<Integer>();
+            SortedSet<Integer> temp ;
+            temp = new TreeSet<Integer>(houseChanges);
+            houseChanges.clear();
             return temp;
         }
     }

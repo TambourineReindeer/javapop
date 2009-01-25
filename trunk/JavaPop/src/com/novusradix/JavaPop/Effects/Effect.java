@@ -1,6 +1,6 @@
 package com.novusradix.JavaPop.Effects;
 
-import com.novusradix.JavaPop.Server.Game;
+import com.novusradix.JavaPop.Server.ServerGame;
 import java.io.Serializable;
 import javax.media.opengl.GL;
 
@@ -19,7 +19,7 @@ public abstract class Effect implements Serializable{
     }
 
     //Effects are executed each frame by the server. To remove the effect, call game.deleteEffect(this)
-    public abstract void execute(Game g);
+    public abstract void execute(ServerGame g);
 
     //Effects are drawn on the client if any are needed.
     public abstract void display(GL gl, float time, com.novusradix.JavaPop.Client.Game g);

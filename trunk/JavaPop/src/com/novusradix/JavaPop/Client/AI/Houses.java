@@ -10,8 +10,8 @@ public class Houses implements AbstractHouses {
 
     private Game game;
     private int[][] map;
-    private Map<Integer, House> houses;
-    private MultiMap<Player, House> playerHouses;
+    private final Map<Integer, House> houses;
+    private MultiMap<com.novusradix.JavaPop.Player, House> playerHouses;
     private static final int TEAMS = 4;
     private static final int EMPTY = 0;
     private static final int FARM = EMPTY + 1;
@@ -22,7 +22,7 @@ public class Houses implements AbstractHouses {
         game = g;
         map = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
         houses = new HashMap<Integer, House>();
-        playerHouses = new MultiMap<Player, House>();
+        playerHouses = new MultiMap<com.novusradix.JavaPop.Player, House>();
     }
 
     public Collection<House> getHouses(Player p) {
@@ -31,7 +31,7 @@ public class Houses implements AbstractHouses {
         }
     }
 
-    public void updateHouse(int id, int x, int y, Player p, int level) {
+    public void updateHouse(int id, int x, int y, Player p, int level, float strength) {
         synchronized (houses) {
             if (level < 0) {
                 //remove
@@ -65,12 +65,14 @@ public class Houses implements AbstractHouses {
         return false;
     }
 
-    public class House {
+    public void step(float seconds) {
+        
+    }
+
+    public class House extends com.novusradix.JavaPop.House{
 
         public final int x;
         public final int y;
-        public int level;
-        public Player player;
 
         public House(int px, int py, Player player, int level) {
             x=px;y=py;

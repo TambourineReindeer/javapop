@@ -1,7 +1,7 @@
 package com.novusradix.JavaPop.Effects;
 
 import com.novusradix.JavaPop.Direction;
-import com.novusradix.JavaPop.Server.Game;
+import com.novusradix.JavaPop.Server.ServerGame;
 import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 import java.util.Arrays;
@@ -31,7 +31,7 @@ public class EarthquakeEffect extends Effect {
     }
 
     @Override
-    public void execute(Game g) {
+    public void execute(ServerGame g) {
         age++;
         int px, py;
         Direction d = direction;

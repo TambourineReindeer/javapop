@@ -14,8 +14,8 @@ public abstract class Message implements Serializable {
     private static final long serialVersionUID = 1L;
     
     protected transient com.novusradix.JavaPop.Server.Server server;
-    protected transient com.novusradix.JavaPop.Server.Player serverPlayer;
-    protected transient com.novusradix.JavaPop.Server.Game serverGame;
+    protected transient com.novusradix.JavaPop.Server.ServerPlayer serverPlayer;
+    protected transient com.novusradix.JavaPop.Server.ServerGame serverGame;
  
     protected transient com.novusradix.JavaPop.Client.Client client;
     protected transient com.novusradix.JavaPop.Client.Game clientGame;
@@ -31,7 +31,7 @@ public abstract class Message implements Serializable {
         }
     }
    
-    public void setServer(com.novusradix.JavaPop.Server.Server s, com.novusradix.JavaPop.Server.Game game, com.novusradix.JavaPop.Server.Player player)
+    public void setServer(com.novusradix.JavaPop.Server.Server s, com.novusradix.JavaPop.Server.ServerGame game, com.novusradix.JavaPop.Server.ServerPlayer player)
     {
         server = s;
         serverGame = game;

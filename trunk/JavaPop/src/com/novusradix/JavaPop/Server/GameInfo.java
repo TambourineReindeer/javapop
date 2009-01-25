@@ -17,15 +17,15 @@ public class GameInfo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public int id;
     public Dimension mapSize;
-    public Map<Integer,Player.Info> players;
+    public Map<Integer,ServerPlayer.Info> players;
 
-    public GameInfo(Game g) {
+    public GameInfo(ServerGame g) {
         id = g.getId();
         if (g.heightMap != null) {
             mapSize = new Dimension(g.heightMap.getWidth(), g.heightMap.getBreadth());
         }
-        players = new HashMap<Integer, Player.Info>();
-        for (Player p : g.players) {
+        players = new HashMap<Integer, ServerPlayer.Info>();
+        for (ServerPlayer p : g.players) {
             players.put(p.getId(), p.info);
         }
     }

@@ -2,7 +2,7 @@ package com.novusradix.JavaPop.Messaging;
 
 import com.novusradix.JavaPop.Server.Peons;
 import com.novusradix.JavaPop.Server.Peons.Peon;
-import com.novusradix.JavaPop.Server.Player;
+import com.novusradix.JavaPop.Server.ServerPlayer;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -33,10 +33,10 @@ public class PeonUpdate extends Message implements Externalizable {
     }
 
     @SuppressWarnings("unchecked")
-    public PeonUpdate(Collection<Detail> pds, Map<Player, Peon> leaderMap) {
+    public PeonUpdate(Collection<Detail> pds, Map<ServerPlayer, Peon> leaderMap) {
         details = new ArrayList(pds);
         leaders = new HashMap<Integer, Integer>();
-        for (Entry<Player, Peon> e : leaderMap.entrySet()) {
+        for (Entry<ServerPlayer, Peon> e : leaderMap.entrySet()) {
             leaders.put(e.getKey().getId(), e.getValue().id);
         }
     }

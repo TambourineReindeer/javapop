@@ -2,6 +2,7 @@ package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
+import java.awt.Point;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,9 +14,9 @@ import javax.media.opengl.GL;
 
 public class Houses implements AbstractHouses, GLObject {
 
-    private Game game;
-    private int[][] map;
-    private Map<Integer, House> houses;
+    private final Game game;
+    private final int[][] map;
+    private final Map<Integer, House> houses;
     private static final int TEAMS = 4;
     private static final int EMPTY = 0;
     private static final int FARM = EMPTY + 1;
@@ -23,7 +24,7 @@ public class Houses implements AbstractHouses, GLObject {
     private static final int NEXT = HOUSE + TEAMS;
     private Model houseModel;
     private Model ankhModel;
-    private Map<Player, House> leaderHouses;
+    private Map<com.novusradix.JavaPop.Player, House> leaderHouses;
 
     public Houses(Game g) {
         game = g;
@@ -35,10 +36,10 @@ public class Houses implements AbstractHouses, GLObject {
         } catch (IOException ex) {
             Logger.getLogger(Houses.class.getName()).log(Level.SEVERE, null, ex);
         }
-        leaderHouses = new HashMap<Player, House>();
+        leaderHouses = new HashMap<com.novusradix.JavaPop.Player, House>();
     }
 
-    public void updateHouse(int id, int x, int y, Player p, int level) {
+    public void updateHouse(int id, int x, int y, Player p, int level, float strength) {
         synchronized (houses) {
             if (level < 0) {
                 //remove
@@ -46,7 +47,11 @@ public class Houses implements AbstractHouses, GLObject {
                     houses.remove(id);
                 }
             } else {
-                houses.put(id, new House(x, y, p, level));
+                if (houses.containsKey(id)) {
+                    houses.get(id).update(p, level, strength);
+                } else {
+                    houses.put(id, new House(x, y, p, level, strength));
+                }
             }
         }
     }
@@ -58,7 +63,6 @@ public class Houses implements AbstractHouses, GLObject {
         }
         return false;
     }
-
     Vector3 p = new Vector3();
     Matrix4 basis = new Matrix4();
 
@@ -69,7 +73,7 @@ public class Houses implements AbstractHouses, GLObject {
                 houseModel.prepare(gl);
                 for (House h : houses.values()) {
 
-                    p.set(h.x + 0.5f, h.y + 0.5f, game.heightMap.getHeight(h.x, h.y));
+                    p.set(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos.x, h.pos.y));
 
                     basis.set(Matrix4.identity);
 
@@ -93,19 +97,28 @@ public class Houses implements AbstractHouses, GLObject {
                     gl.glMatrixMode(GL.GL_MODELVIEW);
 
                     gl.glPushMatrix();
-                    gl.glTranslatef(h.x + 0.5f, h.y + 0.5f, game.heightMap.getHeight(h.x, h.y));
+                    gl.glTranslatef(h.pos.x + 0.5f, h.pos.y + 0.5f, game.heightMap.getHeight(h.pos.x, h.pos.y));
                     if (h.level > 9) {
                         gl.glScalef(3.0f, 3.0f, 1.0f);
                     }
                     if (h.level == 49) {
                         gl.glScalef(1.0f, 1.0f, 2.0f);
                     }
-
-                    gl.glColor3fv(h.player.colour, 0);
+                    float height = h.strength / h.getMaxStrength();
                     gl.glBegin(GL.GL_TRIANGLES);
-                    gl.glVertex3f(0.3f, -0.3f, 1.3f);
+
+                    gl.glColor3f(0.4f, 0.2f, 0.0f);
+                    gl.glVertex3f(0.3f, -0.3f, 0f);
                     gl.glVertex3f(0.3f, -0.3f, 1.5f);
-                    gl.glVertex3f(0.4f, -0.4f, 1.4f);
+                    gl.glVertex3f(0.31f, -0.31f, 0f);
+                    gl.glVertex3f(0.3f, -0.3f, 1.5f);
+                    gl.glVertex3f(0.31f, -0.31f, 1.5f);
+                    gl.glVertex3f(0.31f, -0.31f, 0f);
+
+                    gl.glColor3fv(h.player.getColour(), 0);
+                    gl.glVertex3f(0.31f, -0.31f, 1.5f * height - 0.2f);
+                    gl.glVertex3f(0.31f, -0.31f, 1.5f * height);
+                    gl.glVertex3f(0.4f, -0.4f, 1.5f * height - 0.1f);
                     gl.glEnd();
                     gl.glPopMatrix();
                 }
@@ -114,28 +127,13 @@ public class Houses implements AbstractHouses, GLObject {
             for (House h : leaderHouses.values()) {
                 if (h != null) {
                     basis.set(Matrix4.identity);
-                    p.x = h.x + 0.5f;
-                    p.y = h.y + 0.5f;
+                    p.x = h.pos.x + 0.5f;
+                    p.y = h.pos.y + 0.5f;
                     p.z = game.heightMap.getHeight(p.x, p.y) + 1.0f;
 
                     ankhModel.display(p, basis, gl);
                 }
             }
-        }
-    }
-
-    public class House {
-
-        private final int x,  y;
-        private int level;
-        private Player player;
-
-        public House(int px, int py, Player player, int level) {
-            x = px;
-            y = py;
-            map[x][y] = HOUSE;
-            this.level = level;
-            this.player = player;
         }
     }
 
@@ -148,6 +146,36 @@ public class Houses implements AbstractHouses, GLObject {
         leaderHouses.clear();
         for (Entry<Integer, Integer> e : leaders.entrySet()) {
             leaderHouses.put(game.players.get(e.getKey()), houses.get(e.getValue()));
+        }
+    }
+
+    public void step(float seconds) {
+        synchronized (houses) {
+            for (House h : houses.values()) {
+                h.step(seconds);
+            }
+        }
+    }
+
+    public class House extends com.novusradix.JavaPop.House {
+
+        public House(int x, int y, Player player, int level, float strength) {
+            this.pos = new Point(x, y);
+
+            map[x][y] = HOUSE;
+            this.level = level;
+            this.player = player;
+            this.strength = strength;
+        }
+
+        public void update(Player p, int level, float strength) {
+            this.player = p;
+            this.level = level;
+            this.strength = strength;
+        }
+
+        private void step(float seconds) {
+            strength += seconds * getGrowthRate();
         }
     }
 }
