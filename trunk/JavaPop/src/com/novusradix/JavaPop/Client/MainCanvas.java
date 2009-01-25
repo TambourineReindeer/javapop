@@ -12,6 +12,7 @@ import com.novusradix.JavaPop.Effects.Effect;
 import com.novusradix.JavaPop.Server.ServerPlayer.PeonMode;
 import java.awt.Point;
 
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -104,7 +105,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         try {
             if (mouseIsOver) {
-                setCursor(GLToolButton.getSelected().getCursor());
+                setCursor(GLToolButton.getSelected().getCursor(selected));
             }
             final GL gl = glAD.getGL();
             glHelper.checkGL(gl);

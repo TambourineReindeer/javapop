@@ -1,6 +1,8 @@
 package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
+import com.novusradix.JavaPop.House;
+import com.novusradix.JavaPop.Messaging.Tools.Sprog;
 import com.novusradix.JavaPop.Messaging.Tools.UpDown;
 import java.awt.Cursor;
 import java.awt.Point;
@@ -27,7 +29,11 @@ public class RaiseLowerTool extends Tool {
 
     @Override
     public void SecondaryAction(Point p) {
-        client.sendMessage(new UpDown(p, false));
+        if (overMyHouse(p)) {
+            client.sendMessage(new Sprog(p));
+        } else {
+            client.sendMessage(new UpDown(p, false));
+        }
     }
 
     public String getIconName() {
@@ -39,7 +45,15 @@ public class RaiseLowerTool extends Tool {
     }
 
     @Override
-    public Cursor getCursor() {
-        return cursor;
+    public Cursor getCursor(Point p) {
+        return overMyHouse(p) ? super.getCursor():cursor;
+    }
+
+    boolean overMyHouse(Point p) {
+        House h =client.game.houses.getHouse(p.x, p.y);
+
+        if(h == null)
+            return false;
+        return (h.player == client.game.me);
     }
 }

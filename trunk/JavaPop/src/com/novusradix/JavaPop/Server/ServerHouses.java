@@ -216,15 +216,14 @@ public class ServerHouses {
 
         return null;
     }
-    private static int nextId = 1;
+    
+    public class ServerHouse extends com.novusradix.JavaPop.House {
 
-    public class ServerHouse extends com.novusradix.JavaPop.House
-    {
         private ServerPlayer serverPlayer;
         private boolean changed;
 
         public ServerHouse(int x, int y, ServerPlayer player, float strength) {
-            id = nextId++;
+            id = x + y * game.heightMap.width;
             changed = true;
             pos = new Point(x, y);
             level = 1;
@@ -238,6 +237,15 @@ public class ServerHouses {
         public void damage(float i) {
             strength -= i;
             serverPlayer.info.mana -= i;
+        }
+
+        public void sprog() {
+            strength /= 2;
+            game.peons.addPeon(pos, strength, serverPlayer, leaderHouses.containsValue(this));
+            if (leaderHouses.containsValue(this)) {
+                leaderHouses.remove(serverPlayer);
+            }
+            changed = true;
         }
 
         Peons.State addPeon(Peon p, boolean leader) {
@@ -327,7 +335,6 @@ public class ServerHouses {
                 game.peons.addPeon(pos, strength - houseStrength, serverPlayer, leaderHouses.containsValue(this));
                 if (leaderHouses.containsValue(this)) {
                     leaderHouses.remove(serverPlayer);
-                    
                 }
                 strength = houseStrength;
             }

@@ -17,6 +17,7 @@ public abstract class Tool {
     protected Client client;
     private Point position;
     private Cursor[] directionalCursors;
+    private Cursor defaultCursor;
 
     private Tool() {
     }
@@ -31,6 +32,7 @@ public abstract class Tool {
         directionalCursors[1] = tk.createCustomCursor(tk.getImage(getClass().getResource("/com/novusradix/JavaPop/cursors/east.png")), new Point(0, 0), "east");
         directionalCursors[2] = tk.createCustomCursor(tk.getImage(getClass().getResource("/com/novusradix/JavaPop/cursors/south.png")), new Point(0, 0), "south");
         directionalCursors[3] = tk.createCustomCursor(tk.getImage(getClass().getResource("/com/novusradix/JavaPop/cursors/west.png")), new Point(0, 0), "west");
+        defaultCursor = tk.createCustomCursor(tk.getImage(getClass().getResource("/com/novusradix/JavaPop/cursors/standard.png")), new Point(0, 0), "standard");
     }
 
     public void PrimaryAction(Point p) {
@@ -49,6 +51,10 @@ public abstract class Tool {
     public void Select() {
     }
 
+    public Cursor getCursor(Point selected) {
+        return getCursor();
+    }
+
     public ToolGroup getGroup() {
         return toolGroup;
     }
@@ -64,7 +70,7 @@ public abstract class Tool {
     public abstract String getIconName();
 
     public Cursor getCursor() {
-        return Cursor.getDefaultCursor();
+        return defaultCursor;
     }
 
     public Cursor getDirectionalCursor() {

@@ -69,6 +69,10 @@ public class Houses implements AbstractHouses {
         
     }
 
+    public com.novusradix.JavaPop.House getHouse(int x, int y) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     public class House extends com.novusradix.JavaPop.House{
 
         public final int x;

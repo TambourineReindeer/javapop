@@ -17,11 +17,7 @@ public class Houses implements AbstractHouses, GLObject {
     private final Game game;
     private final int[][] map;
     private final Map<Integer, House> houses;
-    private static final int TEAMS = 4;
     private static final int EMPTY = 0;
-    private static final int FARM = EMPTY + 1;
-    private static final int HOUSE = FARM + TEAMS;
-    private static final int NEXT = HOUSE + TEAMS;
     private Model houseModel;
     private Model ankhModel;
     private Map<com.novusradix.JavaPop.Player, House> leaderHouses;
@@ -59,10 +55,10 @@ public class Houses implements AbstractHouses, GLObject {
     public boolean canBuild(int x, int y) {
         if (game.heightMap.tileInBounds(x, y)) {
             return (map[x][y] == EMPTY && game.heightMap.getHeight(x, y) > 0 && game.heightMap.isFlat(x, y));
-
         }
         return false;
     }
+
     Vector3 p = new Vector3();
     Matrix4 basis = new Matrix4();
 
@@ -157,12 +153,14 @@ public class Houses implements AbstractHouses, GLObject {
         }
     }
 
+    public House getHouse(int x, int y) {
+        return houses.get(x+y*game.heightMap.width);
+    }
+
     public class House extends com.novusradix.JavaPop.House {
 
         public House(int x, int y, Player player, int level, float strength) {
             this.pos = new Point(x, y);
-
-            map[x][y] = HOUSE;
             this.level = level;
             this.player = player;
             this.strength = strength;
