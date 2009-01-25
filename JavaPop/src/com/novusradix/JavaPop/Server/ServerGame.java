@@ -9,7 +9,6 @@ import com.novusradix.JavaPop.Messaging.Lobby.JoinedGame;
 import com.novusradix.JavaPop.Messaging.Message;
 import com.novusradix.JavaPop.Messaging.PlayerUpdate;
 import com.novusradix.JavaPop.Effects.Effect;
-import com.novusradix.JavaPop.Effects.LightningEffect;
 import com.novusradix.JavaPop.Messaging.RockUpdate;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -32,30 +31,30 @@ import java.util.logging.Logger;
  *
  * @author gef
  */
-public class Game extends TimerTask {
+public class ServerGame extends TimerTask {
 
     public volatile static int nextId = 0;
     private int id;
-    public Vector<Player> players;
-    private Player owner;
-    private Server server;
+    public final Vector<ServerPlayer> players;
+    private ServerPlayer owner;
+    private final Server server;
     private Timer timer;
     private float seconds;
     public HeightMap heightMap;
     public Peons peons;
-    public Houses houses;
+    public ServerHouses houses;
     private int humancount;
-    private Map<Integer, Effect> effects;
-    private Map<Integer, Effect> newEffects;
-    private Collection<Integer> deletedEffects;
-    public Map<Player, Map<Class,Effect>> persistentEffects;
+    private final Map<Integer, Effect> effects;
+    private final Map<Integer, Effect> newEffects;
+    private final Collection<Integer> deletedEffects;
+    public final Map<ServerPlayer, Map<Class,Effect>> persistentEffects;
     
     private long frame;
 
-    public Game(Player owner) {
+    public ServerGame(ServerPlayer owner) {
         this.owner = owner;
         server = owner.s;
-        players = new Vector<Player>();
+        players = new Vector<ServerPlayer>();
         owner.currentGame = this;
         id = nextId++;
         humancount = 0;
@@ -63,14 +62,14 @@ public class Game extends TimerTask {
         effects = new HashMap<Integer, Effect>();
         newEffects = new HashMap<Integer, Effect>();
         deletedEffects = new HashSet<Integer>();
-        persistentEffects = new HashMap<Player, Map<Class, Effect>>();
+        persistentEffects = new HashMap<ServerPlayer, Map<Class, Effect>>();
     }
 
     public int getId() {
         return id;
     }
 
-    public void addPlayer(Player p) {
+    public void addPlayer(ServerPlayer p) {
         synchronized (players) {
             players.add(p);
             p.currentGame = this;
@@ -81,7 +80,7 @@ public class Game extends TimerTask {
         }
     }
 
-    public void removePlayer(Player p) {
+    public void removePlayer(ServerPlayer p) {
         synchronized (players) {
             players.remove(p);
             p.currentGame = null;
@@ -96,9 +95,9 @@ public class Game extends TimerTask {
     //TODO: send a message?
     }
 
-    public void PlayerReady(Player p) {
+    public void PlayerReady(ServerPlayer p) {
         p.ready = true;
-        for (Player pl : players) {
+        for (ServerPlayer pl : players) {
             if (!pl.ready) {
                 return;
             }
@@ -112,7 +111,7 @@ public class Game extends TimerTask {
 
         heightMap.randomize(r.nextInt());
         peons = new Peons(this);
-        houses = new Houses(this);
+        houses = new ServerHouses(this);
 
         if (players.size() == 1) {
             //Add an AI player
@@ -125,12 +124,12 @@ public class Game extends TimerTask {
                 Thread.sleep(500);
             }
         } catch (InterruptedException ex) {
-            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServerGame.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         
-        Map<Player, Point> startingPosition = new HashMap<Player, Point>();
-        for (Player p : players) {
+        Map<ServerPlayer, Point> startingPosition = new HashMap<ServerPlayer, Point>();
+        for (ServerPlayer p : players) {
             startingPosition.put(p, new Point(r.nextInt(heightMap.getWidth()), r.nextInt(heightMap.getBreadth())));
             p.info.ankh.setLocation(heightMap.width / 2, heightMap.breadth / 2);
             persistentEffects.put(p, new HashMap<Class, Effect>());
@@ -138,7 +137,7 @@ public class Game extends TimerTask {
         
         int numPeons = 3;
         nextPlayer:
-        for (Map.Entry<Player, Point> me : startingPosition.entrySet()) {
+        for (Map.Entry<ServerPlayer, Point> me : startingPosition.entrySet()) {
             int placed = 0;
             for (ArrayList<Point> ring : Helpers.shuffledRings) {
                 for (Point p : ring) {
@@ -198,8 +197,8 @@ public class Game extends TimerTask {
             }
         }
         if (frame % 8 == 0) {
-            ArrayList<Player.Info> is = new ArrayList<Player.Info>(players.size());
-            for (Player p : players) {
+            ArrayList<ServerPlayer.Info> is = new ArrayList<ServerPlayer.Info>(players.size());
+            for (ServerPlayer p : players) {
                 is.add(p.info);
             }
             sendAllPlayers(new PlayerUpdate(is));
@@ -221,19 +220,19 @@ public class Game extends TimerTask {
 
             System.arraycopy(bs.toByteArray(), start, bytes, 0, bytes.length);
             synchronized (players) {
-                for (Player pl : players) {
+                for (ServerPlayer pl : players) {
                     pl.sendMessage(bytes);
                 }
             }
         //System.out.println(System.currentTimeMillis() + ", " + m.getClass().getName() + ", " + bytes.length);
 
         } catch (IOException ex) {
-            Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ServerGame.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
                 o.close();
             } catch (IOException ex) {
-                Logger.getLogger(Game.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ServerGame.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

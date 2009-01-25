@@ -1,6 +1,6 @@
 package com.novusradix.JavaPop.Effects;
 
-import com.novusradix.JavaPop.Server.Game;
+import com.novusradix.JavaPop.Server.ServerGame;
 import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 import java.util.Random;
@@ -22,7 +22,7 @@ public class BatholithEffect extends Effect {
     }
 
     @Override
-    public void execute(Game g) {
+    public void execute(ServerGame g) {
         if (age % 2 == 0) {
 
             int px, py;

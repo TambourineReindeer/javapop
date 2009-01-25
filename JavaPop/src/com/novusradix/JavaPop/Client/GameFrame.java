@@ -28,12 +28,7 @@ public class GameFrame extends JFrame implements WindowListener {
         caps.setSampleBuffers(true);
         caps.setNumSamples(8);
 
-        /*cf = new ControlFrame();
-        cf.setBounds(1024, 0, cf.getWidth(), cf.getHeight());
-        cf.setVisible(true);
-*/
         setTitle("JavaPop");
-        //setUndecorated(true);
         mc = new MainCanvas(caps, game);
         add(mc);
         addWindowListener(this);
@@ -66,7 +61,6 @@ public class GameFrame extends JFrame implements WindowListener {
 
     public void close() {
         GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(null);
-        game.kill();
         a.stop();
         this.dispose();
         game.client.sendMessage(new LeaveGame());

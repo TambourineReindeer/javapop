@@ -1,7 +1,7 @@
 package com.novusradix.JavaPop.Effects;
 
 import com.novusradix.JavaPop.Direction;
-import com.novusradix.JavaPop.Server.Game;
+import com.novusradix.JavaPop.Server.ServerGame;
 import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 import javax.media.opengl.GL;
@@ -27,7 +27,7 @@ public class LavaTrailEffect extends Effect {
     }
 
     @Override
-    public void execute(Game g) {
+    public void execute(ServerGame g) {
         age++;
         if (g.heightMap.isFlat(origin.x, origin.y)) {
             boolean blocked = false;

@@ -3,7 +3,7 @@
  */
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Server.Player.PeonMode;
+import com.novusradix.JavaPop.Server.ServerPlayer.PeonMode;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,7 +17,7 @@ import com.novusradix.JavaPop.Messaging.Lobby.Bye;
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Messaging.Message;
 import com.novusradix.JavaPop.Messaging.Tools.SetBehaviour;
-import com.novusradix.JavaPop.Server.Player.Info;
+import com.novusradix.JavaPop.Server.ServerPlayer.Info;
 import java.net.SocketException;
 
 /**

@@ -1,7 +1,7 @@
 package com.novusradix.JavaPop.Messaging;
 
-import com.novusradix.JavaPop.Server.Houses.House;
-import com.novusradix.JavaPop.Server.Player;
+import com.novusradix.JavaPop.Server.ServerHouses.ServerHouse;
+import com.novusradix.JavaPop.Server.ServerPlayer;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -24,10 +24,10 @@ public class HouseUpdate extends Message implements Externalizable {
     Map<Integer, Integer> leaderHouses;
 
     @SuppressWarnings("unchecked")
-    public HouseUpdate(Collection<Detail> ds, Map<Player, House> leaderMap) {
+    public HouseUpdate(Collection<Detail> ds, Map<ServerPlayer, ServerHouse> leaderMap) {
         details = new ArrayList<Detail>(ds);
         leaderHouses = new HashMap<Integer, Integer>();
-        for (Entry<Player, House> e : leaderMap.entrySet()) {
+        for (Entry<ServerPlayer, ServerHouse> e : leaderMap.entrySet()) {
             leaderHouses.put(e.getKey().getId(), e.getValue().id);
         }
     }
@@ -35,7 +35,7 @@ public class HouseUpdate extends Message implements Externalizable {
     @Override
     public void execute() {
         for (Detail d : details) {
-            client.game.houses.updateHouse(d.id, d.x, d.y, client.game.players.get(d.playerId), d.level);
+            client.game.houses.updateHouse(d.id, d.x, d.y, client.game.players.get(d.playerId), d.level, d.strength);
         }
         client.game.houses.setLeaders(leaderHouses);
     }
@@ -46,13 +46,15 @@ public class HouseUpdate extends Message implements Externalizable {
         int x, y;
         int level;
         int playerId;
+        float strength;
 
-        public Detail(int id, int x, int y, Player p, int level) {
+        public Detail(int id, int x, int y, ServerPlayer p, int level, float strength) {
             this.id = id;
             this.x = x;
             this.y = y;
             this.playerId = p.getId();
             this.level = level;
+            this.strength = strength;
         }
 
         private Detail() {
@@ -70,6 +72,7 @@ public class HouseUpdate extends Message implements Externalizable {
             out.writeInt(d.y);
             out.writeInt(d.playerId);
             out.writeInt(d.level);
+            out.writeFloat(d.strength);
         }
         out.writeInt(leaderHouses.size());
         for (Entry<Integer, Integer> e : leaderHouses.entrySet()) {
@@ -88,7 +91,7 @@ public class HouseUpdate extends Message implements Externalizable {
             d.y = in.readInt();
             d.playerId = in.readInt();
             d.level = in.readInt();
-
+            d.strength = in.readFloat();
             details.add(d);
         }
         i = in.readInt();

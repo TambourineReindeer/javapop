@@ -3,7 +3,7 @@ package com.novusradix.JavaPop.Client.AI;
 import com.novusradix.JavaPop.Client.Peons;
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Client.Player;
-import com.novusradix.JavaPop.Server.Player.Info;
+import com.novusradix.JavaPop.Server.ServerPlayer.Info;
 import java.util.HashMap;
 
 /**
@@ -31,13 +31,12 @@ public class Game extends com.novusradix.JavaPop.Client.Game {
             }
         }
         ai = new AI(this);
-        startTimer();
+
     }
-    
+
     @Override
     public void kill()
     {
-       super.kill();
        ai.kill();
     }
     

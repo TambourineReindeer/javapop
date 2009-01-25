@@ -4,7 +4,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
 
 import com.novusradix.JavaPop.Server.GameInfo;
-import com.novusradix.JavaPop.Server.Player.Info;
+import com.novusradix.JavaPop.Server.ServerPlayer.Info;
 
 /**
  *

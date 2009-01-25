@@ -17,8 +17,8 @@ import java.util.logging.Logger;
  */
 public class Server implements Runnable {
 
-    private Map<Integer, Game> games;
-    private Vector<Player> players;
+    private Map<Integer, ServerGame> games;
+    private final Vector<ServerPlayer> players;
     int port;
     private boolean keepAlive = true;
     Announcer a;
@@ -30,8 +30,8 @@ public class Server implements Runnable {
     }
 
     public Server(int port) {
-        games = new HashMap<Integer, Game>();
-        players = new Vector<Player>();
+        games = new HashMap<Integer, ServerGame>();
+        players = new Vector<ServerPlayer>();
         this.port = port;
         form = new ServerForm(this);
         new Thread(this, "Server").start();
@@ -40,7 +40,7 @@ public class Server implements Runnable {
         form.setVisible(true);
     }
 
-    Collection<Game> getGames() {
+    Collection<ServerGame> getGames() {
         return games.values();
     }
 
@@ -59,7 +59,7 @@ public class Server implements Runnable {
         try {
             s = new ServerSocket(port);
             while (keepAlive) {
-                Player p = new Player(this, s.accept());
+                ServerPlayer p = new ServerPlayer(this, s.accept());
                 players.add(p);
                 GameList gl = new GameList(games.values());
                 p.sendMessage(gl);
@@ -71,13 +71,13 @@ public class Server implements Runnable {
         System.out.print("Server quitting.\n");
     }
 
-    public void newGame(Player owner) {
+    public void newGame(ServerPlayer owner) {
 
         if (owner.currentGame != null) {
             owner.currentGame.removePlayer(owner);
         }
 
-        Game g = new Game(owner);
+        ServerGame g = new ServerGame(owner);
 
         games.put(g.getId(), g);
 
@@ -85,15 +85,15 @@ public class Server implements Runnable {
         sendAllPlayers(gl);
     }
 
-    public void joinGame(int gId, Player p) {
-        Game g = games.get(gId);
+    public void joinGame(int gId, ServerPlayer p) {
+        ServerGame g = games.get(gId);
         g.addPlayer(p);
 
         GameList gl = new GameList(games.values());
         sendAllPlayers(gl);
     }
 
-    public void removePlayer(Player p) {
+    public void removePlayer(ServerPlayer p) {
        
         players.remove(p);
         GameList gl = new GameList(games.values());
@@ -102,7 +102,7 @@ public class Server implements Runnable {
 
     public void sendAllPlayers(Message m) {
         synchronized (players) {
-            for (Player pl : players) {
+            for (ServerPlayer pl : players) {
                 pl.sendMessage(m);
             }
         }

@@ -18,36 +18,36 @@ import java.util.Vector;
 
 import static java.lang.Math.*;
 
-public class Houses {
+public class ServerHouses {
 
-    private Game game;
+    private final ServerGame game;
     private byte[][] map;
     private byte[][] newmap;
-    private Vector<HouseUpdate.Detail> hds;
-    private Vector<Integer> newHouses;
-    private SortedMap<Integer, House> allHouses;
+    private final Vector<HouseUpdate.Detail> hds;
+    private final Vector<Integer> newHouses;
+    private final SortedMap<Integer, ServerHouse> allHouses;
     private static final int TEAMS = 4;
     private static final int EMPTY = 0;
     private static final int FARM = EMPTY + 1;
     private static final int HOUSE = FARM + TEAMS;
     private static final int NEXT = HOUSE + TEAMS;
-    private Map<Player, House> leaderHouses;
+    private final Map<ServerPlayer, ServerHouse> leaderHouses;
 
-    public Houses(Game g) {
+    public ServerHouses(ServerGame g) {
         game = g;
+        leaderHouses = new HashMap<ServerPlayer, ServerHouse>();
         map = new byte[game.heightMap.getWidth()][game.heightMap.getBreadth()];
         newmap = new byte[game.heightMap.getWidth()][game.heightMap.getBreadth()];
 
-        allHouses = new TreeMap<Integer, House>();
+        allHouses = new TreeMap<Integer, ServerHouse>();
         newHouses = new Vector<Integer>();
         hds = new Vector<HouseUpdate.Detail>();
-        leaderHouses = new HashMap<Player, House>();
     }
 
-    public void addHouse(int x, int y, Player player, float strength, boolean leader) {
+    public void addHouse(int x, int y, ServerPlayer player, float strength, boolean leader) {
         synchronized (allHouses) {
             if (canBuild(x, y)) {
-                House h = new House(x, y, player, strength);
+                ServerHouse h = new ServerHouse(x, y, player, strength);
                 allHouses.put(x + y * game.heightMap.width, h);
                 if (leader) {
                     leaderHouses.put(player, h);
@@ -64,15 +64,15 @@ public class Houses {
         return false;
     }
 
-    private Collection<House> affectedHouses(SortedSet<Integer> mapChanges) {
-        Collection<House> hs = new ArrayList<House>();
+    private Collection<ServerHouse> affectedHouses(SortedSet<Integer> mapChanges) {
+        Collection<ServerHouse> hs = new ArrayList<ServerHouse>();
         if (mapChanges.size() == 0) {
             return hs;
         }
         int firstChange, lastChange;
         firstChange = mapChanges.first() - 3 - 3 * game.heightMap.width;
         lastChange = mapChanges.last() + 3 + 3 * game.heightMap.width + 1;
-        for (House h : allHouses.subMap(firstChange, lastChange).values()) {
+        for (ServerHouse h : allHouses.subMap(firstChange, lastChange).values()) {
             int y;
             Integer max, min;
             min = h.pos.x - 3 + (h.pos.y - 3) * game.heightMap.width; //subset from here (inclusive)
@@ -90,8 +90,8 @@ public class Houses {
 
     public void step(float seconds) {
         SortedSet<Integer> mapChanges = game.heightMap.takeHouseChanges();
-        Collection<House> hs = affectedHouses(mapChanges);
-        for (House h : hs) {
+        Collection<ServerHouse> hs = affectedHouses(mapChanges);
+        for (ServerHouse h : hs) {
             h.setLevel();
         }
         for (int y = 0; y < game.heightMap.getBreadth(); y++) {
@@ -101,13 +101,13 @@ public class Houses {
         }
         synchronized (allHouses) {
             newHouses.clear();
-            Iterator<House> i = allHouses.values().iterator();
-            House h;
+            Iterator<ServerHouse> i = allHouses.values().iterator();
+            ServerHouse h;
             for (; i.hasNext();) {
                 h = i.next();
                 if (h.strength < 0) {
                     i.remove();
-                    hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.player, -1));
+                    hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.serverPlayer, -1, 0));
                     continue;
                 }
                 if (game.heightMap.isFlat(h.pos.x, h.pos.y) && newmap[h.pos.x][h.pos.y] == 0) {
@@ -115,11 +115,11 @@ public class Houses {
                     h.step(seconds);
                 } else {
                     i.remove();
-                    game.peons.addPeon(h.pos, h.strength, h.player, leaderHouses.containsValue(h));
+                    game.peons.addPeon(h.pos, h.strength, h.serverPlayer, leaderHouses.containsValue(h));
                     if (leaderHouses.containsValue(h)) {
-                        leaderHouses.remove(h.player);
+                        leaderHouses.remove(h.serverPlayer);
                     }
-                    hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.player, -1));
+                    hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.serverPlayer, -1, 0));
                 }
             }
             i = allHouses.values().iterator();
@@ -128,12 +128,12 @@ public class Houses {
                 if (newmap[h.pos.x][h.pos.y] != HOUSE) {
                     i.remove();
                     if (h.strength > 0) {
-                        game.peons.addPeon(h.pos, h.strength, h.player, leaderHouses.containsValue(h));
+                        game.peons.addPeon(h.pos, h.strength, h.serverPlayer, leaderHouses.containsValue(h));
                     }
                     if (leaderHouses.containsValue(h)) {
-                        leaderHouses.remove(h.player);
+                        leaderHouses.remove(h.serverPlayer);
                     }
-                    hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.player, -1));
+                    hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.serverPlayer, -1, 0));
                 }
             }
         }
@@ -153,12 +153,12 @@ public class Houses {
         }
     }
 
-    public Houses.House getHouse(int x, int y) {
+    public ServerHouses.ServerHouse getHouse(int x, int y) {
         return allHouses.get(x + y * game.heightMap.width);
     }
 
     private void repaint() {
-        int x,   y;
+        int x, y;
         for (y = 0; y < game.heightMap.getBreadth(); y++) {
             for (x = 0; x < game.heightMap.getWidth(); x++) {
                 if (newmap[x][y] != map[x][y]) {
@@ -176,7 +176,7 @@ public class Houses {
 
     public int countFlatLand(int x, int y) {
         int flat = 0;
-        int px,   py;
+        int px, py;
         for (int radius = 0; radius <= 3; radius++) {
             for (Point offset : Helpers.rings[radius]) {
                 px = x + offset.x;
@@ -198,14 +198,13 @@ public class Houses {
         return flat;
     }
 
-    public Point nearestHouse(
-            Point p, Set<Player> players) {
+    public Point nearestHouse(Point p, Set<ServerPlayer> players) {
         int d2 = game.heightMap.getWidth() * game.heightMap.getBreadth() + 1;
-        House nearest = null;
-        for (House h : allHouses.values()) {
+        ServerHouse nearest = null;
+        for (ServerHouse h : allHouses.values()) {
             int nd2 = (p.x - h.pos.x) * (p.x - h.pos.x) + (p.y - h.pos.y) * (p.y - h.pos.y);
             if (nd2 < d2) {
-                if (players.contains(h.player)) {
+                if (players.contains(h.serverPlayer)) {
                     nearest = h;
                     d2 = nd2;
                 }
@@ -219,21 +218,18 @@ public class Houses {
     }
     private static int nextId = 1;
 
-    public class House {
-
-        public int id;
-        private Point pos;
-        private int level;
-        private Player player;
-        private float strength;
+    public class ServerHouse extends com.novusradix.JavaPop.House
+    {
+        private ServerPlayer serverPlayer;
         private boolean changed;
 
-        public House(int x, int y, Player player, float strength) {
+        public ServerHouse(int x, int y, ServerPlayer player, float strength) {
             id = nextId++;
             changed = true;
             pos = new Point(x, y);
             level = 1;
             this.player = player;
+            serverPlayer = player;
             this.strength = strength;
             setLevel();
             newHouses.add(x + y * game.heightMap.width);
@@ -241,14 +237,14 @@ public class Houses {
 
         public void damage(float i) {
             strength -= i;
-            player.info.mana -= i;
+            serverPlayer.info.mana -= i;
         }
 
         Peons.State addPeon(Peon p, boolean leader) {
             if (p.player == player) {
                 strength += p.strength;
                 if (leader) {
-                    leaderHouses.put(player, this);
+                    leaderHouses.put(serverPlayer, this);
                     changed = true;
                 }
                 return Peons.State.SETTLED;
@@ -256,18 +252,19 @@ public class Houses {
 
             strength -= p.strength;
             p.player.info.mana -= p.strength;
-            player.info.mana -= p.strength;
+            serverPlayer.info.mana -= p.strength;
             if (strength < 0) {
                 if (leaderHouses.containsValue(this)) {
-                    leaderHouses.remove(player);
-                    player.info.ankh.setLocation(this.pos);
+                    leaderHouses.remove(serverPlayer);
+                    serverPlayer.info.ankh.setLocation(this.pos);
                 }
-                player.info.mana -= strength;
+                serverPlayer.info.mana -= strength;
                 player = p.player;
+                serverPlayer = p.player;
                 strength = -strength;
                 changed = true;
                 if (leader) {
-                    leaderHouses.put(player, this);
+                    leaderHouses.put(serverPlayer, this);
                 }
                 changed = true;
                 return Peons.State.SETTLED;
@@ -276,7 +273,7 @@ public class Houses {
         }
 
         void makeLeader() {
-            leaderHouses.put(this.player, this);
+            leaderHouses.put(serverPlayer, this);
             changed = true;
         }
 
@@ -293,7 +290,7 @@ public class Houses {
                 if (level == 49) {
                     radiuslimit = 3;
                 }
-                int px,   py;
+                int px, py;
                 for (int radius = 1; radius <= radiuslimit; radius++) {
                     for (Point offset : Helpers.rings[radius]) {
                         px = pos.x + offset.x;
@@ -323,20 +320,21 @@ public class Houses {
             float rate = (level + 1);
             float newmana = rate * seconds;
             strength += newmana;
-            player.info.mana += newmana;
+            serverPlayer.info.mana += newmana;
             if (strength > rate * 100.0f) {
                 float houseStrength = rate * 100.0f - min(500.0f, rate * 100.0f / 2.0f);
-                game.peons.addPeon(pos, strength - houseStrength, player, leaderHouses.containsValue(this));
+                changed = true;
+                game.peons.addPeon(pos, strength - houseStrength, serverPlayer, leaderHouses.containsValue(this));
                 if (leaderHouses.containsValue(this)) {
-                    leaderHouses.remove(player);
-                    changed = true;
+                    leaderHouses.remove(serverPlayer);
+                    
                 }
                 strength = houseStrength;
             }
 
             if (changed) {
                 changed = false;
-                hds.add(new HouseUpdate.Detail(id, pos.x, pos.y, player, level));
+                hds.add(new HouseUpdate.Detail(id, pos.x, pos.y, serverPlayer, level, strength));
             }
         }
     }

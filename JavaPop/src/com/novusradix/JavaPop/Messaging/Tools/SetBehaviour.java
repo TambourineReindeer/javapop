@@ -1,7 +1,7 @@
 package com.novusradix.JavaPop.Messaging.Tools;
 
 import com.novusradix.JavaPop.Messaging.*;
-import com.novusradix.JavaPop.Server.Player.PeonMode;
+import com.novusradix.JavaPop.Server.ServerPlayer.PeonMode;
 
 /**
  *

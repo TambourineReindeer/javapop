@@ -1,6 +1,6 @@
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Server.Player.Info;
+import com.novusradix.JavaPop.Server.ServerPlayer.Info;
 import java.awt.Point;
 import javax.media.opengl.GL;
 
@@ -10,7 +10,7 @@ import static java.lang.Math.*;
  *
  * @author gef
  */
-public class Player implements GLObject {
+public class Player implements GLObject,com.novusradix.JavaPop.Player  {
 
     public String name;
     public float[] colour;
@@ -71,5 +71,21 @@ public class Player implements GLObject {
     }
 
     public void init(GL gl) {
+    }
+
+    public float[] getColour() {
+        return colour;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Point getPapalMagnet() {
+        return ankh;
+    }
+
+    public double getMana() {
+        return mana;
     }
 }

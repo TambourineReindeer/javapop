@@ -1,6 +1,6 @@
 package com.novusradix.JavaPop.Messaging;
 
-import com.novusradix.JavaPop.Server.Player.Info;
+import com.novusradix.JavaPop.Server.ServerPlayer.Info;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;

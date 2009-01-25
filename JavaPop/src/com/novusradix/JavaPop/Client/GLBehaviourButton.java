@@ -1,6 +1,6 @@
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Server.Player.PeonMode;
+import com.novusradix.JavaPop.Server.ServerPlayer.PeonMode;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.util.Collection;

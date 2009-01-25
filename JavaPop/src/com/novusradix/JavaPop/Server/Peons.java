@@ -4,7 +4,7 @@ import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Math.MultiMap;
 import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.PeonUpdate;
-import com.novusradix.JavaPop.Server.Houses.House;
+import com.novusradix.JavaPop.Server.ServerHouses.ServerHouse;
 import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 import java.util.Collection;
@@ -19,7 +19,11 @@ import static java.lang.Math.*;
 
 public class Peons {
 
-    public Game game;
+    public final ServerGame game;
+    private final Vector<Peon> peons;
+    private final MultiMap<Point, Peon> map;
+    private final Map<ServerPlayer, Peon> leaders;
+    private int nextId = 1;
 
     public enum Action {
 
@@ -30,23 +34,19 @@ public class Peons {
 
         ALIVE, DEAD, SETTLED, WALKING, DROWNING, MERGING, WANDER, FALLING
     }
-    private Vector<Peon> peons;
-    private MultiMap<Point, Peon> map;
-    private int nextId = 1;
-    private Map<Player, Peon> leaders;
 
-    public Peons(Game g) {
+    public Peons(ServerGame g) {
         game = g;
         peons = new Vector<Peon>();
         map = new MultiMap<Point, Peon>();
-        leaders = new HashMap<Player, Peon>();
+        leaders = new HashMap<ServerPlayer, Peon>();
     }
 
     public Collection<Peon> getPeons(Point p) {
         return map.get(p);
     }
 
-    public void addPeon(float x, float y, float strength, Player player, boolean leader) {
+    public void addPeon(float x, float y, float strength, ServerPlayer player, boolean leader) {
         Peon p = new Peon(x, y, strength, player);
         peons.add(p);
         map.put(p.getPoint(), p);
@@ -55,7 +55,7 @@ public class Peons {
         }
     }
 
-    public void addPeon(Point p, float strength, Player player, boolean leader) {
+    public void addPeon(Point p, float strength, ServerPlayer player, boolean leader) {
         addPeon(p.x + 0.5f, p.y + 0.5f, strength, player, leader);
     }
 
@@ -101,7 +101,7 @@ public class Peons {
         private int destx,  desty; // destination to walk to.
         private State state;
         private float dx,  dy;
-        Player player;
+        ServerPlayer player;
         private float stateTimer;
         private int wanderCount;
         private Point p;
@@ -116,7 +116,7 @@ public class Peons {
             return p;
         }
 
-        public Peon(float x, float y, float strength, Player p) {
+        public Peon(float x, float y, float strength, ServerPlayer p) {
             id = nextId++;
             pos = new Vector2(x, y);
             this.strength = strength;
@@ -130,7 +130,7 @@ public class Peons {
         }
 
         private Point findEnemy() {
-            Set<Player> enemies = new HashSet<Player>(game.players);
+            Set<ServerPlayer> enemies = new HashSet<ServerPlayer>(game.players);
             enemies.remove(player);
             Point nearestPeon = nearestPeon(getPoint(), enemies, 8);
             Point nearestHouse = game.houses.nearestHouse(getPoint(), enemies);
@@ -160,7 +160,7 @@ public class Peons {
         }
 
         private Point findFriend() {
-            Set<Player> me = new HashSet<Player>();
+            Set<ServerPlayer> me = new HashSet<ServerPlayer>();
             me.add(player);
             Point nearestPeon = nearestPeon(getPoint(), me, 8);
             if (nearestPeon == null) {
@@ -169,7 +169,7 @@ public class Peons {
             return nearestPeon;
         }
 
-        public Point nearestPeon(Point p, Set<Player> players, int searchRadius) {
+        public Point nearestPeon(Point p, Set<ServerPlayer> players, int searchRadius) {
             float d2 = game.heightMap.getWidth() * game.heightMap.getBreadth() + 1;
             Peon nearest = null;
             for (Peon peon : peons) {
@@ -252,7 +252,7 @@ public class Peons {
                     if (!oldPos.equals(newPos)) {
                         map.remove(oldPos, this);
                         map.put(newPos, this);
-                        House h = game.houses.getHouse(newPos.x, newPos.y);
+                        ServerHouse h = game.houses.getHouse(newPos.x, newPos.y);
                         if (h != null) {
                             return changeState(h.addPeon(this, leaders.containsValue(this)));
                         }
