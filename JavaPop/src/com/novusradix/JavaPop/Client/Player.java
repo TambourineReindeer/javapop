@@ -16,13 +16,15 @@ public class Player implements GLObject,com.novusradix.JavaPop.Player  {
     public float[] colour;
     public Point ankh;
     public double mana;
-    private Game game;
-    private int index;
-
+    public  final int id;
+    private final Game game;
+    private final int index;
+    
     public Player(Info i, Game g, int index) {
         game = g;
         ankh = new Point();
         this.index = index;
+        id = i.id;
         update(i);
     }
 
