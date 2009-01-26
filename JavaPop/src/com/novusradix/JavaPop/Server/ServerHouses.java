@@ -249,6 +249,7 @@ public class ServerHouses {
         }
 
         Peons.State addPeon(Peon p, boolean leader) {
+            changed = true;
             if (p.player == player) {
                 strength += p.strength;
                 if (leader) {
@@ -270,11 +271,9 @@ public class ServerHouses {
                 player = p.player;
                 serverPlayer = p.player;
                 strength = -strength;
-                changed = true;
                 if (leader) {
                     leaderHouses.put(serverPlayer, this);
                 }
-                changed = true;
                 return Peons.State.SETTLED;
             }
             return Peons.State.DEAD;
