@@ -247,7 +247,7 @@ public class Model {
         }
     }
 
-    /* Initialises the model. Loads texture, compiles shaders etc.
+    /* Initialises the model. Compiles shaders etc.
      * If not called before prepare(), it will be called automatically from there.
      * Has to be called in an OpenGL thread
      */
@@ -266,9 +266,6 @@ public class Model {
                 data.vertices.capacity() * BufferUtil.SIZEOF_FLOAT, data.vertices,
                 GL.GL_STATIC_DRAW);
         try {
-            if (defaultShader != 0) {
-                gl.glDeleteProgram(defaultShader);
-            }
             defaultShader = glh.LoadShaderProgram(gl, "/com/novusradix/JavaPop/Client/Shaders/ModelVertex.shader", "/com/novusradix/JavaPop/Client/Shaders/ModelFragment.shader");
         } catch (IOException ex) {
             Logger.getLogger(Model.class.getName()).log(Level.INFO, null, ex);
@@ -286,6 +283,7 @@ public class Model {
         } catch (GLHelperException ex) {
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         }
+        tex=null;
         initialised = true;
     }
 
