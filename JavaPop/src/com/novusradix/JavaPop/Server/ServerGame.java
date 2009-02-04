@@ -41,7 +41,7 @@ public class ServerGame extends TimerTask {
     private Timer timer;
     private float seconds;
     public HeightMap heightMap;
-    public Peons peons;
+    public ServerPeons peons;
     public ServerHouses houses;
     private int humancount;
     private final Map<Integer, Effect> effects;
@@ -110,7 +110,7 @@ public class ServerGame extends TimerTask {
         Random r = new Random();
 
         heightMap.randomize(r.nextInt());
-        peons = new Peons(this);
+        peons = new ServerPeons(this);
         houses = new ServerHouses(this);
 
         if (players.size() == 1) {

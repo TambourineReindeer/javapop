@@ -1,6 +1,6 @@
 package com.novusradix.JavaPop;
 
-import com.novusradix.JavaPop.Server.Peons.Action;
+import com.novusradix.JavaPop.Server.ServerPeons.Action;
 
 /**
  *
