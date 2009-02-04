@@ -8,10 +8,10 @@ import java.util.Collections;
 public class Helpers {
 public static final int radius = 32;
 
-    public static Point[][] rings;
-    public static ArrayList<ArrayList<Point>> shuffledRings;
-    public static Point[][] smallRings;
-    
+    public final static Point[][] rings;
+    public final static ArrayList<ArrayList<Point>> shuffledRings;
+    public final static Point[][] smallRings;
+    public final static Point[] neighbours;
 
     static {
         rings = new Point[radius][];
@@ -46,6 +46,10 @@ public static final int radius = 32;
                 smallRings[i][n + i * 6 + 3] = new Point(n - i - 1, i);
             }
         }
+
+        neighbours = new Point[9];
+        System.arraycopy(rings[1], 0, neighbours, 0, 8);
+        neighbours[8] = new Point(0,0);
     }
 
     //todo: rewrite to avoid object creation

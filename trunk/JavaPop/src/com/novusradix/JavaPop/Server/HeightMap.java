@@ -104,7 +104,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
 
     public void up(int x, int y) {
         synchronized (this) {
-            setHeight(x, y, (byte) (getHeight(x, y) + 1));
+            setHeight(x, y, (byte) (min(getHeight(x, y) + 1,Helpers.rings.length)));
             conform(x, y);
         }
     }
@@ -253,7 +253,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap {
         int px, py;
 
         int r;
-        for (r = 1; r < 64; r++) {
+        for (r = 1; r < Helpers.rings.length; r++) {
             bChanged = false;
             for (Point offset : Helpers.rings[r]) {
                 px = x + offset.x;

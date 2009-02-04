@@ -3,7 +3,7 @@ package com.novusradix.JavaPop.Client;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Messaging.PeonUpdate.Detail;
-import com.novusradix.JavaPop.Server.Peons.State;
+import com.novusradix.JavaPop.Server.ServerPeons.State;
 import java.awt.Point;
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,11 +16,11 @@ import static java.lang.Math.*;
 
 public class Peons implements GLObject {
 
-    public Game game;
-    private Map<Integer, Peon> peons;
+    public final Game game;
+    private final Map<Integer, Peon> peons;
     private Model peonModel,  ankhModel;
     private boolean firstPeon = true;
-    Map<Player, Peon> leaders;
+    private final Map<Player, Peon> leaders;
 
     public Peons(Game g) {
         game = g;
@@ -57,6 +57,8 @@ public class Peons implements GLObject {
     }
     
     private Vector3 v = new Vector3();
+
+    float[] transparent = new float[]{0.5f,0.5f,0.5f,0.5f};
 
     public void display(GL gl, float time) {
         float t;
@@ -118,7 +120,7 @@ public class Peons implements GLObject {
         State state;
         Player player;
         Matrix4 basis;
-
+        
         public Peon(Detail d) {
             posx = d.posx;
             posy = d.posy;
@@ -146,7 +148,7 @@ public class Peons implements GLObject {
         public void step(float seconds) {
             switch (state) {
                 case WALKING:
-                case WANDER:
+                //case WANDER:
                     //if already reached destination, wait there - there'll be another message along shortly!
                     if (reachedDest()) {
                         break;
@@ -162,7 +164,7 @@ public class Peons implements GLObject {
 
         private void calcBasis() {
             front.set(dx, dy, 0);
-            if (front.length() == 0) {
+            if (front.length() == 0 || state == State.WAITING) {
                 front.x = -1;
                 front.y = -1;
             }
@@ -171,12 +173,13 @@ public class Peons implements GLObject {
             up.set(0, 0, 1);
             left.cross(front, up);
             basis.setBasis(front, left, up);
+          
         }
 
         private boolean reachedDest() {
             float ex = posx - (destx + 0.5f);
             float ey = posy - (desty + 0.5f);
-            return ((abs(ex) < 0.1 && abs(ey) < 0.1));
+            return ((abs(ex) < 0.01 && abs(ey) < 0.01));
         }
     }
 }
