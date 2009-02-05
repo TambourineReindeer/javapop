@@ -248,7 +248,7 @@ public class ServerHouses {
             changed = true;
         }
 
-        ServerPeons.State addPeon(Peon p, boolean leader) {
+        public ServerPeons.State addPeon(Peon p, boolean leader) {
             changed = true;
             if (p.player == player) {
                 strength += p.strength;

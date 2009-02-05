@@ -41,10 +41,12 @@ public class ServerPeons {
 
     public void addPeon(int x, int y, float strength, ServerPlayer player, boolean leader) {
         Peon p = new Peon(x + 0.5f, y + 0.5f, strength, player);
-        peons.add(p);
-        map.put(p.getPoint(), p);
-        if (leader) {
-            leaders.put(player, p);
+        synchronized (peons) {
+            peons.add(p);
+            map.put(p.getPoint(), p);
+            if (leader) {
+                leaders.put(player, p);
+            }
         }
     }
 
@@ -71,25 +73,33 @@ public class ServerPeons {
             Vector<PeonUpdate.Detail> pds = new Vector<PeonUpdate.Detail>();
             PeonUpdate.Detail pd;
 
-            for (Iterator<Peon> i = peons.iterator(); i.hasNext();) {
+            synchronized (peons) {
+                for (Iterator<Peon> i = peons.iterator(); i.hasNext();) {
 
-                p = i.next();
-                map.remove(p.getPoint(), p);
-                pd = p.step(seconds);
-                map.put(p.getPoint(), p);
-                if (pd != null) {
-                    pds.add(pd);
+                    p = i.next();
+                    map.remove(p.getPoint(), p);
+                    pd = p.step(seconds);
+                    map.put(p.getPoint(), p);
+                    if (pd != null) {
+                        pds.add(pd);
 
-                    switch (pd.state) {
-                        case DEAD:
-                            if (leaders.containsValue(p)) {
-                                p.player.info.ankh.setLocation(p.getPoint());
-                                leaders.remove(p.player);
-                            }
-                        case SETTLED:
-                            i.remove();
-                            map.remove(p.getPoint(), p);
-                            break;
+                        switch (pd.state) {
+                            case DEAD:
+                                if (leaders.containsValue(p)) {
+                                    p.player.info.ankh.setLocation(p.getPoint());
+                                    leaders.remove(p.player);
+                                }
+                                i.remove();
+                                map.remove(p.getPoint(), p);
+                                break;
+                            case SETTLED:
+                                if (leaders.containsValue(p)) {
+                                    leaders.remove(p.player);
+                                }
+                                i.remove();
+                                map.remove(p.getPoint(), p);
+                                break;
+                        }
                     }
                 }
             }

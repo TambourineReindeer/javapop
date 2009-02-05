@@ -4,13 +4,12 @@ import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.PeonUpdate;
 import com.novusradix.JavaPop.Server.ServerGame;
+import com.novusradix.JavaPop.Server.ServerHouses.ServerHouse;
 import com.novusradix.JavaPop.Server.ServerPeons.State;
 import com.novusradix.JavaPop.Server.ServerPlayer;
 import com.novusradix.JavaPop.Server.ServerPlayer.PeonMode;
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -50,7 +49,7 @@ public class Peon {
         pos = new Vector2(x, y);
         shortDest = new Point(getPoint());
         this.strength = strength;
-        state = State.WALKING;
+        state = State.WAITING;
         changed = true;
         player = sp;
         game = sp.currentGame;
@@ -61,15 +60,20 @@ public class Peon {
     public PeonUpdate.Detail step(float seconds) {
         Point oldPos = getPoint();
         stateTimer += seconds;
+        if (strength < 0) {
+            return changeState(State.DEAD);
+        }
+        State oldState = state;
         switch (game.heightMap.getTile(oldPos.x, oldPos.y).action) {
             case DROWN:
-                return changeState(State.DROWNING);
+                state = State.DROWNING;
             case BURN:
-                return changeState(State.DEAD);
+                state = State.DEAD;
             case FALL:
-                return changeState(State.FALLING);
+                state = State.FALLING;
             default:
         }
+
 
         if (inMiddleOfTile()) {
             for (Peon other : game.peons.getPeons(getPoint())) {
@@ -82,11 +86,12 @@ public class Peon {
                         }
                     } else {
                         //fight
-                        float damage = seconds * (2 + max(strength, other.strength) / 10.0f);
+                        float damage = seconds * (2 + max(strength, other.strength));
                         strength -= damage;
                         other.strength -= damage;
-                        return changeState(State.FIGHTING);
-
+                        state = State.FIGHTING;
+                        stateTimer=0;
+                        break;
                     }
                 }
 
@@ -94,6 +99,10 @@ public class Peon {
                     return changeState(State.WAITING);
                 }
             }
+        }
+
+        if (state != oldState) {
+            changed = true;
         }
 
         switch (state) {
@@ -104,31 +113,30 @@ public class Peon {
                 }
                 break;
 
+            case FIGHTING:
             case ELECTRIFIED:
 
                 if (stateTimer < 0.2f) {
                     break; //still electrified
                 }
             //worn off - fallthrough.
-            case FIGHTING:
             case DROWNING:
             case WAITING:
                 changed = true;
                 state = State.WALKING;
             //fall through
             case WALKING:
-
                 strength -= seconds;
-
-                if (strength < 0) {
-                    return changeState(State.DEAD);
-                }
-
                 if (reachedDest()) {
                     if (player.peonMode == PeonMode.ANKH && getPoint().distanceSq(player.getPapalMagnet()) == 0) {
                         game.peons.getLeaders().put(player, this);
 
                     }
+                    ServerHouse h = game.houses.getHouse(getPoint().x, getPoint().y);
+                    if (h != null) {
+                        return changeState(h.addPeon(this, game.peons.getLeaders().containsValue(this)));
+                    }
+
                     float settleProb;
                     Random r = new Random();
                     switch (player.peonMode) {
@@ -154,6 +162,9 @@ public class Peon {
                 }
                 pos.x += seconds * dx;
                 pos.y += seconds * dy;
+                pos.x = Helpers.clip(pos.x, 0.5f, game.heightMap.width-0.5f);
+                pos.y = Helpers.clip(pos.y, 0.5f, game.heightMap.breadth-0.5f);
+
             default:
 
         }
