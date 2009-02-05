@@ -90,7 +90,7 @@ public class Peon {
                         strength -= damage;
                         other.strength -= damage;
                         state = State.FIGHTING;
-                        stateTimer=0;
+                        stateTimer = 0;
                         break;
                     }
                 }
@@ -162,8 +162,8 @@ public class Peon {
                 }
                 pos.x += seconds * dx;
                 pos.y += seconds * dy;
-                pos.x = Helpers.clip(pos.x, 0.5f, game.heightMap.width-0.5f);
-                pos.y = Helpers.clip(pos.y, 0.5f, game.heightMap.breadth-0.5f);
+                pos.x = Helpers.clip(pos.x, 0.5f, game.heightMap.width - 1.5f);
+                pos.y = Helpers.clip(pos.y, 0.5f, game.heightMap.breadth - 1.5f);
 
             default:
 
@@ -265,7 +265,12 @@ public class Peon {
                         target = l.getPoint();
                     }
                 } else {
-                    target = player.getPapalMagnet();
+                    ServerHouse h = game.houses.getLeaderHouse(player);
+                    if (h != null) {
+                        target = h.pos;
+                    } else {
+                        target = player.getPapalMagnet();
+                    }
                 }
                 break;
             case FIGHT:
@@ -306,9 +311,10 @@ public class Peon {
 
         if (maxscore > -1) {
             setShortDest(temp);
+        } else {
+            //nowhere to go - die.
+            strength *= 0.8;
         }
-        //nowhere to go - die.
-        strength *= 0.8;
     }
 
     private Point findFlatLand(Point start, int radius) {

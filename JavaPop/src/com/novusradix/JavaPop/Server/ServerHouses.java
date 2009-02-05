@@ -64,6 +64,10 @@ public class ServerHouses {
         return false;
     }
 
+    public ServerHouse getLeaderHouse(ServerPlayer p) {
+        return leaderHouses.get(p);
+    }
+
     private Collection<ServerHouse> affectedHouses(SortedSet<Integer> mapChanges) {
         Collection<ServerHouse> hs = new ArrayList<ServerHouse>();
         if (mapChanges.size() == 0) {
@@ -216,7 +220,7 @@ public class ServerHouses {
 
         return null;
     }
-    
+
     public class ServerHouse extends com.novusradix.JavaPop.House {
 
         private ServerPlayer serverPlayer;
@@ -241,10 +245,12 @@ public class ServerHouses {
 
         public void sprog() {
             strength /= 2;
-            game.peons.addPeon(pos, strength, serverPlayer, leaderHouses.containsValue(this));
-            if (leaderHouses.containsValue(this)) {
+            boolean leader = leaderHouses.containsValue(this);
+            if (leader) {
                 leaderHouses.remove(serverPlayer);
             }
+            game.peons.addPeon(pos, strength, serverPlayer, leader);
+
             changed = true;
         }
 
@@ -331,10 +337,12 @@ public class ServerHouses {
             if (strength > rate * 100.0f) {
                 float houseStrength = rate * 100.0f - min(500.0f, rate * 100.0f / 2.0f);
                 changed = true;
-                game.peons.addPeon(pos, strength - houseStrength, serverPlayer, leaderHouses.containsValue(this));
-                if (leaderHouses.containsValue(this)) {
+                boolean leader = leaderHouses.containsValue(this);
+                if (leader) {
                     leaderHouses.remove(serverPlayer);
                 }
+                game.peons.addPeon(pos, strength - houseStrength, serverPlayer, leader);
+
                 strength = houseStrength;
             }
 
