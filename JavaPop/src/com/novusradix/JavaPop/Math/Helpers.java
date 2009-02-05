@@ -79,4 +79,14 @@ public static final int radius = 32;
 
         return n;
     }
+
+    public static int clip(int i,int min, int max)
+    {
+        return Math.min(max,Math.max(min,i));
+    }
+
+    public static float clip(float f,float min, float max)
+    {
+        return Math.min(max,Math.max(min,f));
+    }
 }
