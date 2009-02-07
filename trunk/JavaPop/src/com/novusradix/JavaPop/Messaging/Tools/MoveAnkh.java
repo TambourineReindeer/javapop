@@ -17,6 +17,6 @@ public class MoveAnkh extends Message {
 
     @Override
     public void execute() {
-           serverPlayer.MoveAnkh(where);    
+           serverPlayer.setPapalMagnet(where.x,where.y);
     }
 }

@@ -77,7 +77,9 @@ public class ServerPeons {
     public void step(float seconds) {
         if (peons != null) {
             Peon p;
-
+            for (ServerPlayer sp : game.players) {
+                sp.peonMana = 0;
+            }
             Vector<PeonUpdate.Detail> pds = new Vector<PeonUpdate.Detail>();
             PeonUpdate.Detail pd;
 
@@ -88,13 +90,14 @@ public class ServerPeons {
                     map.remove(p.getPoint(), p);
                     pd = p.step(seconds);
                     map.put(p.getPoint(), p);
+                    p.player.peonMana += Math.max(0, p.strength);
                     if (pd != null) {
                         pds.add(pd);
 
                         switch (pd.state) {
                             case DEAD:
                                 if (leaders.containsValue(p)) {
-                                    p.player.info.ankh.setLocation(p.getPoint());
+                                    p.player.setPapalMagnet(p.getPoint().x, p.getPoint().y);
                                     leaders.remove(p.player);
                                 }
                                 i.remove();

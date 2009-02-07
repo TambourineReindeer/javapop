@@ -1,10 +1,10 @@
 package com.novusradix.JavaPop.Client.Lobby;
 
+import com.novusradix.JavaPop.Messaging.PlayerUpdate.Info;
 import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
 
 import com.novusradix.JavaPop.Server.GameInfo;
-import com.novusradix.JavaPop.Server.ServerPlayer.Info;
 
 /**
  *
@@ -28,7 +28,6 @@ public class Game {
     }
 
     void update(GameInfo gi) {
-
         playerList.clear();
         for (Info player : gi.players.values()) {
             playerList.addElement(player.name);

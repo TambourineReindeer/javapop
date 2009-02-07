@@ -2,7 +2,6 @@ package com.novusradix.JavaPop.Client.AI;
 
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Messaging.Lobby.JoinGame;
-import com.novusradix.JavaPop.Server.ServerPlayer.Info;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -31,14 +30,7 @@ public class Client extends com.novusradix.JavaPop.Client.Client {
             oos.flush();
             ois = new ObjectInputStream(socket.getInputStream());
             oos.writeBoolean(false); //indicate we're not human
-            try {
-                info = (Info) ois.readObject();
-            } catch (IOException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
+            playerID = ois.readInt();
             (new Thread(this, "AI player")).start();
         } catch (IOException ioe) {
             return;

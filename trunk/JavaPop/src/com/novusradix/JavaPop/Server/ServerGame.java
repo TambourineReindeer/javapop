@@ -131,7 +131,7 @@ public class ServerGame extends TimerTask {
         Map<ServerPlayer, Point> startingPosition = new HashMap<ServerPlayer, Point>();
         for (ServerPlayer p : players) {
             startingPosition.put(p, new Point(r.nextInt(heightMap.getWidth()), r.nextInt(heightMap.getBreadth())));
-            p.info.ankh.setLocation(heightMap.width / 2, heightMap.breadth / 2);
+            p.setPapalMagnet(heightMap.width / 2, heightMap.breadth / 2);
             persistentEffects.put(p, new HashMap<Class, Effect>());
         }
         
@@ -197,11 +197,7 @@ public class ServerGame extends TimerTask {
             }
         }
         if (frame % 8 == 0) {
-            ArrayList<ServerPlayer.Info> is = new ArrayList<ServerPlayer.Info>(players.size());
-            for (ServerPlayer p : players) {
-                is.add(p.info);
-            }
-            sendAllPlayers(new PlayerUpdate(is));
+            sendAllPlayers(new PlayerUpdate(players));
         }
         frame++;
     }

@@ -11,5 +11,6 @@ public interface Player {
     public String getName();
     public float[] getColour();
     public Point getPapalMagnet();
+    //public void setPapalMagnet(Point p);
     public double getMana();
 }

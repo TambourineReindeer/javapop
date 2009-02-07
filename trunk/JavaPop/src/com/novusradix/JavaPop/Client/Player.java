@@ -1,6 +1,6 @@
 package com.novusradix.JavaPop.Client;
 
-import com.novusradix.JavaPop.Server.ServerPlayer.Info;
+import com.novusradix.JavaPop.Messaging.PlayerUpdate.Info;
 import java.awt.Point;
 import javax.media.opengl.GL;
 
@@ -31,7 +31,7 @@ public class Player implements GLObject,com.novusradix.JavaPop.Player  {
     public void update(Info i) {
         name = i.name;
         colour = i.colour;
-        ankh.setLocation(i.ankh);
+        ankh.setLocation(i.ankhx, i.ankhy);
         mana = i.mana;
     }
 
