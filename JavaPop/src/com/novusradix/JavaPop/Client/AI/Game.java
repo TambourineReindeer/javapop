@@ -3,7 +3,7 @@ package com.novusradix.JavaPop.Client.AI;
 import com.novusradix.JavaPop.Client.Peons;
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Client.Player;
-import com.novusradix.JavaPop.Server.ServerPlayer.Info;
+import com.novusradix.JavaPop.Messaging.PlayerUpdate.Info;
 import java.util.HashMap;
 
 /**
@@ -26,7 +26,7 @@ public class Game extends com.novusradix.JavaPop.Client.Game {
         for (Info i : g.gi.players.values()) {
             Player p = new Player(i, this, index++);
             players.put(i.id, p);
-            if (i.id == c.info.id) {
+            if (i.id == c.getPlayerID()) {
                 me = p;
             }
         }

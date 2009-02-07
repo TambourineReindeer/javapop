@@ -17,7 +17,6 @@ import com.novusradix.JavaPop.Messaging.Lobby.Bye;
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Messaging.Message;
 import com.novusradix.JavaPop.Messaging.Tools.SetBehaviour;
-import com.novusradix.JavaPop.Server.ServerPlayer.Info;
 import java.net.SocketException;
 
 /**
@@ -32,7 +31,7 @@ public class Client implements Runnable {
     private boolean connected;
     public Lobby lobby;
     public Game game;
-    public Info info;
+    protected int playerID;
     public PeonMode behaviour;
 
     protected Client() {
@@ -55,18 +54,18 @@ public class Client implements Runnable {
             oos.flush();
             ois = new ObjectInputStream(socket.getInputStream());
             oos.writeBoolean(true);// indicate we're human
-            try {
-                info = (Info) ois.readObject();
-            } catch (IOException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            oos.flush();
+            playerID = ois.readInt();
+
             connected = true;
             (new Thread(this, "Client Player")).start();
         } catch (IOException ioe) {
             return;
         }
+    }
+
+    public int getPlayerID() {
+        return playerID;
     }
 
     public boolean isConnected() {

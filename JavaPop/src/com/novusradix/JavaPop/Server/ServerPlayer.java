@@ -8,11 +8,8 @@ import com.novusradix.JavaPop.Messaging.Lobby.GameList;
 import com.novusradix.JavaPop.Messaging.Message;
 import com.novusradix.JavaPop.Messaging.PlayerUpdate;
 import java.awt.Point;
-import java.io.Externalizable;
 import java.io.IOException;
-import java.io.ObjectInput;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -39,22 +36,33 @@ public class ServerPlayer implements Runnable, com.novusradix.JavaPop.Player {
     private static int nextId = 1;
     private int id;
     public boolean ready = false;
-    Info info;
+    private String name;
+    private int ankhx,  ankhy;
+    private float[] colour;
+    double houseMana;
+    double peonMana;
+    private double spentMana;
+    private Point magnet;
     public PeonMode peonMode;
 
     public ServerPlayer(Server s, Socket sock) {
         this.s = s;
         this.socket = sock;
         id = nextId++;
-        info = new Info(id, "Player " + id, new Point(0, 0), defaultColors[id % 3], 0);
+        name = "Player " + id;
+        magnet = new Point(0, 0);
+        colour = defaultColors[id % 3];
+        houseMana = 0;
+        peonMana = 0;
+        spentMana = 0;
         peonMode = PeonMode.SETTLE;
         try {
             socket.setTcpNoDelay(true);
             oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.writeInt(id);
             oos.flush();
             ois = new ObjectInputStream(socket.getInputStream());
 
-            oos.writeObject(info);
             human = ois.readBoolean();
             (new Thread(this, "Server Player")).start();
             sendMessage(new GameList(s.getGames()));
@@ -63,9 +71,9 @@ public class ServerPlayer implements Runnable, com.novusradix.JavaPop.Player {
         }
     }
 
-    public void MoveAnkh(Point where) {
-        info.ankh.setLocation(where);
-        currentGame.sendAllPlayers(new PlayerUpdate(info));
+    public void setPapalMagnet(int x, int y) {
+        magnet.setLocation(x, y);
+        currentGame.sendAllPlayers(new PlayerUpdate(this));
     }
 
     public int getId() {
@@ -127,63 +135,18 @@ public class ServerPlayer implements Runnable, com.novusradix.JavaPop.Player {
     }
 
     public String getName() {
-        return info.name;
+        return name;
     }
 
     public float[] getColour() {
-        return info.colour;
+        return colour;
     }
 
     public Point getPapalMagnet() {
-        return info.ankh;
+        return magnet;
     }
 
     public double getMana() {
-        return info.mana;
-    }
-
-    public static class Info implements Externalizable {
-
-        public int id;
-        public String name;
-        public Point ankh;
-        public float[] colour;
-        public double mana;
-        public int leaderPeonId,  leaderHouseId;
-
-        public Info() {
-        }
-
-        private Info(int id, String name, Point ankh, float[] colour, double mana) {
-            this.id = id;
-            this.name = name;
-            this.ankh = ankh;
-            this.colour = colour;
-            this.mana = mana;
-        }
-
-        public void writeExternal(ObjectOutput o) throws IOException {
-            o.writeInt(id);
-            o.writeUTF(name);
-            o.writeInt(ankh.x);
-            o.writeInt(ankh.y);
-            o.writeFloat(colour[0]);
-            o.writeFloat(colour[1]);
-            o.writeFloat(colour[2]);
-            o.writeDouble(mana);
-        }
-
-        public void readExternal(ObjectInput i) throws IOException, ClassNotFoundException {
-            id = i.readInt();
-            name = i.readUTF();
-            ankh = new Point();
-            ankh.x = i.readInt();
-            ankh.y = i.readInt();
-            colour = new float[3];
-            colour[0] = i.readFloat();
-            colour[1] = i.readFloat();
-            colour[2] = i.readFloat();
-            mana = i.readDouble();
-        }
+        return peonMana + houseMana - spentMana;
     }
 }

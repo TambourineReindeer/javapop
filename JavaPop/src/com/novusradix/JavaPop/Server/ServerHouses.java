@@ -92,6 +92,10 @@ public class ServerHouses {
     }
 
     public void step(float seconds) {
+        for (ServerPlayer sp : game.players) {
+            sp.houseMana = 0;
+        }
+
         SortedSet<Integer> mapChanges = game.heightMap.takeHouseChanges();
         Collection<ServerHouse> hs = affectedHouses(mapChanges);
         for (ServerHouse h : hs) {
@@ -127,6 +131,10 @@ public class ServerHouses {
                 if (newmap[h.pos.x][h.pos.y] != HOUSE) {
                     i.remove();
                     removeHouse(h);
+                }
+                else
+                {
+                    h.serverPlayer.houseMana +=h.strength;
                 }
             }
         }
@@ -279,7 +287,7 @@ public class ServerHouses {
             if (strength < 0) {
                 if (leaderHouses.containsValue(this)) {
                     leaderHouses.remove(serverPlayer);
-                    serverPlayer.info.ankh.setLocation(this.pos);
+                    serverPlayer.setPapalMagnet(pos.x,pos.y);
                 }
                 player = p.player;
                 serverPlayer = p.player;

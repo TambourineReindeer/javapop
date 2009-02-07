@@ -7,7 +7,7 @@ package com.novusradix.JavaPop.Client;
 import com.novusradix.JavaPop.Client.Tools.*;
 import com.novusradix.JavaPop.Messaging.Lobby.GameStarted;
 import com.novusradix.JavaPop.Effects.Effect;
-import com.novusradix.JavaPop.Server.ServerPlayer.Info;
+import com.novusradix.JavaPop.Messaging.PlayerUpdate.Info;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,7 +61,7 @@ public class Game {
             Player p = new Player(i, this, index++);
             players.put(i.id, p);
             objects.add(p);
-            if (i.id == c.info.id) {
+            if (i.id == c.getPlayerID()) {
                 me = p;
             }
         }
