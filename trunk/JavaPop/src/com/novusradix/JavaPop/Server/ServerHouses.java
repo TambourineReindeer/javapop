@@ -59,7 +59,6 @@ public class ServerHouses {
     public boolean canBuild(int x, int y) {
         if (game.heightMap.tileInBounds(x, y)) {
             return (map[x][y] == EMPTY && game.heightMap.getTile(x, y).isFertile && !newHouses.contains(x + y * game.heightMap.width));
-
         }
         return false;
     }
@@ -109,9 +108,9 @@ public class ServerHouses {
             ServerHouse h;
             for (; i.hasNext();) {
                 h = i.next();
-                if (h.strength < 0) {
+                if (h.strength <= 0) {
                     i.remove();
-                    hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.serverPlayer, -1, 0));
+                    removeHouse(h);
                     continue;
                 }
                 if (game.heightMap.isFlat(h.pos.x, h.pos.y) && newmap[h.pos.x][h.pos.y] == 0) {
@@ -119,11 +118,7 @@ public class ServerHouses {
                     h.step(seconds);
                 } else {
                     i.remove();
-                    game.peons.addPeon(h.pos, h.strength, h.serverPlayer, leaderHouses.containsValue(h));
-                    if (leaderHouses.containsValue(h)) {
-                        leaderHouses.remove(h.serverPlayer);
-                    }
-                    hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.serverPlayer, -1, 0));
+                    removeHouse(h);
                 }
             }
             i = allHouses.values().iterator();
@@ -131,13 +126,7 @@ public class ServerHouses {
                 h = i.next();
                 if (newmap[h.pos.x][h.pos.y] != HOUSE) {
                     i.remove();
-                    if (h.strength > 0) {
-                        game.peons.addPeon(h.pos, h.strength, h.serverPlayer, leaderHouses.containsValue(h));
-                    }
-                    if (leaderHouses.containsValue(h)) {
-                        leaderHouses.remove(h.serverPlayer);
-                    }
-                    hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.serverPlayer, -1, 0));
+                    removeHouse(h);
                 }
             }
         }
@@ -155,6 +144,18 @@ public class ServerHouses {
             game.sendAllPlayers(new HouseUpdate(hds, leaderHouses));
             hds.clear();
         }
+    }
+
+    private Peon removeHouse(ServerHouse h) {
+        boolean leader = leaderHouses.containsValue(h);
+        hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.serverPlayer, -1, 0));
+        if (leader) {
+            leaderHouses.remove(h.serverPlayer);
+        }
+        if (h.strength > 0) {
+            return game.peons.addPeon(h.pos.x, h.pos.y, h.strength, h.serverPlayer, leader);
+        }
+        return null;
     }
 
     public ServerHouses.ServerHouse getHouse(int x, int y) {
@@ -240,7 +241,9 @@ public class ServerHouses {
 
         public void damage(float i) {
             strength -= i;
-            serverPlayer.info.mana -= i;
+            if (strength <= 0) {
+                burnFarms();
+            }
         }
 
         public void sprog() {
@@ -249,12 +252,19 @@ public class ServerHouses {
             if (leader) {
                 leaderHouses.remove(serverPlayer);
             }
-            game.peons.addPeon(pos, strength, serverPlayer, leader);
+            game.peons.addPeon(pos.x, pos.y, strength, serverPlayer, leader);
 
             changed = true;
         }
 
-        public ServerPeons.State addPeon(Peon p, boolean leader) {
+        public Peon knockDown() {
+            boolean leader = leaderHouses.containsValue(this);
+            Peon p = game.peons.addPeon(pos.x, pos.y, strength, serverPlayer, leader);
+            strength = 0;
+            return p;
+        }
+
+        public Peon.State addPeon(Peon p, boolean leader) {
             changed = true;
             if (p.player == player) {
                 strength += p.strength;
@@ -262,27 +272,24 @@ public class ServerHouses {
                     leaderHouses.put(serverPlayer, this);
                     changed = true;
                 }
-                return ServerPeons.State.SETTLED;
+                return Peon.State.SETTLED;
             }
 
             strength -= p.strength;
-            p.player.info.mana -= p.strength;
-            serverPlayer.info.mana -= p.strength;
             if (strength < 0) {
                 if (leaderHouses.containsValue(this)) {
                     leaderHouses.remove(serverPlayer);
                     serverPlayer.info.ankh.setLocation(this.pos);
                 }
-                serverPlayer.info.mana -= strength;
                 player = p.player;
                 serverPlayer = p.player;
                 strength = -strength;
                 if (leader) {
                     leaderHouses.put(serverPlayer, this);
                 }
-                return ServerPeons.State.SETTLED;
+                return Peon.State.SETTLED;
             }
-            return ServerPeons.State.DEAD;
+            return Peon.State.DEAD;
         }
 
         void makeLeader() {
@@ -290,29 +297,59 @@ public class ServerHouses {
             changed = true;
         }
 
+        private void burnFarms() {
+            int radius = 0;
+            if (level > 0) {
+                radius = 1;
+            }
+            if (level > 9) {
+                radius = 2;
+            }
+            if (level == 49) {
+                radius = 3;
+            }
+            int px, py;
+            for (px = pos.x - radius; px <= pos.x + radius; px++) {
+                for (py = pos.y - radius; py <= pos.y + radius; py++)
+                {
+
+                        if (game.heightMap.tileInBounds(px, py) && game.heightMap.getTile(px, py).isFertile) {
+                            game.heightMap.setTile(px, py, Tile.BURNT);
+                        }
+
+                }
+            }
+        }
+
         private void paintmap(byte[][] newmap) {
             if (game.heightMap.getTile(pos.x, pos.y).isFertile) {
                 newmap[pos.x][pos.y] = HOUSE;
-                int radiuslimit = 0;
+                int radius = 0;
                 if (level > 0) {
-                    radiuslimit = 1;
+                    radius = 1;
                 }
                 if (level > 9) {
-                    radiuslimit = 2;
+                    radius = 2;
                 }
                 if (level == 49) {
-                    radiuslimit = 3;
+                    radius = 3;
                 }
                 int px, py;
-                for (int radius = 1; radius <= radiuslimit; radius++) {
-                    for (Point offset : Helpers.rings[radius]) {
-                        px = pos.x + offset.x;
-                        py = pos.y + offset.y;
-                        if (game.heightMap.tileInBounds(px, py) && game.heightMap.getTile(px, py).isFertile) {
-                            newmap[px][py] = FARM;
+                for (px = pos.x - radius; px <= pos.x + radius; px++) {
+                    for (py = pos.y - radius; py <= pos.y + radius; py++) //for (int radius = 1; radius <= radiuslimit; radius++) {
+                    // for (Point offset : Helpers.rings[radius]) {
+                    //  px = pos.x + offset.x;
+                    // py = pos.y + offset.y;
+                    {
+                        if (!(px == pos.x && py == pos.y)) {
+                            if (game.heightMap.tileInBounds(px, py) && game.heightMap.getTile(px, py).isFertile) {
+                                newmap[px][py] = FARM;
+                            }
                         }
                     }
                 }
+            //}
+            //}
             }
         }
 
@@ -330,10 +367,10 @@ public class ServerHouses {
         }
 
         private void step(float seconds) {
+
             float rate = (level + 1);
             float newmana = rate * seconds;
             strength += newmana;
-            serverPlayer.info.mana += newmana;
             if (strength > rate * 100.0f) {
                 float houseStrength = rate * 100.0f - min(500.0f, rate * 100.0f / 2.0f);
                 changed = true;
@@ -341,7 +378,7 @@ public class ServerHouses {
                 if (leader) {
                     leaderHouses.remove(serverPlayer);
                 }
-                game.peons.addPeon(pos, strength - houseStrength, serverPlayer, leader);
+                game.peons.addPeon(pos.x, pos.y, strength - houseStrength, serverPlayer, leader);
 
                 strength = houseStrength;
             }

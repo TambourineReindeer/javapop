@@ -459,36 +459,26 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             yOrig = yPos;
         }
         if (e.getButton() == MouseEvent.BUTTON1) {
-            GLToolButton.getSelected().ButtonDown(selected);
+            GLToolButton.getSelected().PrimaryDown(selected);
+        }if (e.getButton() == MouseEvent.BUTTON3) {
+            GLToolButton.getSelected().SecondaryDown(selected);
         }
     }
 
     public void mouseReleased(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-            GLToolButton.getSelected().ButtonUp(selected);
+        if (e.getButton() == MouseEvent.BUTTON2) {
+             mouseMoved(e);
         }
-        if (abs(e.getX() - dragOrigin.x) < 16 && abs(e.getY() - dragOrigin.y) < 16) {
-            boolean primary;
+        else
+        {
             if (e.getButton() == MouseEvent.BUTTON1) {
-                if ((e.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) != 0) {
-                    primary = false;
-                } else {
-                    primary = true;
-                }
-            } else if (e.getButton() == MouseEvent.BUTTON3) {
-                primary = false;
-            } else {
-                return;
+                GLToolButton.getSelected().PrimaryUp(selected);
             }
-
-            if (primary) {
-                GLToolButton.getSelected().PrimaryAction(selected);
-            } else {
-                GLToolButton.getSelected().SecondaryAction(selected);
+            if (e.getButton() == MouseEvent.BUTTON3) {
+            GLToolButton.getSelected().SecondaryUp(selected);
             }
-        } else {
-            mouseMoved(e);
         }
+        
     }
 
     public void mouseWheelMoved(MouseWheelEvent e) {

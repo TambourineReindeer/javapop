@@ -1,7 +1,9 @@
 package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
-import java.awt.Point;
+import com.novusradix.JavaPop.Client.GLToolButton;
+import com.novusradix.JavaPop.Messaging.Tools.Hero;
+import com.novusradix.JavaPop.Messaging.Tools.Hero.Type;
 
 /**
  *
@@ -14,8 +16,12 @@ public class PerseusTool extends Tool {
     }
 
     @Override
-    public void PrimaryAction(Point p) {
+    public void Select() {
+        client.sendMessage(new Hero(Type.PERSEUS));
+        GLToolButton.selectDefault();
     }
+
+    
 
     public String getIconName() {
         return "/com/novusradix/JavaPop/icons/Perseus.png";

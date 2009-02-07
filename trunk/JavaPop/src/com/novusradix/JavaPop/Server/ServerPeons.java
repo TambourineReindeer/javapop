@@ -2,7 +2,10 @@ package com.novusradix.JavaPop.Server;
 
 import com.novusradix.JavaPop.Math.MultiMap;
 import com.novusradix.JavaPop.Messaging.PeonUpdate;
+import com.novusradix.JavaPop.Messaging.Tools.Hero.Type;
 import com.novusradix.JavaPop.Server.Peons.Peon;
+import com.novusradix.JavaPop.Server.Peons.Peon.State;
+import com.novusradix.JavaPop.Server.Peons.Perseus;
 import java.awt.Point;
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,14 +21,22 @@ public class ServerPeons {
     private final Map<ServerPlayer, Peon> leaders;
     private int nextId = 1;
 
+    public void makeHero(Peon p, Type type) {
+        synchronized (peons) {
+            p.setState(State.DEAD);
+            Peon hero;
+            switch (type) {
+                default:
+                case PERSEUS:
+                    hero = new Perseus(p);
+            }
+            peons.add(hero);
+        }
+    }
+
     public enum Action {
 
         DROWN, BURN, FALL, NONE;
-    }
-
-    public enum State {
-
-        WAITING, WALKING, DEAD, SETTLED, DROWNING, ELECTRIFIED, FALLING, BURNT, FIGHTING
     }
 
     public ServerPeons(ServerGame g) {
@@ -39,8 +50,8 @@ public class ServerPeons {
         return map.get(p);
     }
 
-    public void addPeon(int x, int y, float strength, ServerPlayer player, boolean leader) {
-        Peon p = new Peon(x + 0.5f, y + 0.5f, strength, player);
+    public Peon addPeon(int x, int y, float strength, ServerPlayer player, boolean leader) {
+        Peon p = new Peon(x + 0.5f, y + 0.5f, strength, player, game);
         synchronized (peons) {
             peons.add(p);
             map.put(p.getPoint(), p);
@@ -48,10 +59,7 @@ public class ServerPeons {
                 leaders.put(player, p);
             }
         }
-    }
-
-    public void addPeon(Point p, float strength, ServerPlayer player, boolean leader) {
-        addPeon(p.x, p.y, strength, player, leader);
+        return p;
     }
 
     public Collection<Peon> getPeons() {

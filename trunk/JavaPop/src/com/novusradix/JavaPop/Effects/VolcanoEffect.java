@@ -44,10 +44,18 @@ public class VolcanoEffect extends Effect {
                 py = p.y + target.y;
                 g.heightMap.setTile(px, py, Tile.LAVA);
             }
-            g.addEffect(new LavaTrailEffect(target, Direction.NORTH));
-            g.addEffect(new LavaTrailEffect(new Point(target.x - 1, target.y), Direction.WEST));
-            g.addEffect(new LavaTrailEffect(new Point(target.x, target.y - 1), Direction.EAST));
-            g.addEffect(new LavaTrailEffect(new Point(target.x - 1, target.y - 1), Direction.SOUTH));
+            if (g.heightMap.tileInBounds(target.x, target.y)) {
+                g.addEffect(new LavaTrailEffect(target.x, target.y, Direction.NORTH));
+            }
+            if (g.heightMap.tileInBounds(target.x - 1, target.y)) {
+                g.addEffect(new LavaTrailEffect(target.x - 1, target.y, Direction.WEST));
+            }
+            if (g.heightMap.tileInBounds(target.x, target.y - 1)) {
+                g.addEffect(new LavaTrailEffect(target.x, target.y - 1, Direction.EAST));
+            }
+            if (g.heightMap.tileInBounds(target.x - 1, target.y - 1)) {
+                g.addEffect(new LavaTrailEffect(target.x - 1, target.y - 1, Direction.SOUTH));
+            }
             g.deleteEffect(this);
         }
         age++;

@@ -3,7 +3,7 @@ package com.novusradix.JavaPop.Client;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Messaging.PeonUpdate.Detail;
-import com.novusradix.JavaPop.Server.ServerPeons.State;
+import com.novusradix.JavaPop.Server.Peons.Peon.State;
 import java.awt.Point;
 import java.io.IOException;
 import java.util.HashMap;
@@ -55,10 +55,8 @@ public class Peons implements GLObject {
             }
         }
     }
-    
     private Vector3 v = new Vector3();
-
-    float[] transparent = new float[]{0.5f,0.5f,0.5f,0.5f};
+    float[] transparent = new float[]{0.5f, 0.5f, 0.5f, 0.5f};
 
     public void display(GL gl, float time) {
         float t;
@@ -78,7 +76,7 @@ public class Peons implements GLObject {
         ankhModel.prepare(gl);
         synchronized (leaders) {
             for (Peon p : leaders.values()) {
-                if (p != null) {                    
+                if (p != null) {
                     v.x = p.posx + 0.5f;
                     v.y = p.posy + 0.5f;
                     v.z = game.heightMap.getHeight(p.posx, p.posy) + 1.0f;
@@ -109,7 +107,6 @@ public class Peons implements GLObject {
             }
         }
     }
-    
     private Vector3 front = new Vector3(),  up = new Vector3(),  left = new Vector3();
 
     private class Peon {
@@ -120,7 +117,7 @@ public class Peons implements GLObject {
         State state;
         Player player;
         Matrix4 basis;
-        
+
         public Peon(Detail d) {
             posx = d.posx;
             posy = d.posy;
@@ -148,16 +145,23 @@ public class Peons implements GLObject {
         public void step(float seconds) {
             switch (state) {
                 case WALKING:
-                //case WANDER:
+                    //case WANDER:
                     //if already reached destination, wait there - there'll be another message along shortly!
                     if (reachedDest()) {
                         break;
                     }
                     posx += seconds * dx;
                     posy += seconds * dy;
+                    posz=0;
                     break;
                 case FALLING:
                     posz = (float) ((-9.81f / 2.0f) * pow(sqrt(posz * 2.0f / -9.81f) + seconds, 2.0f));
+                    break;
+                case BURNT:
+                    posz = posz + 0.1f;
+                    break;
+                case ATPAPALMAGNET:
+                    posz = 0.5f;
                     break;
             }
         }
@@ -173,7 +177,7 @@ public class Peons implements GLObject {
             up.set(0, 0, 1);
             left.cross(front, up);
             basis.setBasis(front, left, up);
-          
+
         }
 
         private boolean reachedDest() {

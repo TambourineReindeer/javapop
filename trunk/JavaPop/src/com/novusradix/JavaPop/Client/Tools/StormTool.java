@@ -14,7 +14,7 @@ public class StormTool extends Tool {
     }
 
     @Override
-    public void PrimaryAction(Point p) {
+    public void PrimaryDown(Point p) {
     }
 
     public String getIconName() {
