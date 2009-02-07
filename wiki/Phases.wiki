@@ -9,12 +9,12 @@ High level plan
   #  add more spells
   #  design some house and better people models
   #  mana
-  #  peon routefinding
   #  AI
   #  Improve startup menu - single player, multiplayer etc.
 
 == Done ==
  
+  #  peon routefinding (well - sort of)
   #  added volcano, basalt and batholith effects
   #  add more behaviour modes - fight, group
   #  enable fighting for houses
