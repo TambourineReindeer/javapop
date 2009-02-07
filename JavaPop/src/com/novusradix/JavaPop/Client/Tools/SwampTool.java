@@ -15,7 +15,7 @@ public SwampTool(ToolGroup tg, Client c)
     }
     
     @Override
-    public void PrimaryAction(Point p) {
+    public void PrimaryDown(Point p) {
         client.sendMessage(new Swamp(p));
     }
 

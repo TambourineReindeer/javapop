@@ -16,12 +16,12 @@ public class BatholithTool extends Tool {
     }
 
     @Override
-    public void ButtonDown(Point p) {
+    public void PrimaryDown(Point p) {
         client.sendMessage(new StartBatholith(p));
     }
 
     @Override
-    public void ButtonUp(Point p) {
+    public void PrimaryUp(Point p) {
         client.sendMessage(new StopBatholith());
     }
 

@@ -21,6 +21,8 @@ public class Basalt extends Message {
 
     @Override
     public void execute() {
-        serverGame.addEffect(new BasaltEffect(target, direction));
+        if (serverGame.heightMap.tileInBounds(target.x, target.y)) {
+            serverGame.addEffect(new BasaltEffect(target, direction));
+        }
     }
 }

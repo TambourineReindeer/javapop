@@ -14,7 +14,7 @@ public class FireRainTool extends Tool {
     }
 
     @Override
-    public void PrimaryAction(Point p) {
+    public void PrimaryDown(Point p) {
     }
 
     public String getIconName() {

@@ -5,7 +5,7 @@ import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.PeonUpdate;
 import com.novusradix.JavaPop.Server.ServerGame;
 import com.novusradix.JavaPop.Server.ServerHouses.ServerHouse;
-import com.novusradix.JavaPop.Server.ServerPeons.State;
+
 import com.novusradix.JavaPop.Server.ServerPlayer;
 import com.novusradix.JavaPop.Server.ServerPlayer.PeonMode;
 import java.awt.Point;
@@ -21,18 +21,48 @@ import static java.lang.Math.*;
  */
 public class Peon {
 
+    public enum State {
+
+        WAITING, WALKING, DEAD, SETTLED, DROWNING, ELECTRIFIED, FALLING, BURNT, FIGHTING, ATPAPALMAGNET
+    }
     public final int id;
     public final Vector2 pos;
     public float strength;
-    private State state;
+    protected State state;
     public ServerPlayer player;
-    private static int nextId = 1;
+    protected static int nextId = 1;
     private Point p;
-    private final ServerGame game;
-    private float dx,  dy;
-    private Point shortDest;
-    private boolean changed;
-    private float stateTimer = 0;
+    protected final ServerGame game;
+    protected float dx,  dy;
+    protected Point shortDest;
+    protected boolean changed;
+    protected float stateTimer = 0;
+
+    public Peon(float x, float y, float strength, ServerPlayer sp, ServerGame g) {
+        id = nextId++;
+        pos = new Vector2(x, y);
+        shortDest = new Point(getPoint());
+        this.strength = strength;
+        state = State.WAITING;
+        changed = true;
+        player = sp;
+        game = g;
+        pickNextShortDest();
+
+    }
+
+    protected Peon(Peon p) //clone constructor, for making heroes etc based on an existing peon
+    {
+        id = nextId++;
+        pos = new Vector2(p.pos.x, p.pos.y);
+        shortDest = new Point(getPoint());
+        strength = p.strength;
+        state = State.WAITING;
+        changed = true;
+        player = p.player;
+        game = p.game;
+        pickNextShortDest();
+    }
 
     public Point getPoint() {
         int fx, fy;
@@ -42,19 +72,6 @@ public class Peon {
             p = new Point(fx, fy);
         }
         return p;
-    }
-
-    public Peon(float x, float y, float strength, ServerPlayer sp) {
-        id = nextId++;
-        pos = new Vector2(x, y);
-        shortDest = new Point(getPoint());
-        this.strength = strength;
-        state = State.WAITING;
-        changed = true;
-        player = sp;
-        game = sp.currentGame;
-        pickNextShortDest();
-
     }
 
     public PeonUpdate.Detail step(float seconds) {
@@ -67,10 +84,13 @@ public class Peon {
         switch (game.heightMap.getTile(oldPos.x, oldPos.y).action) {
             case DROWN:
                 state = State.DROWNING;
+                break;
             case BURN:
-                state = State.DEAD;
+                state = State.BURNT;
+                break;
             case FALL:
                 state = State.FALLING;
+                break;
             default:
         }
 
@@ -112,14 +132,16 @@ public class Peon {
                     return changeState(State.DEAD);
                 }
                 break;
-
             case FIGHTING:
             case ELECTRIFIED:
-
                 if (stateTimer < 0.2f) {
                     break; //still electrified
                 }
             //worn off - fallthrough.
+            case ATPAPALMAGNET:
+                if (player.peonMode == PeonMode.ANKH) {
+                    break;
+                }
             case DROWNING:
             case WAITING:
                 changed = true;
@@ -128,15 +150,15 @@ public class Peon {
             case WALKING:
                 strength -= seconds;
                 if (reachedDest()) {
-                    if (player.peonMode == PeonMode.ANKH && getPoint().distanceSq(player.getPapalMagnet()) == 0) {
-                        game.peons.getLeaders().put(player, this);
 
-                    }
                     ServerHouse h = game.houses.getHouse(getPoint().x, getPoint().y);
                     if (h != null) {
                         return changeState(h.addPeon(this, game.peons.getLeaders().containsValue(this)));
                     }
-
+                    if (player.peonMode == PeonMode.ANKH && getPoint().distanceSq(player.getPapalMagnet()) == 0) {
+                        game.peons.getLeaders().put(player, this);
+                        return changeState(State.ATPAPALMAGNET);
+                    }
                     float settleProb;
                     Random r = new Random();
                     switch (player.peonMode) {
@@ -186,7 +208,11 @@ public class Peon {
         changed = true;
     }
 
-    private Point findEnemy() {
+    protected float getSpeed() {
+        return 1.0f;
+    }
+
+    protected Point findEnemy(int radius) {
         Set<ServerPlayer> enemies = new HashSet<ServerPlayer>(game.players);
         enemies.remove(player);
         Point nearestPeon = nearestPeon(getPoint(), enemies, 8);
@@ -209,14 +235,14 @@ public class Peon {
                 nearest = nearestHouse;
             }
         }
-        if ((p.x - nearest.x) * (p.x - nearest.x) + (p.y - nearest.y) + (p.y - nearest.y) > 100) {
+        if ((p.x - nearest.x) * (p.x - nearest.x) + (p.y - nearest.y) + (p.y - nearest.y) > radius * radius) {
             return findFlatLand(getPoint(), 15);
         }
         return nearest;
 
     }
 
-    private Point findFriend() {
+    protected Point findFriend() {
         Set<ServerPlayer> me = new HashSet<ServerPlayer>();
         me.add(player);
         Point nearestPeon = nearestPeon(getPoint(), me, 8);
@@ -226,7 +252,7 @@ public class Peon {
         return nearestPeon;
     }
 
-    public Point nearestPeon(Point p, Set<ServerPlayer> players, int searchRadius) {
+    protected Point nearestPeon(Point p, Set<ServerPlayer> players, int searchRadius) {
         float d2 = game.heightMap.getWidth() * game.heightMap.getBreadth() + 1;
         Peon nearest = null;
         for (Peon peon : game.peons.getPeons()) {
@@ -245,15 +271,15 @@ public class Peon {
         return null;
     }
 
-    private PeonUpdate.Detail changeState(State s) {
+    protected PeonUpdate.Detail changeState(State s) {
         state = s;
         stateTimer = 0;
+        changed = false;
         return new PeonUpdate.Detail(id, state, pos.x, pos.y, shortDest.x, shortDest.y, dx, dy, player.getId());
     }
     Point temp = new Point();
 
-    private void pickNextShortDest() {
-        int tx, ty;
+    protected Point pickNextTarget() {
         Point target;
         switch (player.peonMode) {
             case ANKH:
@@ -274,7 +300,7 @@ public class Peon {
                 }
                 break;
             case FIGHT:
-                target = findEnemy();
+                target = findEnemy(10);
                 break;
             case GROUP:
                 target = findFriend();
@@ -284,6 +310,14 @@ public class Peon {
                 target = findFlatLand(getPoint(), 15);
                 break;
         }
+        return target;
+    }
+
+    protected void pickNextShortDest() {
+        Random r = new Random();
+
+        Point target = pickNextTarget();
+
         int[] score = new int[9];
         Point[] ps = Helpers.neighbours;
 
@@ -292,12 +326,13 @@ public class Peon {
             if (game.heightMap.tileInBounds(temp.x, temp.y) && !game.heightMap.getTile(temp.x, temp.y).isObstruction) {
                 if (target != null) {
                     if (ps[i].x == Integer.signum(target.x - getPoint().x)) {
-                        score[i]++;
+                        score[i] += 4;
                     }
                     if (ps[i].y == Integer.signum(target.y - getPoint().y)) {
-                        score[i]++;
+                        score[i] += 4;
                     }
                 }
+                score[i] += r.nextInt(5);
             }
         }
 
@@ -317,7 +352,7 @@ public class Peon {
         }
     }
 
-    private Point findFlatLand(Point start, int radius) {
+    protected Point findFlatLand(Point start, int radius) {
 
         int px, py;
         assert (radius > 0);
@@ -342,19 +377,19 @@ public class Peon {
         return null;
     }
 
-    private void setShortDest(Point p) {
+    protected void setShortDest(Point p) {
 
         shortDest.setLocation(p);
         dx = shortDest.x + 0.5f - pos.x;
         dy = shortDest.y + 0.5f - pos.y;
         float dist = (float) sqrt(dx * dx + dy * dy);
         if (dist > 0.01) {
-            dx = dx / dist;
-            dy = dy / dist;
+            dx = getSpeed() * dx / dist;
+            dy = getSpeed() * dy / dist;
         }
     }
 
-    private boolean reachedDest() {
+    protected boolean reachedDest() {
         float ex = pos.x - (shortDest.x + 0.5f);
         float ey = pos.y - (shortDest.y + 0.5f);
         if ((abs(ex) < 0.1 && abs(ey) < 0.1)) {
@@ -365,7 +400,7 @@ public class Peon {
         return false;
     }
 
-    private boolean inMiddleOfTile() {
+    protected boolean inMiddleOfTile() {
         float ex = pos.x - (shortDest.x + 0.5f);
         float ey = pos.y - (shortDest.y + 0.5f);
         if ((abs(ex) < 0.1 && abs(ey) < 0.1)) {

@@ -35,17 +35,18 @@ public abstract class Tool {
         defaultCursor = tk.createCustomCursor(tk.getImage(getClass().getResource("/com/novusradix/JavaPop/cursors/standard.png")), new Point(0, 0), "standard");
     }
 
-    public void PrimaryAction(Point p) {
+    public void PrimaryDown(Point p) {
     }
 
-    public void SecondaryAction(Point p) {
+    public void PrimaryUp(Point p) {
         GLToolButton.selectDefault();
     }
 
-    public void ButtonDown(Point p) {
+    public void SecondaryDown(Point p) {
     }
 
-    public void ButtonUp(Point p) {
+    public void SecondaryUp(Point p) {
+        GLToolButton.selectDefault();
     }
 
     public void Select() {

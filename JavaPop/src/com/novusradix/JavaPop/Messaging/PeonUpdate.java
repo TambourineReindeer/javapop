@@ -55,13 +55,13 @@ public class PeonUpdate extends Message implements Externalizable {
     public static class Detail {
 
         public int id;
-        public ServerPeons.State state;
+        public Peon.State state;
         public float dx,  dy;
         public int destx,  desty;
         public float posx,  posy;
         public int playerId;
 
-        public Detail(int id, ServerPeons.State state, float posx, float posy, int destx, int desty, float dx, float dy, int playerId) {
+        public Detail(int id, Peon.State state, float posx, float posy, int destx, int desty, float dx, float dy, int playerId) {
             this.id = id;
             this.state = state;
             this.dx = dx;
@@ -122,7 +122,7 @@ public class PeonUpdate extends Message implements Externalizable {
             }
             Detail d = tds[n];
             d.id = in.readInt();
-            d.state = ServerPeons.State.values()[in.readInt()];
+            d.state = Peon.State.values()[in.readInt()];
             d.dx = in.readFloat();
             d.dy = in.readFloat();
             d.posx = in.readFloat();

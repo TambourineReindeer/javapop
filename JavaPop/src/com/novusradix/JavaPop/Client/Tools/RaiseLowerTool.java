@@ -23,12 +23,12 @@ public class RaiseLowerTool extends Tool {
     }
 
     @Override
-    public void PrimaryAction(Point p) {
+    public void PrimaryDown(Point p) {
         client.sendMessage(new UpDown(p, true));
     }
 
     @Override
-    public void SecondaryAction(Point p) {
+    public void SecondaryDown(Point p) {
         if (overMyHouse(p)) {
             client.sendMessage(new Sprog(p));
         } else {

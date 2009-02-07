@@ -6,6 +6,7 @@ package com.novusradix.JavaPop.Server;
 
 import com.novusradix.JavaPop.Messaging.Lobby.GameList;
 import com.novusradix.JavaPop.Messaging.Message;
+import com.novusradix.JavaPop.Messaging.PlayerUpdate;
 import java.awt.Point;
 import java.io.Externalizable;
 import java.io.IOException;
@@ -64,6 +65,7 @@ public class ServerPlayer implements Runnable, com.novusradix.JavaPop.Player {
 
     public void MoveAnkh(Point where) {
         info.ankh.setLocation(where);
+        currentGame.sendAllPlayers(new PlayerUpdate(info));
     }
 
     public int getId() {
@@ -139,7 +141,7 @@ public class ServerPlayer implements Runnable, com.novusradix.JavaPop.Player {
     public double getMana() {
         return info.mana;
     }
-    
+
     public static class Info implements Externalizable {
 
         public int id;

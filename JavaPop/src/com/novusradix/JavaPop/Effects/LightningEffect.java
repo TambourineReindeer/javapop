@@ -3,7 +3,7 @@ package com.novusradix.JavaPop.Effects;
 import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Server.ServerGame;
 import com.novusradix.JavaPop.Server.Peons.Peon;
-import com.novusradix.JavaPop.Server.ServerPeons.State;
+import com.novusradix.JavaPop.Server.Peons.Peon.State;
 import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 import java.io.IOException;

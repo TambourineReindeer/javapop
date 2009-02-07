@@ -19,8 +19,8 @@ public class LavaTrailEffect extends Effect {
 
     
 
-    public LavaTrailEffect(Point o, Direction d) {
-        origin = o;
+    public LavaTrailEffect(int x, int y, Direction d) {
+        origin = new Point(x,y);
         direction = d;
         length = 1;
         age = 0;
