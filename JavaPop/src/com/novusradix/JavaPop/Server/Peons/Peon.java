@@ -5,7 +5,7 @@ import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.PeonUpdate;
 import com.novusradix.JavaPop.Server.ServerGame;
 import com.novusradix.JavaPop.Server.ServerHouses.ServerHouse;
-
+import com.novusradix.JavaPop.Server.ServerPeons.Action;
 import com.novusradix.JavaPop.Server.ServerPlayer;
 import com.novusradix.JavaPop.Server.ServerPlayer.PeonMode;
 import java.awt.Point;

@@ -177,7 +177,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
                 }
             }
             displayCursor(gl);
-text.drawString(gl, "ABCDEFGHIHJLMNOPQRSTUVWXYZ", 0, 0, 0.05f);
+text.drawString(gl, "JavaPop", 0, 0, 0.05f);
             gl.glMatrixMode(GL.GL_MODELVIEW);
             gl.glPopMatrix();
 
@@ -480,7 +480,7 @@ text.drawString(gl, "ABCDEFGHIHJLMNOPQRSTUVWXYZ", 0, 0, 0.05f);
                 GLToolButton.getSelected().PrimaryUp(selected);
             }
             if (e.getButton() == MouseEvent.BUTTON3) {
-            GLToolButton.getSelected().SecondaryUp(selected);
+                GLToolButton.getSelected().SecondaryUp(selected);
             }
         }
         
