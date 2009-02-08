@@ -3,6 +3,7 @@ package com.novusradix.JavaPop.Server.Peons;
 import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Messaging.PeonUpdate.Detail;
 import com.novusradix.JavaPop.Server.ServerHouses.ServerHouse;
+import com.novusradix.JavaPop.Server.ServerPeons.Action;
 import java.awt.Point;
 import static java.lang.Math.*;
 
