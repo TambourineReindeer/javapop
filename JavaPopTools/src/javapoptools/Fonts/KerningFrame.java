@@ -46,8 +46,6 @@ public class KerningFrame extends JFrame implements WindowListener {
     }
 
     public void windowClosed(WindowEvent e) {
-        a.stop();
-        dispose();
     }
 
     public void windowIconified(WindowEvent e) {
