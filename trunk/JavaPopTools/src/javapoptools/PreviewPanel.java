@@ -97,6 +97,8 @@ public class PreviewPanel extends GLCanvas implements GLEventListener {
         gl.glColorMaterial(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT_AND_DIFFUSE);
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA);
+        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
+        
         vertexShader = gl.glCreateShader(GL.GL_VERTEX_SHADER);
         fragmentShader = gl.glCreateShader(GL.GL_FRAGMENT_SHADER);
         shaderProgram = gl.glCreateProgram();

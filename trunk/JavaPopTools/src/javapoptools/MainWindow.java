@@ -42,14 +42,14 @@ public class MainWindow extends javax.swing.JFrame {
         chooser = new JFileChooser();
         GLCapabilities caps = new GLCapabilities();
         caps.setSampleBuffers(true);
-        caps.setNumSamples(8);
+        caps.setNumSamples(4);
         mp = new PreviewPanel(caps, this);
 
 
         mp.setPreferredSize(new Dimension(128, 128));
         previewPanel.add(mp);
 
-        XImporter i = new XImporter(getClass().getResource("/com/novusradix/JavaPop/models/peon5.x"));
+        XImporter i = new XImporter(getClass().getResource("/com/novusradix/JavaPop/models/peon5.model"));
         vertexEditor.setText(loadText(getClass().getResource("/com/novusradix/JavaPop/Client/Shaders/ModelVertex.shader")));
         fragmentEditor.setText(loadText(getClass().getResource("/com/novusradix/JavaPop/Client/Shaders/ModelFragment.shader")));
         modelName = "peon5";
@@ -483,12 +483,10 @@ private void OpenMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 }//GEN-LAST:event_OpenMenuItemActionPerformed
 
 private void jSlider1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider1StateChanged
-// TODO add your handling code here:
     mp.setZoom(jSlider1.getValue());
 }//GEN-LAST:event_jSlider1StateChanged
 
 private void openTextureMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openTextureMenuItemActionPerformed
-// TODO add your handling code here:
 
     Preferences p = Preferences.userNodeForPackage(this.getClass());
     String dir = p.get("TextureDir", null);
@@ -512,28 +510,23 @@ private void openTextureMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
 }//GEN-LAST:event_openTextureMenuItemActionPerformed
 
 private void renderFixedFunctionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_renderFixedFunctionActionPerformed
-// TODO add your handling code here:
     mp.setPipeline(PreviewPanel.Pipeline.FIXED);
 }//GEN-LAST:event_renderFixedFunctionActionPerformed
 
 private void renderDefaultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_renderDefaultActionPerformed
-// TODO add your handling code here:
     mp.setPipeline(PreviewPanel.Pipeline.DEFAULT);
 
 }//GEN-LAST:event_renderDefaultActionPerformed
 
 private void renderCustomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_renderCustomActionPerformed
-// TODO add your handling code here:
     mp.setPipeline(PreviewPanel.Pipeline.CUSTOM);
 
 }//GEN-LAST:event_renderCustomActionPerformed
 
 private void jSplitPane2ComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jSplitPane2ComponentResized
-// TODO add your handling code here:
 }//GEN-LAST:event_jSplitPane2ComponentResized
 
 private void SaveModelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveModelActionPerformed
-// TODO add your handling code here:
     Preferences p = Preferences.userNodeForPackage(this.getClass());
     String dir = p.get("ModelSaveDir", null);
     if (dir != null) {
