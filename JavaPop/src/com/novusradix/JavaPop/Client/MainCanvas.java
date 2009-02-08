@@ -12,7 +12,6 @@ import com.novusradix.JavaPop.Effects.Effect;
 import com.novusradix.JavaPop.Server.ServerPlayer.PeonMode;
 import java.awt.Point;
 
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -61,6 +60,8 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private float tileSize = 64;
     private boolean zoomChanged = false;
 
+    private final GLText text;
+
     public MainCanvas(GLCapabilities caps, Game g) {
         super(caps);
         glHelper = GLHelper.glHelper;
@@ -95,6 +96,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         }
 
         mouseIsOver = false;
+        text = new GLText();
     }
 
     public void display(final GLAutoDrawable glAD) {
@@ -175,7 +177,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
                 }
             }
             displayCursor(gl);
-
+text.drawString(gl, "ABCDEFGHIHJLMNOPQRSTUVWXYZ", 0, 0, 0.05f);
             gl.glMatrixMode(GL.GL_MODELVIEW);
             gl.glPopMatrix();
 
@@ -255,7 +257,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     public void init(final GLAutoDrawable glDrawable) {
         //Called before first display and on fullscreen/mode changes
-        //glDrawable.setGL(new DebugGL(glDrawable.getGL()));
+        glDrawable.setGL(new DebugGL(glDrawable.getGL()));
 
         final GL gl = glDrawable.getGL();
         Logger.getLogger(MainCanvas.class.getName()).log(Level.INFO, "GL Init");
@@ -285,6 +287,9 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             for (GLObject glo : game.transparentObjects) {
                 glo.init(gl);
             }
+            glHelper.checkGL(gl);
+
+            text.init(gl);
             glHelper.checkGL(gl);
         } catch (GLHelperException ex) {
             Logger.getLogger(MainCanvas.class.getName()).log(Level.SEVERE, null, ex);
