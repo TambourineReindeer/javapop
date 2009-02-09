@@ -177,7 +177,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
                 }
             }
             displayCursor(gl);
-text.drawString(gl, "JavaPop", 0, 0, 0.05f);
             gl.glMatrixMode(GL.GL_MODELVIEW);
             gl.glPopMatrix();
 

@@ -103,13 +103,17 @@ public class GLText {
             if ('A' <= c && c <= 'Z') {
                 index = c - 'A';
                 scale = 1.0f;
-            }
+            } else
             if ('a' <= c && c <= 'z') {
                 index = c - 'a';
                 scale = 0.7f;
+            } else{
+                x+=size*0.6f*lastScale;
+                
+                continue;
             }
             if (!first) {
-                x += (scale + lastScale) / 2.0f * size * kerning[lastIndex][index];
+                x += (scale * 0.0f + lastScale*1.0f) * size * kerning[lastIndex][index];
             }
             first = false;
             drawChar(gl, index, x, y, size*scale);
@@ -140,16 +144,16 @@ public class GLText {
         gl.glBegin(GL.GL_QUADS);
         {
             gl.glTexCoord2f(tx, ty);
-            gl.glVertex2f(x, y + size);
+            gl.glVertex2f(x, y + 0.8f*size);
 
             gl.glTexCoord2f(tx, ty + 1.0f / 8.0f);
-            gl.glVertex2f(x, y);
+            gl.glVertex2f(x, y - 0.2f*size);
 
             gl.glTexCoord2f(tx + 1.0f / 8.0f, ty + 1.0f / 8.0f);
-            gl.glVertex2f(x + size, y);
+            gl.glVertex2f(x + size, y - 0.2f*size);
 
             gl.glTexCoord2f(tx + 1.0f / 8.0f, ty);
-            gl.glVertex2f(x + size, y + size);
+            gl.glVertex2f(x + size, y + 0.8f*size);
         }
         gl.glEnd();
     }
