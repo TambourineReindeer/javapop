@@ -19,6 +19,7 @@ import javax.media.opengl.GLEventListener;
 public class KerningPanel extends GLCanvas implements GLEventListener, MouseListener, KeyListener {
 
     GLText text;
+    private String testString;
 
     KerningPanel(GLCapabilities caps) {
         super(caps);
@@ -26,6 +27,7 @@ public class KerningPanel extends GLCanvas implements GLEventListener, MouseList
         addMouseListener(this);
         addKeyListener(this);
         text = new GLText();
+        testString = "The Quick Brown JavaPop";
     }
 
     public void init(GLAutoDrawable glad) {
@@ -47,9 +49,10 @@ public class KerningPanel extends GLCanvas implements GLEventListener, MouseList
             for (int b = 0; b < 26; b++) {
                 sb.setCharAt(1, (char) ('A' + b));
                 String s = sb.toString();
-                text.drawString(gl, s, a / 26.0f, b / 26.0f, 0.02f);
+                text.drawString(gl, s, a / 27.0f, b / 27.0f, 0.02f);
             }
         }
+        text.drawString(gl, testString, 0, 26.0f/27.0f, 0.04f);
     }
 
     public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {
@@ -61,13 +64,17 @@ public class KerningPanel extends GLCanvas implements GLEventListener, MouseList
     public void mouseClicked(MouseEvent e) {
         Point p = e.getPoint();
         int a, b;
-        a = 26 * p.x / getWidth();
-        b = 25 - 26 * p.y / getHeight();
+        a = 27 * p.x / getWidth();
+        b = 26 - 27 * p.y / getHeight();
 
-        if (e.getButton() == MouseEvent.BUTTON3 || e.getModifiersEx() == MouseEvent.CTRL_DOWN_MASK) {
-            text.increaseKern(a, b);
-        } else {
-            text.decreaseKern(a, b);
+        if (a <26  && b<26) {
+            
+
+            if (e.getButton() == MouseEvent.BUTTON3 || e.getModifiersEx() == MouseEvent.CTRL_DOWN_MASK) {
+                text.increaseKern(a, b);
+            } else {
+                text.decreaseKern(a, b);
+            }
         }
     }
 
@@ -98,5 +105,9 @@ public class KerningPanel extends GLCanvas implements GLEventListener, MouseList
     }
 
     public void keyReleased(KeyEvent arg0) {
+    }
+
+    void setText(String text) {
+        testString = text;
     }
 }
