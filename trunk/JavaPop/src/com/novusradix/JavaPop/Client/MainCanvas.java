@@ -182,7 +182,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
             flush(gl);
             handleKeys();
-            //printFPS();
+            printFPS(gl);
 
             glHelper.checkGL(gl);
 
@@ -493,16 +493,19 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         }
     }
 
-    private void printFPS() {
+    private String fpsstring="";
+    private void printFPS(GL gl) {
         if (frameCount % 100 == 0) {
             long t = System.currentTimeMillis();
 
             if (frameCount > 0) {
                 float fps = 100000.0f / (t - frameTime);
-                System.out.print(fps + " fps\n");
+
+                fpsstring = String.format("%1.2f", fps) + " fps";
             }
             frameTime = t;
         }
         frameCount++;
+        text.drawString(gl, fpsstring,0.01f,0.01f,0.02f);
     }
 }
