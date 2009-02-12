@@ -20,6 +20,26 @@ public class KerningPanel extends GLCanvas implements GLEventListener, MouseList
 
     GLText text;
     private String testString;
+    private PageType currentpage;
+    private char currentChar;
+    private char[] row,  column;
+    private static final char[] alpha = new char[]{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+    private static final char[] numeric = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    private static final char[] symbols = new char[]{',', '.', '!', '?'};
+    private static final char[] all;
+
+
+    static {
+        all = new char[alpha.length + numeric.length + symbols.length];
+        System.arraycopy(alpha, 0, all, 0, alpha.length);
+        System.arraycopy(numeric, 0, all, alpha.length, numeric.length);
+        System.arraycopy(symbols, 0, all, alpha.length + numeric.length, symbols.length);
+    }
+
+    public enum PageType {
+
+        ALPHA, NUMERIC, SYMBOLS, CHARACTER
+    };
 
     KerningPanel(GLCapabilities caps) {
         super(caps);
@@ -28,6 +48,11 @@ public class KerningPanel extends GLCanvas implements GLEventListener, MouseList
         addKeyListener(this);
         text = new GLText();
         testString = "The Quick Brown JavaPop";
+
+        row = alpha;
+        column = alpha;
+        currentpage = PageType.ALPHA;
+        currentChar ='Q';
     }
 
     public void init(GLAutoDrawable glad) {
@@ -43,16 +68,21 @@ public class KerningPanel extends GLCanvas implements GLEventListener, MouseList
         StringBuffer sb = new StringBuffer();
         sb.setLength(2);
 
-        for (int a = 0; a < 26; a++) {
-            sb.setCharAt(0, (char) ('A' + a));
 
-            for (int b = 0; b < 26; b++) {
-                sb.setCharAt(1, (char) ('A' + b));
+
+        for (int a = 0; a < row.length; a++) {
+            sb.setCharAt(0, row[a]);
+
+            for (int b = 0; b < column.length; b++) {
+                sb.setCharAt(1, column[b]);
                 String s = sb.toString();
-                text.drawString(gl, s, a / 27.0f, b / 27.0f, 0.02f);
+                text.drawString(gl, s, (float) a / row.length, (float) b / column.length * 0.95f, 0.04f);
             }
         }
-        text.drawString(gl, testString, 0, 26.0f/27.0f, 0.04f);
+
+
+
+        text.drawString(gl, testString, 0, 0.95f, 0.05f);
     }
 
     public void reshape(GLAutoDrawable arg0, int arg1, int arg2, int arg3, int arg4) {
@@ -64,16 +94,15 @@ public class KerningPanel extends GLCanvas implements GLEventListener, MouseList
     public void mouseClicked(MouseEvent e) {
         Point p = e.getPoint();
         int a, b;
-        a = 27 * p.x / getWidth();
-        b = 26 - 27 * p.y / getHeight();
+        a = row.length * p.x / getWidth();
+        b = (int) (column.length * (1.0f - 1.0f*p.y / getHeight())/0.95f);
 
-        if (a <26  && b<26) {
-            
+        if (a < row.length && b < column.length) {
 
             if (e.getButton() == MouseEvent.BUTTON3 || e.getModifiersEx() == MouseEvent.CTRL_DOWN_MASK) {
-                text.increaseKern(a, b);
+                text.increaseKern(row[a], column[b]);
             } else {
-                text.decreaseKern(a, b);
+                text.decreaseKern(row[a], column[b]);
             }
         }
     }
@@ -109,5 +138,39 @@ public class KerningPanel extends GLCanvas implements GLEventListener, MouseList
 
     void setText(String text) {
         testString = text;
+    }
+
+    void setPage(PageType p) {
+        currentpage = p;
+        setRowAndColumn();
+    }
+
+    void setCharacter(char c) {
+        currentChar = c;
+        setRowAndColumn();
+    }
+
+    private void setRowAndColumn() {
+        switch (currentpage) {
+            case ALPHA:
+                row = column = alpha;
+                break;
+            case NUMERIC:
+                row = column = numeric;
+                break;
+            case SYMBOLS:
+                row = alpha;
+                column = symbols;
+                break;
+            case CHARACTER:
+                row = all;
+                column = new char[]{currentChar};
+                break;
+        }
+    }
+    public void setRowAndColumn(String r, String c)
+    {
+        row = r.toCharArray();
+        column = c.toCharArray();
     }
 }
