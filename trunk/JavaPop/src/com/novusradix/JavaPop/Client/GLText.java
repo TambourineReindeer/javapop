@@ -24,7 +24,7 @@ public class GLText {
 
     private static final char[] alpha = new char[]{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
     private static final char[] numeric = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-    private static final char[] symbols = new char[]{',', '.', '!', '?'};
+    private static final char[] symbols = new char[]{'.', ',', '!', '?'};
     private static String all;
 
 
@@ -40,7 +40,7 @@ public class GLText {
 
     class KernPair {
 
-        char a, b;
+        final char a,  b;
 
         public KernPair(char a, char b) {
             this.a = a;
@@ -70,37 +70,27 @@ public class GLText {
     }
 
     private void loadKerning() {
+        int i;
         try {
             DataInputStream is;
+
             try {
                 is = new DataInputStream(new FileInputStream("kerning2.dat"));
-                kerning = new HashMap<KernPair, Float>();
-                int n = is.read();
-                char a, b;
-                float f;
-                //for (int i = 0; i < n; i++) {
-                while(true)
-                {
-                    a = is.readChar();
-                    b = is.readChar();
-                    f = is.readFloat();
-                    kerning.put(new KernPair(a, b), f);
-                }
-            } catch (IOException e) {
-                try {
-                    is = new DataInputStream(new FileInputStream("kerning.dat"));
-                } catch (FileNotFoundException e2) {
-                    is = new DataInputStream(getClass().getResourceAsStream("/com/novusradix/JavaPop/kerning.dat"));
-                }
-                float f;
-                for (int a = 0; a < 26; a++) {
-                    for (int b = 0; b < 26; b++) {
-                        f = is.readFloat();
-                        kerning.put(new KernPair(alpha[a], alpha[b]), f);
-                        kerning.put(new KernPair((char) (alpha[a] - 'A' + 'a'),(char) (alpha[b] - 'A' + 'a')), f);
-                    }
-                }
+            } catch (FileNotFoundException e2) {
+                is = new DataInputStream(getClass().getResourceAsStream("/com/novusradix/JavaPop/kerning2.dat"));
             }
+            kerning = new HashMap<KernPair, Float>();
+            int n = is.readInt();
+            char a, b;
+            float f;
+
+            for (i = 0; i < n; i++) {
+                a = is.readChar();
+                b = is.readChar();
+                f = is.readFloat();
+                kerning.put(new KernPair(a, b), f);
+            }
+
         } catch (IOException ex) {
             for (int a = 0; a < 26; a++) {
                 for (int b = 0; b < 26; b++) {
