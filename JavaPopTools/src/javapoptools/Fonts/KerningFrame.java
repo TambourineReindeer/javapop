@@ -27,7 +27,7 @@ public class KerningFrame extends JFrame implements WindowListener {
     private JTextField row,  column;
 
     KerningFrame() {
-        this.setSize(800, 800);
+        this.setSize(800, 820);
         this.setLayout(new BorderLayout());
         GLCapabilities caps = new GLCapabilities();
         caps.setSampleBuffers(true);
@@ -56,8 +56,8 @@ public class KerningFrame extends JFrame implements WindowListener {
 
         row = new JTextField(20);
         column = new JTextField(20);
-        row.setText("ABCDEFGHIJKLMNOPQRTUVWXYZ");
-        column.setText("ABCDEFGHIJKLMNOPQRTUVWXYZ");
+        row.setText("ABCDEFGHIJKLM");
+        column.setText("NOPQRTUVWXYZ");
 
 
         controls.add(row);
@@ -71,6 +71,7 @@ public class KerningFrame extends JFrame implements WindowListener {
         row.addActionListener(al);
         column.addActionListener(al);
 
+        al.actionPerformed(null);
     }
 
     public static void main(String[] args) {
