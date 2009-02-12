@@ -8,7 +8,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.lang.Float;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.GL;
@@ -19,40 +22,103 @@ import javax.media.opengl.GL;
  */
 public class GLText {
 
+    private static final char[] alpha = new char[]{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+    private static final char[] numeric = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    private static final char[] symbols = new char[]{',', '.', '!', '?'};
+    private static String all;
+
+
+    static {
+        char[] allChars = new char[alpha.length + numeric.length + symbols.length];
+        System.arraycopy(alpha, 0, allChars, 0, alpha.length);
+        System.arraycopy(numeric, 0, allChars, alpha.length, numeric.length);
+        System.arraycopy(symbols, 0, allChars, alpha.length + numeric.length, symbols.length);
+        all = new String(allChars);
+    }
     Texture font;
-    private float[][] kerning;
+    private Map<KernPair, Float> kerning;
+
+    class KernPair {
+
+        char a, b;
+
+        public KernPair(char a, char b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o.getClass() == KernPair.class) {
+                return ((KernPair) o).a == a && ((KernPair) o).b == b;
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 41 * hash + this.a;
+            hash = 41 * hash + this.b;
+            return hash;
+        }
+    }
 
     public GLText() {
-        kerning = new float[26][26];
+        kerning = new HashMap<KernPair, Float>();
+        loadKerning();
+    }
+
+    private void loadKerning() {
         try {
             DataInputStream is;
             try {
-                is = new DataInputStream(new FileInputStream("kerning.dat"));
-            } catch (FileNotFoundException e) {
-                is = new DataInputStream(getClass().getResourceAsStream("/com/novusradix/JavaPop/kerning.dat"));
-            }
-            for (int a = 0; a < 26; a++) {
-                for (int b = 0; b < 26; b++) {
-                    kerning[a][b] = is.readFloat();
+                is = new DataInputStream(new FileInputStream("kerning2.dat"));
+                kerning = new HashMap<KernPair, Float>();
+                int n = is.read();
+                char a, b;
+                float f;
+                //for (int i = 0; i < n; i++) {
+                while(true)
+                {
+                    a = is.readChar();
+                    b = is.readChar();
+                    f = is.readFloat();
+                    kerning.put(new KernPair(a, b), f);
+                }
+            } catch (IOException e) {
+                try {
+                    is = new DataInputStream(new FileInputStream("kerning.dat"));
+                } catch (FileNotFoundException e2) {
+                    is = new DataInputStream(getClass().getResourceAsStream("/com/novusradix/JavaPop/kerning.dat"));
+                }
+                float f;
+                for (int a = 0; a < 26; a++) {
+                    for (int b = 0; b < 26; b++) {
+                        f = is.readFloat();
+                        kerning.put(new KernPair(alpha[a], alpha[b]), f);
+                        kerning.put(new KernPair((char) (alpha[a] - 'A' + 'a'),(char) (alpha[b] - 'A' + 'a')), f);
+                    }
                 }
             }
         } catch (IOException ex) {
             for (int a = 0; a < 26; a++) {
                 for (int b = 0; b < 26; b++) {
-                    kerning[a][b] = 0.7f;
+                    kerning.put(new KernPair(alpha[a], alpha[b]), 0.7f);
                 }
             }
         }
-
     }
 
     public void saveKerning() {
         try {
-            DataOutputStream os = new DataOutputStream(new FileOutputStream("kerning.dat"));
-            for (int a = 0; a < 26; a++) {
-                for (int b = 0; b < 26; b++) {
-                    os.writeFloat(kerning[a][b]);
-                }
+            DataOutputStream os = new DataOutputStream(new FileOutputStream("kerning2.dat"));
+            os.writeInt(kerning.size());
+
+            for (Entry<KernPair, Float> e : kerning.entrySet()) {
+                os.writeChar(e.getKey().a);
+                os.writeChar(e.getKey().b);
+                os.writeFloat(e.getValue());
             }
             os.close();
         } catch (IOException ex) {
@@ -60,12 +126,29 @@ public class GLText {
         }
     }
 
-    public void increaseKern(int a, int b) {
-        kerning[a][b] += 0.05f;
+    private float getKern(KernPair k) {
+        Float f = kerning.get(k);
+        if (f != null) {
+            return f;
+        }
+        return 0.7f;
     }
 
-    public void decreaseKern(int a, int b) {
-        kerning[a][b] -= 0.05f;
+    private float getKern(char a, char b) {
+        KernPair k = new KernPair(a, b);
+        return getKern(k);
+    }
+
+    public void increaseKern(char a, char b) {
+        KernPair k = new KernPair(a, b);
+        float f = getKern(k);
+        kerning.put(k, f + 0.05f);
+    }
+
+    public void decreaseKern(char a, char b) {
+        KernPair k = new KernPair(a, b);
+        float f = getKern(k);
+        kerning.put(k, f - 0.05f);
     }
 
     public void drawString(GL gl, String text, float x, float y, float size) {
@@ -94,30 +177,28 @@ public class GLText {
         gl.glActiveTexture(GL.GL_TEXTURE0);
         font.bind();
 
-        int lastIndex = 0;
+        char lastChar = 0;
         float lastScale = 1.0f;
         boolean first = true;
         for (char c : text.toCharArray()) {
             int index = 0;
             float scale = 1.0f;
-            if ('A' <= c && c <= 'Z') {
-                index = c - 'A';
-                scale = 1.0f;
-            } else
-            if ('a' <= c && c <= 'z') {
-                index = c - 'a';
-                scale = 0.7f;
-            } else{
-                x+=size*0.6f*lastScale;
-                
-                continue;
+            index = all.indexOf(c);
+            if (index == -1) {
+                index = all.toLowerCase().indexOf(c);
+                if (index != -1) {
+                    scale = 0.7f;
+                } else {
+                    x += size * 0.6f * lastScale;
+                    continue;
+                }
             }
             if (!first) {
-                x += (scale * 0.0f + lastScale*1.0f) * size * kerning[lastIndex][index];
+                x += (scale * 0.0f + lastScale * 1.0f) * size * getKern(lastChar, c);
             }
             first = false;
-            drawChar(gl, index, x, y, size*scale);
-            lastIndex = index;
+            drawChar(gl, index, x, y, size * scale);
+            lastChar = c;
             lastScale = scale;
 
         }
@@ -144,16 +225,16 @@ public class GLText {
         gl.glBegin(GL.GL_QUADS);
         {
             gl.glTexCoord2f(tx, ty);
-            gl.glVertex2f(x, y + 0.8f*size);
+            gl.glVertex2f(x, y + 0.8f * size);
 
             gl.glTexCoord2f(tx, ty + 1.0f / 8.0f);
-            gl.glVertex2f(x, y - 0.2f*size);
+            gl.glVertex2f(x, y - 0.2f * size);
 
             gl.glTexCoord2f(tx + 1.0f / 8.0f, ty + 1.0f / 8.0f);
-            gl.glVertex2f(x + size, y - 0.2f*size);
+            gl.glVertex2f(x + size, y - 0.2f * size);
 
             gl.glTexCoord2f(tx + 1.0f / 8.0f, ty);
-            gl.glVertex2f(x + size, y + 0.8f*size);
+            gl.glVertex2f(x + size, y + 0.8f * size);
         }
         gl.glEnd();
     }
