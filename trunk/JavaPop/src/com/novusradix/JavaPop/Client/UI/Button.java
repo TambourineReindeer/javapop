@@ -1,11 +1,12 @@
-package com.novusradix.JavaPop.Client;
+package com.novusradix.JavaPop.Client.UI;
 
+import com.novusradix.JavaPop.Client.*;
 import com.sun.opengl.util.texture.Texture;
+import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.GL;
@@ -15,7 +16,7 @@ import javax.media.opengl.GLException;
  *
  * @author gef
  * */
-public abstract class GLButton implements GLObject, GLClickable {
+public abstract class Button implements GLObject2D, Clickable {
 
     Polygon buttonShape;
     boolean enabled;
@@ -23,63 +24,47 @@ public abstract class GLButton implements GLObject, GLClickable {
     String texname;
     Texture tex, marble;
     boolean flipx, flipy;
-    private static int[] view = new int[4];
 
-    private GLButton() {
+    private Button() {
     }
 
-    protected GLButton(ClickableHandler ch, Collection<GLObject> objects) {
+    protected Button(ClickableHandler ch) {
         enabled = true;
         visible = false;
         ch.addClickable(this);
-        objects.add(this);
     }
 
     protected abstract boolean isSelected();
 
     public abstract void select();
 
-    public void display(GL gl, float time) {
+    public void display(GL gl, float time, int screenWidth, int screenHeight) {
         //TODO: most of this only needs to be done once per frame, not per button.
         if (!visible) {
             return;
         }
-        gl.glGetIntegerv(GL.GL_VIEWPORT, view, 0);
-        gl.glMatrixMode(GL.GL_PROJECTION);
-        gl.glPushMatrix();
-        gl.glLoadIdentity();
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPushMatrix();
-        gl.glLoadIdentity();
-        gl.glScalef(2.0f, 2.0f, 1.0f);
         if (flipx) {
+            gl.glTranslatef(1.0f, 0.0f, 0.0f);
             gl.glScalef(-1.0f, 1.0f, 1.0f);
         }
-        if (!flipy) {
+        if (flipy) {
+            gl.glTranslatef(0.0f, 1.0f, 0.0f);
             gl.glScalef(1.0f, -1.0f, 1.0f);
         }
-        gl.glTranslatef(-0.5f, -0.5f, 0.0f);
-        gl.glScalef(1.0f / view[2], 1.0f / view[3], 1.0f);
-        gl.glDisable(GL.GL_LIGHTING);
-        gl.glEnable(GL.GL_BLEND);
-        gl.glShadeModel(GL.GL_FLAT);
-        gl.glEnable(GL.GL_TEXTURE_2D);
-        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR_MIPMAP_LINEAR);
-        gl.glUseProgram(0);
+        gl.glScalef(1.0f / screenWidth, 1.0f / screenHeight, 1.0f);
         if (isSelected() || (mDown && mOver)) {
             gl.glColor3f(0.6f, 0.6f, 0.8f);
         } else {
             gl.glColor3f(0.8f, 0.8f, 0.8f);
         }
+        gl.glActiveTexture(GL.GL_TEXTURE0);
         marble.enable();
         marble.bind();
         gl.glMatrixMode(GL.GL_TEXTURE);
         gl.glPushMatrix();
-
         gl.glLoadIdentity();
-        gl.glPushMatrix();
-        //gl.glScalef(0.1f, 0.2f, 0.1f);
-
         gl.glBegin(GL.GL_POLYGON);
 
         for (int n = 0; n < buttonShape.npoints; n++) {
@@ -87,7 +72,7 @@ public abstract class GLButton implements GLObject, GLClickable {
             gl.glVertex3f(buttonShape.xpoints[n], buttonShape.ypoints[n], -0.5f);
         }
         gl.glEnd();
-        gl.glPopMatrix();
+
         tex.enable();
         tex.bind();
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
@@ -103,8 +88,6 @@ public abstract class GLButton implements GLObject, GLClickable {
         gl.glMatrixMode(GL.GL_MODELVIEW);
         gl.glPopMatrix();
 
-        gl.glMatrixMode(GL.GL_PROJECTION);
-        gl.glPopMatrix();
     }
 
     public void init(GL gl) {
@@ -113,9 +96,9 @@ public abstract class GLButton implements GLObject, GLClickable {
             tex = MainCanvas.glHelper.getTexture(gl, texname);
             marble = MainCanvas.glHelper.getTexture(gl, "/com/novusradix/JavaPop/textures/marble.png");
         } catch (IOException ex) {
-            Logger.getLogger(GLButton.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Button.class.getName()).log(Level.SEVERE, null, ex);
         } catch (GLException ex) {
-            Logger.getLogger(GLButton.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Button.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -143,12 +126,19 @@ public abstract class GLButton implements GLObject, GLClickable {
         mOver = false;
     }
 
+    public void mouseDrag(float oldX, float oldY, float newX, float newY) {
+    }
+
     public boolean anchorLeft() {
         return !flipx;
     }
 
     public boolean anchorTop() {
         return !flipy;
+    }
+
+    public boolean inScreenSpace() {
+        return true;
     }
 
     public boolean isVisible() {

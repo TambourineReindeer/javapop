@@ -1,30 +1,28 @@
-package com.novusradix.JavaPop.Client;
+package com.novusradix.JavaPop.Client.UI;
 
 import com.novusradix.JavaPop.Client.Tools.RaiseLowerTool;
 import com.novusradix.JavaPop.Client.Tools.Tool;
+import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Polygon;
-import java.util.Collection;
 
 /**
  *
  * @author gef
  */
-public class GLToolButton extends GLButton {
+public class ToolButton extends Button {
 
-    private static GLToolButton selected;
-    private static GLToolButton defaultToolButton;
-    
+    private static ToolButton selected;
+    private static ToolButton defaultToolButton;
     private Tool tool;
-    private GLToolGroupButton groupButton;
-    
-    public Tool getTool()
-    {
+    private ToolGroupButton groupButton;
+
+    public Tool getTool() {
         return tool;
     }
-    
-    public GLToolButton(Tool t, GLToolGroupButton parent, ClickableHandler ch, Collection<GLObject> objects) {
-        super(ch, objects);
+
+    public ToolButton(Tool t, ToolGroupButton parent, ClickableHandler ch) {
+        super(ch);
         tool = t;
         int[] x, y;
         x = new int[4];
@@ -46,27 +44,27 @@ public class GLToolButton extends GLButton {
         y[1] = p.y + 25;
         y[2] = p.y;
         y[3] = p.y - 25;
-        
+
         visible = false;
         texname = t.getIconName();
         buttonShape = new Polygon(x, y, 4);
         groupButton = parent;
-        
-        if(t.getClass() == RaiseLowerTool.class)
+
+        if (t.getClass() == RaiseLowerTool.class) {
             defaultToolButton = this;
+        }
     }
 
-    public static void selectDefault()
-    {
-        if(defaultToolButton!=null)
+    public static void selectDefault() {
+        if (defaultToolButton != null) {
             defaultToolButton.select();
+        }
     }
-    
-    public static Tool getSelected()
-    {
+
+    public static Tool getSelected() {
         return selected.tool;
     }
-    
+
     @Override
     public void select() {
         selected = this;
@@ -76,8 +74,10 @@ public class GLToolButton extends GLButton {
 
     @Override
     protected boolean isSelected() {
-        return selected==this;
+        return selected == this;
     }
 
-    
+    public Cursor getCursor() {
+        return Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+    }
 }

@@ -3,15 +3,23 @@
  */
 package com.novusradix.JavaPop.Client;
 
+import com.novusradix.JavaPop.Client.UI.GLText;
+import com.novusradix.JavaPop.Client.UI.ToolGroupButton;
+import com.novusradix.JavaPop.Client.UI.ClickableHandler;
+import com.novusradix.JavaPop.Client.UI.BehaviourButton;
+import com.novusradix.JavaPop.Client.UI.ToolButton;
 import com.novusradix.JavaPop.Client.GLHelper.GLHelperException;
 import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Client.Tools.ToolGroup;
+import com.novusradix.JavaPop.Client.UI.GLObject2D;
+import com.novusradix.JavaPop.Client.UI.Panel;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Effects.Effect;
 import com.novusradix.JavaPop.Server.ServerPlayer.PeonMode;
 import java.awt.Point;
 
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -28,6 +36,9 @@ import javax.media.opengl.GLEventListener;
 
 
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.DebugGL;
@@ -59,7 +70,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     public static GLHelper glHelper;
     private float tileSize = 64;
     private boolean zoomChanged = false;
-
+    private Collection<GLObject2D> uiObjects;
     private final GLText text;
 
     public MainCanvas(GLCapabilities caps, Game g) {
@@ -82,19 +93,25 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         xPos = 0;
         yPos = 0;
 
+        uiObjects = new ArrayList<GLObject2D>();
         for (ToolGroup tg : game.toolGroups) {
-            GLToolGroupButton tgb = new GLToolGroupButton(tg, clickables, game.objects);
+            ToolGroupButton tgb = new ToolGroupButton(tg, clickables);
+            uiObjects.add(tgb);
         }
-        GLToolGroupButton.selectVisibleToolGroupButton(1);
-        GLToolButton.selectDefault();
+        ToolGroupButton.selectVisibleToolGroupButton(1);
+        ToolButton.selectDefault();
 
         for (PeonMode m : PeonMode.values()) {
-            GLBehaviourButton b = new GLBehaviourButton(m, clickables, game.objects, game.client);
+            BehaviourButton b = new BehaviourButton(m, clickables, game.client);
+            uiObjects.add(b);
             if (m == PeonMode.SETTLE) {
                 b.select();
             }
         }
 
+        Panel p = new Panel(new Rectangle2D.Float(0.25f,0.25f,0.5f,0.5f));
+        uiObjects.add(p);
+        clickables.addClickable(p);
         mouseIsOver = false;
         text = new GLText();
     }
@@ -107,7 +124,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         try {
             if (mouseIsOver) {
-                setCursor(GLToolButton.getSelected().getCursor(selected));
+                setCursor(ToolButton.getSelected().getCursor(selected));
             }
             final GL gl = glAD.getGL();
             glHelper.checkGL(gl);
@@ -179,6 +196,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             displayCursor(gl);
             gl.glMatrixMode(GL.GL_MODELVIEW);
             gl.glPopMatrix();
+            drawUI(gl, time);
 
             flush(gl);
             handleKeys();
@@ -196,6 +214,47 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         yPos = (p.x + p.y) / 2.8f;
     //rough and ready
     }
+    private static int[] view = new int[4];
+
+    private void drawUI(final GL gl, float time) throws GLHelperException {
+        glHelper.checkGL(gl);
+        gl.glGetIntegerv(GL.GL_VIEWPORT, view, 0);
+        gl.glMatrixMode(GL.GL_PROJECTION);
+        gl.glPushMatrix();
+        gl.glLoadIdentity();
+        gl.glMatrixMode(GL.GL_MODELVIEW);
+        gl.glPushMatrix();
+        gl.glLoadIdentity();
+        gl.glScalef(2.0f, -2.0f, 1.0f);
+        gl.glTranslatef(-0.5f, -0.5f, 0.0f);
+
+        gl.glDisable(GL.GL_LIGHTING);
+        gl.glEnable(GL.GL_BLEND);
+        gl.glShadeModel(GL.GL_FLAT);
+        gl.glDisable(GL.GL_DEPTH_TEST);
+        gl.glUseProgram(0);
+
+        gl.glActiveTexture(GL.GL_TEXTURE0);
+        gl.glMatrixMode(GL.GL_TEXTURE);
+        gl.glPushMatrix();
+        gl.glLoadIdentity();
+
+        gl.glUseProgram(0);
+
+
+        for (GLObject2D glo : uiObjects) {
+            glo.display(gl, time, view[2] - view[0], view[3] - view[1]);
+        }
+
+        gl.glMatrixMode(GL.GL_TEXTURE);
+        gl.glPopMatrix();
+        gl.glMatrixMode(GL.GL_MODELVIEW);
+        gl.glPopMatrix();
+        gl.glMatrixMode(GL.GL_PROJECTION);
+        gl.glPopMatrix();
+
+
+    }
 
     private void flush(GL gl) { //separate method helps when profiling
         //gl.glFlush();
@@ -211,9 +270,11 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             gl.glShadeModel(GL.GL_SMOOTH);
             gl.glDisable(GL.GL_DEPTH_TEST);
             gl.glUseProgram(0);
+            gl.glActiveTexture(GL.GL_TEXTURE1);
+            gl.glDisable(GL_TEXTURE_2D);
             gl.glActiveTexture(GL.GL_TEXTURE0);
             gl.glDisable(GL_TEXTURE_2D);
-            gl.glMatrixMode(GL.GL_MODELVIEW);
+             gl.glMatrixMode(GL.GL_MODELVIEW);
             gl.glPushMatrix();
             gl.glTranslatef(selected.x, selected.y, game.heightMap.getHeight(selected.x, selected.y));
             gl.glBegin(GL.GL_TRIANGLES);
@@ -282,8 +343,11 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
                 glo.init(gl);
             }
             glHelper.checkGL(gl);
-
             for (GLObject glo : game.transparentObjects) {
+                glo.init(gl);
+            }
+            glHelper.checkGL(gl);
+            for (GLObject2D glo : uiObjects) {
                 glo.init(gl);
             }
             glHelper.checkGL(gl);
@@ -399,9 +463,9 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         for (int n = 0; n < 6; n++) {
             if (keys[VK_1 + n]) {
                 if (keys[VK_SHIFT]) {
-                    GLToolGroupButton.selectVisibleToolGroupButton(n + 1);
+                    ToolGroupButton.selectVisibleToolGroupButton(n + 1);
                 } else {
-                    GLToolGroupButton.selectVisibleToolButton(n + 1);
+                    ToolGroupButton.selectVisibleToolButton(n + 1);
                 }
             }
         }
@@ -463,26 +527,25 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             yOrig = yPos;
         }
         if (e.getButton() == MouseEvent.BUTTON1) {
-            GLToolButton.getSelected().PrimaryDown(selected);
-        }if (e.getButton() == MouseEvent.BUTTON3) {
-            GLToolButton.getSelected().SecondaryDown(selected);
+            ToolButton.getSelected().PrimaryDown(selected);
+        }
+        if (e.getButton() == MouseEvent.BUTTON3) {
+            ToolButton.getSelected().SecondaryDown(selected);
         }
     }
 
     public void mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON2) {
-             mouseMoved(e);
-        }
-        else
-        {
+            mouseMoved(e);
+        } else {
             if (e.getButton() == MouseEvent.BUTTON1) {
-                GLToolButton.getSelected().PrimaryUp(selected);
+                ToolButton.getSelected().PrimaryUp(selected);
             }
             if (e.getButton() == MouseEvent.BUTTON3) {
-                GLToolButton.getSelected().SecondaryUp(selected);
+                ToolButton.getSelected().SecondaryUp(selected);
             }
         }
-        
+
     }
 
     public void mouseWheelMoved(MouseWheelEvent e) {
@@ -492,8 +555,8 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             yPos -= e.getWheelRotation();
         }
     }
+    private String fpsstring = "";
 
-    private String fpsstring="";
     private void printFPS(GL gl) {
         if (frameCount % 100 == 0) {
             long t = System.currentTimeMillis();
@@ -506,6 +569,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             frameTime = t;
         }
         frameCount++;
-        text.drawString(gl, fpsstring,0.01f,0.01f,0.02f);
+        text.drawString(gl, fpsstring, 0.01f, 0.01f, 0.02f);
     }
 }

@@ -1,7 +1,7 @@
 package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
-import com.novusradix.JavaPop.Client.GLToolButton;
+import com.novusradix.JavaPop.Client.UI.ToolButton;
 import com.novusradix.JavaPop.Direction;
 import java.awt.Cursor;
 import java.awt.Point;
@@ -39,14 +39,14 @@ public abstract class Tool {
     }
 
     public void PrimaryUp(Point p) {
-        GLToolButton.selectDefault();
+        ToolButton.selectDefault();
     }
 
     public void SecondaryDown(Point p) {
     }
 
     public void SecondaryUp(Point p) {
-        GLToolButton.selectDefault();
+        ToolButton.selectDefault();
     }
 
     public void Select() {

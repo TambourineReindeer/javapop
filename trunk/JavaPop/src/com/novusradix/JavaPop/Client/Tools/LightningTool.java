@@ -1,7 +1,7 @@
 package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
-import com.novusradix.JavaPop.Client.GLToolButton;
+import com.novusradix.JavaPop.Client.UI.ToolButton;
 import com.novusradix.JavaPop.Messaging.Tools.StartLightning;
 import com.novusradix.JavaPop.Messaging.Tools.StopLightning;
 import java.awt.Point;
@@ -24,7 +24,7 @@ public class LightningTool extends Tool {
     @Override
     public void PrimaryUp(Point p) {
         client.sendMessage(new StopLightning());
-        GLToolButton.selectDefault();
+        ToolButton.selectDefault();
     }
 
     public String getIconName() {
