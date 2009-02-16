@@ -1,7 +1,6 @@
 package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
-import com.novusradix.JavaPop.Client.GLToolButton;
 import com.novusradix.JavaPop.Messaging.Tools.MoveAnkh;
 import java.awt.Point;
 

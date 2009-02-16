@@ -1,22 +1,23 @@
-package com.novusradix.JavaPop.Client;
+package com.novusradix.JavaPop.Client.UI;
 
+import com.novusradix.JavaPop.Client.*;
 import com.novusradix.JavaPop.Server.ServerPlayer.PeonMode;
+import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Polygon;
-import java.util.Collection;
 
 /**
  *
  * @author gef
  */
-public class GLBehaviourButton extends GLButton {
+public class BehaviourButton extends Button {
 
     PeonMode mode;
-    private static GLButton selected;
+    private static Button selected;
     private Client client;
     
-    GLBehaviourButton(PeonMode m, ClickableHandler ch, Collection<GLObject> objects, Client c) {
-        super(ch, objects);
+    public BehaviourButton(PeonMode m, ClickableHandler ch, Client c) {
+        super(ch);
         client = c;
         mode = m;
         int[] x, y;
@@ -74,5 +75,9 @@ public class GLBehaviourButton extends GLButton {
     public void select() {
         client.setBehaviour(mode);
         selected = this;
+    }
+
+    public Cursor getCursor() {
+        return Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     }
 }

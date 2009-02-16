@@ -367,24 +367,25 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
 
     public void display(GL gl, float time) {
 
-        tex.enable();
 
         gl.glEnable(GL_LIGHTING);
         gl.glEnable(GL.GL_LIGHT1);
         gl.glColor3f(1, 1, 1);
-        gl.glMatrixMode(GL.GL_TEXTURE);
-        gl.glLoadIdentity();
-        gl.glScalef(1.0f / 255.0f, 1.0f / 255.0f, 1.0f);
         gl.glMatrixMode(GL_MODELVIEW);
         gl.glEnable(GL.GL_BLEND);
         gl.glEnable(GL.GL_DEPTH_TEST);
+        gl.glMatrixMode(GL.GL_TEXTURE);
         gl.glActiveTexture(GL.GL_TEXTURE0);
+        gl.glPushMatrix();
+
+        gl.glScalef(1.0f / 255.0f, 1.0f / 255.0f, 1.0f);
+        tex.enable();
         tex.bind();
+
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         gl.glActiveTexture(GL.GL_TEXTURE1);
         gl.glBindTexture(GL_TEXTURE_2D, textures[0]);
-        gl.glActiveTexture(GL.GL_TEXTURE1);
         if (dirtyTiles) {
             gl.glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, heightMap.width, heightMap.breadth, GL_RGB, GL_UNSIGNED_BYTE, ByteBuffer.wrap(tiles));
             dirtyTiles = false;
@@ -422,6 +423,9 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
                 gl.glCallList(displaylist + n);
             }
         }
+        gl.glMatrixMode(GL.GL_TEXTURE);
+        gl.glActiveTexture(GL.GL_TEXTURE0);
+        gl.glPopMatrix();
     }
 
     public void applyUpdate(HeightMapUpdate u) {
@@ -444,6 +448,4 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
             }
         }
     }
-
-
 }
