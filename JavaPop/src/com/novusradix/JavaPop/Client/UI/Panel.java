@@ -1,7 +1,6 @@
 package com.novusradix.JavaPop.Client.UI;
 
 import java.awt.Cursor;
-import java.awt.Point;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
@@ -13,24 +12,45 @@ import javax.media.opengl.GL;
  */
 public class Panel implements GLObject2D, Clickable {
 
-    Rectangle2D.Float bounds;
+    private Rectangle2D.Float bounds;
+    private final GLText text;
     private static int[] view = new int[4];
 
-    public Panel(Rectangle2D.Float r) {
+    public Panel(Rectangle2D.Float r, GLText text) {
         bounds = (Rectangle2D.Float) r.clone();
+        this.text = text;
     }
 
     public void display(GL gl, float time, int screenWidth, int screenHeight) {
         gl.glDisable(GL.GL_TEXTURE_2D);
 
-        gl.glColor4f(0.5f, 0.9f, 0.5f, 1.0f);
-        gl.glBegin(GL.GL_QUADS);
-        gl.glVertex2f(this.bounds.x, this.bounds.y);
-        gl.glVertex2f(this.bounds.x + this.bounds.width, this.bounds.y);
-        gl.glVertex2f(this.bounds.x + this.bounds.width, this.bounds.y + this.bounds.height);
-        gl.glVertex2f(this.bounds.x, this.bounds.y + this.bounds.height);
+        gl.glColor4f(0.0f, 0.4f, 0.05f, 1.0f);
+        gl.glMatrixMode(GL.GL_MODELVIEW);
+        gl.glTranslatef(bounds.x, bounds.y, 0.0f);
+        gl.glScalef(bounds.width, bounds.height, 1.0f);
 
+        gl.glBegin(GL.GL_QUADS);
+        gl.glVertex2f(0.0f, 0.0f);
+        gl.glVertex2f(1.0f, 0.0f);
+        gl.glVertex2f(1.0f, 1.0f);
+        gl.glVertex2f(0.0f, 1.0f);
         gl.glEnd();
+
+
+        gl.glBegin(GL.GL_LINE_STRIP);
+        gl.glColor4f(0.8f, 0.8f, 0.05f, 1.0f);
+        gl.glVertex2f(0.0f, 0.0f);
+        gl.glVertex2f(1.0f, 0.0f);
+        gl.glColor4f(0.4f, 0.4f, 0.05f, 1.0f);
+        gl.glVertex2f(1.0f, 1.0f);
+        gl.glVertex2f(0.0f, 1.0f);
+        gl.glColor4f(0.8f, 0.8f, 0.05f, 1.0f);
+        gl.glVertex2f(0.0f, 0.0f);
+        gl.glEnd();
+
+
+        text.drawString(gl, "Welcome to JavaPop!", 0.5f-0.5f*text.getWidth("Welcome to JavaPop!", 0.1f), 0.1f, 0.1f);
+
     }
 
     public void init(GL gl) {

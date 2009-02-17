@@ -108,12 +108,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
                 b.select();
             }
         }
-
-        Panel p = new Panel(new Rectangle2D.Float(0.25f,0.25f,0.5f,0.5f));
+        text = new GLText();
+        Panel p = new Panel(new Rectangle2D.Float(0.25f, 0.25f, 0.5f, 0.5f), text);
         uiObjects.add(p);
         clickables.addClickable(p);
         mouseIsOver = false;
-        text = new GLText();
+
     }
 
     public void display(final GLAutoDrawable glAD) {
@@ -200,7 +200,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
             flush(gl);
             handleKeys();
-            printFPS(gl);
 
             glHelper.checkGL(gl);
 
@@ -241,7 +240,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         gl.glUseProgram(0);
 
-
+        printFPS(gl);
         for (GLObject2D glo : uiObjects) {
             glo.display(gl, time, view[2] - view[0], view[3] - view[1]);
         }
@@ -252,8 +251,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glPopMatrix();
         gl.glMatrixMode(GL.GL_PROJECTION);
         gl.glPopMatrix();
-
-
     }
 
     private void flush(GL gl) { //separate method helps when profiling
@@ -274,7 +271,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             gl.glDisable(GL_TEXTURE_2D);
             gl.glActiveTexture(GL.GL_TEXTURE0);
             gl.glDisable(GL_TEXTURE_2D);
-             gl.glMatrixMode(GL.GL_MODELVIEW);
+            gl.glMatrixMode(GL.GL_MODELVIEW);
             gl.glPushMatrix();
             gl.glTranslatef(selected.x, selected.y, game.heightMap.getHeight(selected.x, selected.y));
             gl.glBegin(GL.GL_TRIANGLES);
@@ -569,6 +566,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             frameTime = t;
         }
         frameCount++;
-        text.drawString(gl, fpsstring, 0.01f, 0.01f, 0.02f);
+        text.drawString(gl, fpsstring, 0.01f, 0.99f, 0.02f);
     }
 }
