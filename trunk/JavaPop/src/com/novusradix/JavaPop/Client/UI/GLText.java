@@ -141,20 +141,35 @@ public class GLText {
         kerning.put(k, f - 0.05f);
     }
 
+    public float getWidth(String text, float size){
+        float x=0;
+         char lastChar = 0;
+        float lastScale = 1.0f;
+        boolean first = true;
+        for (char c : text.toCharArray()) {
+            int index = 0;
+            float scale = 1.0f;
+            index = all.indexOf(c);
+            if (index == -1) {
+                index = all.toLowerCase().indexOf(c);
+                if (index != -1) {
+                    scale = 0.7f;
+                } else {
+                    x += size * 0.6f * lastScale;
+                    continue;
+                }
+            }
+            if (!first) {
+                x += (lastScale * 1.0f) * size * getKern(lastChar, c);
+            }
+            first = false;
+            lastChar = c;
+            lastScale = scale;
+        }
+        x += (lastScale * 1.0f) * size * getKern(lastChar, '.');
+        return x;
+    }
     public void drawString(GL gl, String text, float x, float y, float size) {
-
-        gl.glMatrixMode(GL.GL_PROJECTION);
-        gl.glPushMatrix();
-        gl.glLoadIdentity();
-        gl.glMatrixMode(GL.GL_MODELVIEW);
-        gl.glPushMatrix();
-        gl.glLoadIdentity();
-        gl.glScalef(2.0f, 2.0f, 1.0f);
-        gl.glTranslatef(-0.5f, -0.5f, 0.0f);
-        gl.glMatrixMode(GL.GL_TEXTURE);
-        gl.glActiveTexture(GL.GL_TEXTURE0);
-        gl.glPushMatrix();
-        gl.glLoadIdentity();
             
         gl.glDisable(GL.GL_LIGHTING);
         gl.glDisable(GL.GL_DEPTH_TEST);
@@ -189,16 +204,7 @@ public class GLText {
             drawChar(gl, index, x, y, size * scale);
             lastChar = c;
             lastScale = scale;
-
         }
-
-        gl.glMatrixMode(GL.GL_TEXTURE);
-        gl.glPopMatrix();
-        gl.glMatrixMode(GL.GL_MODELVIEW);
-        gl.glPopMatrix();
-        gl.glMatrixMode(GL.GL_PROJECTION);
-        gl.glPopMatrix();
-
     }
 
     public void init(GL gl) {
@@ -216,16 +222,16 @@ public class GLText {
         gl.glBegin(GL.GL_QUADS);
         {
             gl.glTexCoord2f(tx, ty);
-            gl.glVertex2f(x, y + 0.8f * size);
+            gl.glVertex2f(x, y - 0.8f * size);
 
             gl.glTexCoord2f(tx, ty + 1.0f / 8.0f);
-            gl.glVertex2f(x, y - 0.2f * size);
+            gl.glVertex2f(x, y + 0.2f * size);
 
             gl.glTexCoord2f(tx + 1.0f / 8.0f, ty + 1.0f / 8.0f);
-            gl.glVertex2f(x + size, y - 0.2f * size);
+            gl.glVertex2f(x + size, y + 0.2f * size);
 
             gl.glTexCoord2f(tx + 1.0f / 8.0f, ty);
-            gl.glVertex2f(x + size, y + 0.8f * size);
+            gl.glVertex2f(x + size, y - 0.8f * size);
         }
         gl.glEnd();
     }

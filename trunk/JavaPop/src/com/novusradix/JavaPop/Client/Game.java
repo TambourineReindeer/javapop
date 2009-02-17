@@ -24,13 +24,12 @@ public class Game {
     public Client client;
     public Peons peons;
     public AbstractHouses houses;
-
     public Map<Integer, Player> players;
     public Player me;
     GameFrame frame;
     Collection<GLObject> objects;
     Collection<GLObject> transparentObjects;
-    public Map<Integer, Effect> effects;
+    public final Map<Integer, Effect> effects = new HashMap<Integer, Effect>();
     public Collection<ToolGroup> toolGroups;
     public ModelFactory modelFactory;
 
@@ -54,7 +53,6 @@ public class Game {
         houses = h1;
         objects.add(h1);
 
-        effects = new HashMap<Integer, Effect>();
         players = new HashMap<Integer, Player>();
         int index = 0;
         for (Info i : g.gi.players.values()) {
@@ -130,8 +128,6 @@ public class Game {
         }
     }
 
-    public void kill()
-    {
-
+    public void kill() {
     }
 }
