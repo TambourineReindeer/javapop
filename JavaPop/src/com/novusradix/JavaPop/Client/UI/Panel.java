@@ -4,21 +4,30 @@ import java.awt.Cursor;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.Stack;
 import javax.media.opengl.GL;
 
 /**
  *
  * @author gef
  */
-public class Panel implements GLObject2D, Clickable {
+public class Panel implements Clickable {
 
     private Rectangle2D.Float bounds;
     private final GLText text;
     private static int[] view = new int[4];
 
+   private Stack<Clickable> components;
+
     public Panel(Rectangle2D.Float r, GLText text) {
         bounds = (Rectangle2D.Float) r.clone();
         this.text = text;
+        components = new Stack<Clickable>();
+    }
+
+    public void add(Clickable component)
+    {
+        components.add(component);
     }
 
     public void display(GL gl, float time, int screenWidth, int screenHeight) {
@@ -36,7 +45,6 @@ public class Panel implements GLObject2D, Clickable {
         gl.glVertex2f(0.0f, 1.0f);
         gl.glEnd();
 
-
         gl.glBegin(GL.GL_LINE_STRIP);
         gl.glColor4f(0.8f, 0.8f, 0.05f, 1.0f);
         gl.glVertex2f(0.0f, 0.0f);
@@ -48,12 +56,17 @@ public class Panel implements GLObject2D, Clickable {
         gl.glVertex2f(0.0f, 0.0f);
         gl.glEnd();
 
-
         text.drawString(gl, "Welcome to JavaPop!", 0.5f-0.5f*text.getWidth("Welcome to JavaPop!", 0.1f), 0.1f, 0.1f);
 
+        for(Clickable c:components)
+            c.display(gl, time, screenWidth, screenHeight);
     }
 
     public void init(GL gl) {
+        for(Clickable c:components)
+        {
+            c.init(gl);
+        }
     }
 
     public Shape getShape() {

@@ -13,6 +13,7 @@ import com.novusradix.JavaPop.Math.Helpers;
 import com.novusradix.JavaPop.Client.Tools.ToolGroup;
 import com.novusradix.JavaPop.Client.UI.GLObject2D;
 import com.novusradix.JavaPop.Client.UI.Panel;
+import com.novusradix.JavaPop.Client.UI.UIButton;
 import com.novusradix.JavaPop.Math.Matrix4;
 import com.novusradix.JavaPop.Math.Vector3;
 import com.novusradix.JavaPop.Effects.Effect;
@@ -110,6 +111,8 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         }
         text = new GLText();
         Panel p = new Panel(new Rectangle2D.Float(0.25f, 0.25f, 0.5f, 0.5f), text);
+        Rectangle2D r = new Rectangle2D.Float(0.5f, 0.5f, 0.1f, 0.1f);
+        p.add(new UIButton(r, "Yay", null));
         uiObjects.add(p);
         clickables.addClickable(p);
         mouseIsOver = false;
