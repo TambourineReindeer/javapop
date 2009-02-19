@@ -8,7 +8,7 @@ import java.awt.event.MouseEvent;
  *
  * @author gef
  */
-public interface Clickable {
+public interface Clickable extends GLObject2D{
 
     public Shape getShape();
     public boolean anchorLeft();

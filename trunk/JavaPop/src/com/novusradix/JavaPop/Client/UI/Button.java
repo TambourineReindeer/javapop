@@ -2,7 +2,6 @@ package com.novusradix.JavaPop.Client.UI;
 
 import com.novusradix.JavaPop.Client.*;
 import com.sun.opengl.util.texture.Texture;
-import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
@@ -16,7 +15,7 @@ import javax.media.opengl.GLException;
  *
  * @author gef
  * */
-public abstract class Button implements GLObject2D, Clickable {
+public abstract class Button implements Clickable {
 
     Polygon buttonShape;
     boolean enabled;
