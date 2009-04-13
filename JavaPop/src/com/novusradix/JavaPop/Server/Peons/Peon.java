@@ -8,6 +8,7 @@ import com.novusradix.JavaPop.Server.ServerHouses.ServerHouse;
 import com.novusradix.JavaPop.Server.ServerPeons.Action;
 import com.novusradix.JavaPop.Server.ServerPlayer;
 import com.novusradix.JavaPop.Server.ServerPlayer.PeonMode;
+import com.novusradix.JavaPop.Tile;
 import java.awt.Point;
 import java.util.Collection;
 import java.util.HashSet;
@@ -143,6 +144,10 @@ public class Peon {
                     break;
                 }
             case DROWNING:
+                if (game.heightMap.getTile(getPoint().x, getPoint().y) == Tile.SEA) {
+                    strength -= seconds * 10f;
+                    break;
+                }
             case WAITING:
                 changed = true;
                 state = State.WALKING;

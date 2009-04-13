@@ -110,11 +110,13 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             }
         }
         text = new GLText();
-        Panel p = new Panel(new Rectangle2D.Float(0.25f, 0.25f, 0.5f, 0.5f), text);
-        Rectangle2D r = new Rectangle2D.Float(0.5f, 0.5f, 0.1f, 0.1f);
-        p.add(new UIButton(r, "Yay", null));
+       /* Panel p = new Panel(new Rectangle2D.Float(0.25f, 0.25f, 0.5f, 0.5f), text);
+        Rectangle2D.Float r = new Rectangle2D.Float(0.5f, 0.5f, 0.1f, 0.1f);
+        UIButton b= new UIButton(r, "Yay", null, text);
+        p.add(b);
         uiObjects.add(p);
         clickables.addClickable(p);
+        clickables.addClickable(b);*/
         mouseIsOver = false;
 
     }

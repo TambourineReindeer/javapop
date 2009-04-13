@@ -80,4 +80,8 @@ public class BehaviourButton extends Button {
     public Cursor getCursor() {
         return Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
     }
+
+    public Clickable getClickableAtPoint(float x, float y) {
+        return this;
+    }
 }

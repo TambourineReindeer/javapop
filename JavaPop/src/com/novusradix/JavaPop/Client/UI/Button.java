@@ -147,4 +147,8 @@ public abstract class Button implements Clickable {
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
+
+    public Clickable getClickableAtPoint(float x, float y) {
+        return this;
+    }
 }
