@@ -47,9 +47,11 @@ public class Vector3 implements Serializable {
 
     public void normalize() {
         float l = length();
-        x = x / l;
-        y = y / l;
-        z = z / l;
+        if (l > 0) {
+            x = x / l;
+            y = y / l;
+            z = z / l;
+        }
     }
 
     public void set(float x, float y, float z) {
@@ -88,6 +90,9 @@ public class Vector3 implements Serializable {
         z += a.z;
     }
 
+    public Vector3 inverse() {
+        return new Vector3(-x,-y,-z);
+    }
     public float length() {
         return (float) Math.sqrt(x * x + y * y + z * z);
     }

@@ -20,12 +20,14 @@ public class ClickableHandler implements MouseMotionListener, MouseListener {
     private MouseListener ml;
     private Component win;
     private float lastX,  lastY;
+    private boolean virtualRightClick;
 
     public ClickableHandler(MouseListener fallthrough, MouseMotionListener fallthroughmotion, Component w) {
         buttons = new LinkedList<Clickable>();
         ml = fallthrough;
         mml = fallthroughmotion;
         win = w;
+        virtualRightClick=false;
     }
 
     public void addClickable(Clickable b) {
@@ -93,25 +95,43 @@ public class ClickableHandler implements MouseMotionListener, MouseListener {
     }
 
     public void mouseClicked(MouseEvent e) {
+        MouseEvent e2=e;
+        if((e.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) == MouseEvent.CTRL_DOWN_MASK)
+        {
+            e2=new MouseEvent((Component)e.getSource(),e.getID(), e.getWhen(), MouseEvent.BUTTON3_DOWN_MASK , e.getX(), e.getY(), e.getClickCount(),false, MouseEvent.BUTTON3);
+        }
         if (over == null) {
-            ml.mouseClicked(e);
+            ml.mouseClicked(e2);
         }
     }
 
     public void mousePressed(MouseEvent e) {
+        MouseEvent e2=e;
+        if((e.getModifiersEx() & MouseEvent.CTRL_DOWN_MASK) == MouseEvent.CTRL_DOWN_MASK)
+        {
+            e2=new MouseEvent((Component)e.getSource(),e.getID(), e.getWhen(), MouseEvent.BUTTON3_DOWN_MASK , e.getX(), e.getY(), e.getClickCount(),false, MouseEvent.BUTTON3);
+        virtualRightClick = true;
+        }
         if (over != null) {
-            over.mouseDown(e);
+            over.mouseDown(e2);
         } else {
-            ml.mousePressed(e);
+            ml.mousePressed(e2);
         }
     }
 
     public void mouseReleased(MouseEvent e) {
+        MouseEvent e2=e;
+        if(virtualRightClick)
+        {
+            virtualRightClick=false;
+            e2=new MouseEvent((Component)e.getSource(),e.getID(), e.getWhen(), MouseEvent.BUTTON3_DOWN_MASK , e.getX(), e.getY(), e.getClickCount(),false, MouseEvent.BUTTON3);
+
+        }
         if (over != null) {
-            over.mouseUp(e);
+            over.mouseUp(e2);
         } else {
-            ml.mouseEntered(e);
-            ml.mouseReleased(e);
+            ml.mouseEntered(e2);
+            ml.mouseReleased(e2);
         }
     }
 

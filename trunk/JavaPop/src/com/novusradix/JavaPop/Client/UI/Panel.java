@@ -28,6 +28,7 @@ public class Panel implements Clickable {
     public void add(Clickable component)
     {
         components.add(component);
+
     }
 
     public void display(GL gl, float time, int screenWidth, int screenHeight) {
@@ -111,5 +112,14 @@ public class Panel implements Clickable {
     public void mouseDrag(float oldX, float oldY, float newX, float newY) {
         bounds.x += newX - oldX;
         bounds.y += newY - oldY;
+    }
+
+    public Clickable getClickableAtPoint(float x, float y) {
+        for(Clickable c:components)
+        {
+            if(c.getShape().contains(x, y))
+                return c;
+        }
+        return this;
     }
 }

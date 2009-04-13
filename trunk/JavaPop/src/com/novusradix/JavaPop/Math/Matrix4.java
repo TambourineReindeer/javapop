@@ -8,8 +8,8 @@ import java.io.Serializable;
  */
 public class Matrix4 implements Serializable {
 
+    private static final long serialVersionUID=7707581038502586365L;
     public static final Matrix4 identity;
-    
 
     static {
         identity = new Matrix4();
@@ -17,8 +17,8 @@ public class Matrix4 implements Serializable {
         identity.m[5] = 1;
         identity.m[10] = 1;
         identity.m[15] = 1;
-
     }
+
     private float[] m;
 
     public Matrix4() {
@@ -41,7 +41,6 @@ public class Matrix4 implements Serializable {
         m[9] = up.y;
         m[10] = up.z;
         m[15] = 1;
-
     }
 
     public void set(Matrix4 mat) {
@@ -203,12 +202,45 @@ public class Matrix4 implements Serializable {
 
     public void set(float[] buf) {
         System.arraycopy(buf, 0, m, 0, buf.length);
-       // m = buf.clone();
+    // m = buf.clone();
+    }
+
+    public void set(Vector3 position, Quaternion rotation) {
+        float xx = rotation.x * rotation.x;
+        float xy = rotation.x * rotation.y;
+        float xz = rotation.x * rotation.z;
+        float xw = rotation.x * rotation.w;
+
+        float yy = rotation.y * rotation.y;
+        float yz = rotation.y * rotation.z;
+        float yw = rotation.y * rotation.w;
+
+        float zz = rotation.z * rotation.z;
+        float zw = rotation.z * rotation.w;
+
+        m[0] = 1 - 2 * (yy + zz);
+        m[1] = 2 * (xy - zw);
+        m[2] = 2 * (xz + yw);
+
+        m[4] = 2 * (xy + zw);
+        m[5] = 1 - 2 * (xx + zz);
+        m[6] = 2 * (yz - xw);
+
+        m[8] = 2 * (xz - yw);
+        m[9] = 2 * (yz + xw);
+        m[10] = 1 - 2 * (xx + yy);
+
+        m[3] = m[7] = m[11] = 0;
+        m[12] = position.x;
+        m[13] = position.y;
+        m[14] = position.z;
+        m[15] = 1;
+
     }
 
     public void transform(Vector3 v) {
 
-        float x,  y,  z,  w;
+        float x, y, z, w;
         x = m[0] * v.x + m[1] * v.y + m[2] * v.z + m[3];
         y = m[4] * v.x + m[5] * v.y + m[6] * v.z + m[7];
         z = m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11];
@@ -242,5 +274,16 @@ public class Matrix4 implements Serializable {
         buf[15] = m[15];
 
         m = buf;
+    }
+
+    public void translate(float tx, float ty, float tz) {
+        m[12] += tx;
+        m[13] += ty;
+        m[14] += tz;
+    }
+    public void translate(Vector3 t) {
+        m[12] += t.x;
+        m[13] += t.y;
+        m[14] += t.z;
     }
 }

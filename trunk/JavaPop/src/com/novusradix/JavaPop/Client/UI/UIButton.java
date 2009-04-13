@@ -1,13 +1,12 @@
 package com.novusradix.JavaPop.Client.UI;
 
 import com.novusradix.JavaPop.Client.GLHelper;
-import com.sun.opengl.impl.GLObjectTracker;
 import com.sun.opengl.util.texture.Texture;
 import java.awt.Cursor;
 import java.awt.Shape;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.geom.PathIterator;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,19 +18,21 @@ import javax.media.opengl.GL;
  */
 public class UIButton implements Clickable {
 
-    Shape shape;
+    Rectangle2D.Float bounds;
     String text;
     ActionListener action;
     Texture buttonTex;
+    GLText textRenderer;
 
-    public UIButton(Shape shape, String text, ActionListener action) {
-        this.shape = shape;
+    public UIButton(Rectangle2D.Float bounds, String text, ActionListener action, GLText textRenderer) {
+        this.bounds = bounds;
         this.text = text;
         this.action = action;
+        this.textRenderer = textRenderer;
     }
 
     public Shape getShape() {
-        return shape;
+        return bounds;
     }
 
     public boolean anchorLeft() {
@@ -73,35 +74,32 @@ public class UIButton implements Clickable {
     }
 
     public void display(GL gl, float time, int screenWidth, int screenHeight) {
-        PathIterator p = shape.getPathIterator(null);
-        float[] coords = new float[6];
-        int segment;
-        float moveToX = 0, moveToY = 0;
+        gl.glColor4f(1.0f,1.0f,1.0f,1.0f);
         buttonTex.bind();
-        do {
-            segment = p.currentSegment(coords);
-            switch (segment) {
-                case PathIterator.SEG_MOVETO:
-                    moveToX = coords[0];
-                    moveToY = coords[1];
-                    gl.glBegin(GL.GL_POLYGON);
-                    gl.glTexCoord2f(moveToX, moveToY);
-                    gl.glVertex2f(moveToX, moveToY);
-                    break;
-                case PathIterator.SEG_LINETO:
-                case PathIterator.SEG_CUBICTO:
-                case PathIterator.SEG_QUADTO:
-                    gl.glTexCoord2f(coords[0], coords[1]);
-                    gl.glVertex2f(coords[0], coords[1]);
-                    break;
-                case PathIterator.SEG_CLOSE:
-                    gl.glTexCoord2f(moveToX, moveToY);
-                    gl.glVertex2f(moveToX, moveToY);
-                    gl.glEnd();
-                    break;
-            }
-            p.next();
-        } while (!p.isDone());
+        gl.glMatrixMode(GL.GL_MODELVIEW);
+        gl.glTranslatef(bounds.x, bounds.y, 0.0f);
+        gl.glScalef(bounds.width, bounds.height, 1.0f);
+
+        gl.glBegin(GL.GL_QUADS);
+        gl.glVertex2f(0.0f, 0.0f);
+        gl.glVertex2f(1.0f, 0.0f);
+        gl.glVertex2f(1.0f, 1.0f);
+        gl.glVertex2f(0.0f, 1.0f);
+        gl.glEnd();
+
+        gl.glBegin(GL.GL_LINE_STRIP);
+        gl.glColor4f(0.8f, 0.8f, 0.05f, 1.0f);
+        gl.glVertex2f(0.0f, 0.0f);
+        gl.glVertex2f(1.0f, 0.0f);
+        gl.glColor4f(0.4f, 0.4f, 0.05f, 1.0f);
+        gl.glVertex2f(1.0f, 1.0f);
+        gl.glVertex2f(0.0f, 1.0f);
+        gl.glColor4f(0.8f, 0.8f, 0.05f, 1.0f);
+        gl.glVertex2f(0.0f, 0.0f);
+        gl.glEnd();
+
+        textRenderer.drawString(gl, text, 0.5f-0.5f*textRenderer.getWidth(text, 1.0f), 0.8f, 1.0f);
+
         
     }
 
@@ -111,5 +109,9 @@ public class UIButton implements Clickable {
         } catch (IOException ex) {
             Logger.getLogger(UIButton.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public Clickable getClickableAtPoint(float x, float y) {
+        return this;
     }
 }

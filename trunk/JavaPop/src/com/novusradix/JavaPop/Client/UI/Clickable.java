@@ -22,4 +22,5 @@ public interface Clickable extends GLObject2D{
     public boolean isVisible();
     public void setVisible(boolean visible);
     public Cursor getCursor();
+    public Clickable getClickableAtPoint(float x, float y);
 }
