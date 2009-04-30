@@ -3,7 +3,6 @@
  *
  * Created on November 21, 2008, 5:08 PM
  */
-
 package com.novusradix.JavaPop.Server;
 
 /**
@@ -13,11 +12,16 @@ package com.novusradix.JavaPop.Server;
 public class ServerForm extends javax.swing.JFrame {
 
     Server server;
+
     /** Creates new form ServerForm */
     public ServerForm(Server s) {
         server = s;
         initComponents();
-        
+
+    }
+
+    void writeLog(String s) {
+        output.append(s);
     }
 
     /** This method is called from within the constructor to
@@ -29,14 +33,12 @@ public class ServerForm extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        output = new javax.swing.JTextPane();
         btnQuit = new javax.swing.JButton();
+        outputScroll = new javax.swing.JScrollPane();
+        output = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Server - JavaPop");
-
-        jScrollPane1.setViewportView(output);
 
         btnQuit.setText("Quit");
         btnQuit.addActionListener(new java.awt.event.ActionListener() {
@@ -45,19 +47,23 @@ public class ServerForm extends javax.swing.JFrame {
             }
         });
 
+        output.setColumns(20);
+        output.setRows(5);
+        outputScroll.setViewportView(output);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(btnQuit))
+            .add(outputScroll, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE)
+                .add(outputScroll, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 148, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(btnQuit))
         );
@@ -66,18 +72,14 @@ public class ServerForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
 private void btnQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitActionPerformed
-server.kill();
+    server.kill();
 }//GEN-LAST:event_btnQuitActionPerformed
-
     /**
-    * @param args the command line arguments
-    */
-    
-
+     * @param args the command line arguments
+     */
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnQuit;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextPane output;
+    private javax.swing.JTextArea output;
+    private javax.swing.JScrollPane outputScroll;
     // End of variables declaration//GEN-END:variables
-
 }
