@@ -4,7 +4,6 @@ import com.sun.opengl.util.BufferUtil;
 import com.sun.opengl.util.texture.*;
 import java.io.*;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +14,10 @@ import javax.media.opengl.GL;
 import javax.media.opengl.glu.GLU;
 import static javax.media.opengl.GL.*;
 
+/**
+ * Performs various GL utility and management functions
+ * @author gef
+ */
 public class GLHelper {
 
     final static public GLHelper glHelper = new GLHelper();

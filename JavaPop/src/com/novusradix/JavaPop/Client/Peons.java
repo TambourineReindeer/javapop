@@ -14,6 +14,10 @@ import java.util.logging.Logger;
 import javax.media.opengl.GL;
 import static java.lang.Math.*;
 
+/**
+ * Client specific Peon implementation
+ * @author gef
+ */
 public class Peons implements GLObject {
 
     public final Game game;
@@ -57,6 +61,7 @@ public class Peons implements GLObject {
     }
     private Vector3 v = new Vector3();
     float[] transparent = new float[]{0.5f, 0.5f, 0.5f, 0.5f};
+    float[] plagued = new float[]{0.2f,0.2f,0.2f,1f};
 
     public void display(GL gl, float time) {
         float t;
@@ -69,7 +74,11 @@ public class Peons implements GLObject {
                 if (p.state == State.DROWNING) {
                     v.z += (float) abs((float) sin(t * 4.0f) / 2.0f + 0.1f);
                 }
+                if(p.infected)
+                peonModel.setColor(gl, plagued);
+                else
                 peonModel.setColor(gl, p.player.colour);
+
                 peonModel.display(v, p.basis, gl);
             }
         }
@@ -114,6 +123,7 @@ public class Peons implements GLObject {
         float posx, posy, posz;
         private int destx,  desty;
         private float dx,  dy;
+        private boolean infected;
         State state;
         Player player;
         Matrix4 basis;
@@ -126,6 +136,7 @@ public class Peons implements GLObject {
             dx = d.dx;
             dy = d.dy;
             state = d.state;
+            infected = d.infected;
             player = game.players.get(d.playerId);
             basis = new Matrix4();
             calcBasis();
@@ -139,6 +150,7 @@ public class Peons implements GLObject {
             dx = d.dx;
             dy = d.dy;
             state = d.state;
+            infected=d.infected;
             calcBasis();
         }
 

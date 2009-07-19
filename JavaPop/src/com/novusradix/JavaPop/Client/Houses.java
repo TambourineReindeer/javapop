@@ -12,6 +12,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.GL;
 
+/**
+ * The house manager.
+ * @author gef
+ */
 public class Houses implements AbstractHouses, GLObject {
 
     private final Game game;
@@ -21,7 +25,10 @@ public class Houses implements AbstractHouses, GLObject {
     private Model houseModel;
     private Model ankhModel;
     private Map<com.novusradix.JavaPop.Player, House> leaderHouses;
-
+/**
+ * Creates a new house manager for the specified game. There will be no houses on the map after this call.
+ * @param g
+ */
     public Houses(Game g) {
         game = g;
         map = new int[game.heightMap.getWidth()][game.heightMap.getBreadth()];
@@ -35,7 +42,17 @@ public class Houses implements AbstractHouses, GLObject {
         leaderHouses = new HashMap<com.novusradix.JavaPop.Player, House>();
     }
 
-    public void updateHouse(int id, int x, int y, Player p, int level, float strength) {
+    /**
+     * Call in response to a HouseUpdate message from the server.
+     * @param id    The unique ID of the house in question.
+     * @param x     The x coordinate of the house. This may potentially change in response to hurricanes, etc.
+     * @param y     The y coordinate of the house.
+     * @param p     The Player who owns the house. This can change after a battle.
+     * @param level The house level. 1 is a small shack, and higher numbers indicate a larger, more luxurious dwelling.
+     * @param strength  The strength of the house. This will increase over time, but updates are not sent if it is growing normally.
+     * @param infected  True if the house suffers from the plague. Plagued houses do not contribute mana to their player.
+     */
+    public void updateHouse(int id, int x, int y, Player p, int level, float strength, boolean infected) {
         synchronized (houses) {
             if (level < 0) {
                 //remove
@@ -44,24 +61,34 @@ public class Houses implements AbstractHouses, GLObject {
                 }
             } else {
                 if (houses.containsKey(id)) {
-                    houses.get(id).update(p, level, strength);
+                    houses.get(id).update(p, level, strength, infected);
                 } else {
-                    houses.put(id, new House(x, y, p, level, strength));
+                    houses.put(id, new House(x, y, p, level, strength, infected));
                 }
             }
         }
     }
 
+    /**
+     * Check whether a house could be built at a specific location
+     * @param x The x coordinate of the tile to query
+     * @param y the y coordinate of the tile to query
+     * @return True if a house can currently be built, according to the client's latest info.
+     */
     public boolean canBuild(int x, int y) {
         if (game.heightMap.tileInBounds(x, y)) {
             return (map[x][y] == EMPTY && game.heightMap.getHeight(x, y) > 0 && game.heightMap.isFlat(x, y));
         }
         return false;
     }
-
     Vector3 p = new Vector3();
     Matrix4 basis = new Matrix4();
 
+    /**
+     * Draws all houses on the map
+     * @param gl The GL object to use for drawing.
+     * @param time Elapsed time, for animation.
+     */
     public void display(GL gl, float time) {
         synchronized (houses) {
             if (houses != null) {
@@ -111,7 +138,11 @@ public class Houses implements AbstractHouses, GLObject {
                     gl.glVertex3f(0.31f, -0.31f, 1.5f);
                     gl.glVertex3f(0.31f, -0.31f, 0f);
 
-                    gl.glColor3fv(h.player.getColour(), 0);
+                    if (h.infected) {
+                        gl.glColor3f(0.2f, 0.2f, 0.2f);
+                    } else {
+                        gl.glColor3fv(h.player.getColour(), 0);
+                    }
                     gl.glVertex3f(0.31f, -0.31f, 1.5f * height - 0.2f);
                     gl.glVertex3f(0.31f, -0.31f, 1.5f * height);
                     gl.glVertex3f(0.4f, -0.4f, 1.5f * height - 0.1f);
@@ -133,11 +164,19 @@ public class Houses implements AbstractHouses, GLObject {
         }
     }
 
+    /**
+     * Call whenever the relevant GL object needs to initialise.
+     * @param gl
+     */
     public void init(GL gl) {
         houseModel.init(gl);
         ankhModel.init(gl);
     }
 
+    /**
+     * Call if the server indicates the leaders houses have changed.
+     * @param leaders The new map of player IDs to house IDs
+     */
     public void setLeaders(Map<Integer, Integer> leaders) {
         leaderHouses.clear();
         for (Entry<Integer, Integer> e : leaders.entrySet()) {
@@ -145,6 +184,10 @@ public class Houses implements AbstractHouses, GLObject {
         }
     }
 
+    /**
+     * Step all houses through game time. This keeps strength values, etc. in sync with the server.
+     * @param seconds
+     */
     public void step(float seconds) {
         synchronized (houses) {
             for (House h : houses.values()) {
@@ -153,27 +196,41 @@ public class Houses implements AbstractHouses, GLObject {
         }
     }
 
+    /** Return the house if any at the given coordinates.
+     * @param x The x coordinate of the tile in question
+     * @param y The y coordinate of the tile in question
+     * @return The House object that exists at that point, or null if there is no house there.
+     */
     public House getHouse(int x, int y) {
-        return houses.get(x+y*game.heightMap.width);
+        return houses.get(x + y * game.heightMap.width);
     }
 
     public class House extends com.novusradix.JavaPop.House {
 
-        public House(int x, int y, Player player, int level, float strength) {
+        private boolean infected;
+
+        public House(int x, int y, Player player, int level, float strength, boolean infected) {
             this.pos = new Point(x, y);
             this.level = level;
             this.player = player;
             this.strength = strength;
+            this.infected = infected;
         }
 
-        public void update(Player p, int level, float strength) {
+        public void update(Player p, int level, float strength, boolean infected) {
             this.player = p;
             this.level = level;
             this.strength = strength;
+            this.infected = infected;
         }
 
         private void step(float seconds) {
             strength += seconds * getGrowthRate();
+        }
+
+        @Override
+        public boolean isInfected() {
+            return infected;
         }
     }
 }

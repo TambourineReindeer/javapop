@@ -268,6 +268,7 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 texid = 6;
                 break;
             case SWAMP:
+            case FUNGUS:
                 texid = 7;
                 break;
             case BASALT:

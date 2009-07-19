@@ -1,6 +1,7 @@
 package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
+import com.novusradix.JavaPop.Messaging.Tools.Fungus;
 import java.awt.Point;
 
 /**
@@ -15,6 +16,7 @@ public class FungusTool extends Tool {
 
     @Override
     public void PrimaryDown(Point p) {
+        client.sendMessage(new Fungus(p));
     }
 
     public String getIconName() {

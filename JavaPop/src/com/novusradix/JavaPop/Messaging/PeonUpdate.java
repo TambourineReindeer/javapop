@@ -60,8 +60,9 @@ public class PeonUpdate extends Message implements Externalizable {
         public int destx,  desty;
         public float posx,  posy;
         public int playerId;
+        public boolean infected;
 
-        public Detail(int id, Peon.State state, float posx, float posy, int destx, int desty, float dx, float dy, int playerId) {
+        public Detail(int id, Peon.State state, float posx, float posy, int destx, int desty, float dx, float dy, int playerId, boolean infected) {
             this.id = id;
             this.state = state;
             this.dx = dx;
@@ -71,6 +72,7 @@ public class PeonUpdate extends Message implements Externalizable {
             this.posx = posx;
             this.posy = posy;
             this.playerId = playerId;
+            this.infected = infected;
         }
 
         private Detail() {
@@ -98,6 +100,7 @@ public class PeonUpdate extends Message implements Externalizable {
             out.writeInt(d.destx);
             out.writeInt(d.desty);
             out.writeInt(d.playerId);
+            out.writeBoolean(d.infected);
         }
 
         out.writeInt(leaders.size());
@@ -130,7 +133,7 @@ public class PeonUpdate extends Message implements Externalizable {
             d.destx = in.readInt();
             d.desty = in.readInt();
             d.playerId = in.readInt();
-
+            d.infected = in.readBoolean();
         }
         i = in.readInt();
         leaders = new HashMap<Integer, Integer>();

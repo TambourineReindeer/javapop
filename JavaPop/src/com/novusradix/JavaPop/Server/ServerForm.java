@@ -74,9 +74,7 @@ public class ServerForm extends javax.swing.JFrame {
 private void btnQuitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnQuitActionPerformed
     server.kill();
 }//GEN-LAST:event_btnQuitActionPerformed
-    /**
-     * @param args the command line arguments
-     */
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnQuit;
     private javax.swing.JTextArea output;

@@ -21,6 +21,12 @@ public class ServerPeons {
     private final Map<ServerPlayer, Peon> leaders;
     private int nextId = 1;
 
+    public void infectWithPlague(int x, int y) {
+        for (Peon victim : getPeons(new Point(x, y))) {
+            victim.infectWithPlague();
+        }
+    }
+
     public void makeHero(Peon p, Type type) {
         synchronized (peons) {
             p.setState(State.DEAD);
@@ -50,8 +56,8 @@ public class ServerPeons {
         return map.get(p);
     }
 
-    public Peon addPeon(int x, int y, float strength, ServerPlayer player, boolean leader) {
-        Peon p = new Peon(x + 0.5f, y + 0.5f, strength, player, game);
+    public Peon addPeon(int x, int y, float strength, ServerPlayer player, boolean leader, boolean infected) {
+        Peon p = new Peon(x + 0.5f, y + 0.5f, strength, infected, player, game);
         synchronized (peons) {
             peons.add(p);
             map.put(p.getPoint(), p);

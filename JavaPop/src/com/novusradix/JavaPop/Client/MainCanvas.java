@@ -1,5 +1,5 @@
 /*
- * Renders the main game view, and reacts to user input.
+ * 
  */
 package com.novusradix.JavaPop.Client;
 
@@ -47,12 +47,12 @@ import static java.lang.Math.*;
 import static java.awt.event.KeyEvent.*;
 import static javax.media.opengl.GL.*;
 
+/**
+ * Renders the main game view, and reacts to user input.
+ * @author gef
+ */
 public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener, MouseWheelListener, MouseMotionListener, MouseListener {
 
-    /**
-     *
-     * @author gef
-     */
     private static final long serialVersionUID = 1L;
     private static final float fHeightScale = 0.4082f;
     private float xPos,  yPos,  xOrig,  yOrig;
@@ -74,6 +74,11 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Collection<GLObject2D> uiObjects;
     private final GLText text;
 
+    /**
+     * Creates a new MainCanvas for a game.
+     * @param caps
+     * @param g
+     */
     public MainCanvas(GLCapabilities caps, Game g) {
         super(caps);
         glHelper = GLHelper.glHelper;
@@ -110,7 +115,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             }
         }
         text = new GLText();
-       /* Panel p = new Panel(new Rectangle2D.Float(0.25f, 0.25f, 0.5f, 0.5f), text);
+        /* Panel p = new Panel(new Rectangle2D.Float(0.25f, 0.25f, 0.5f, 0.5f), text);
         Rectangle2D.Float r = new Rectangle2D.Float(0.5f, 0.5f, 0.1f, 0.1f);
         UIButton b= new UIButton(r, "Yay", null, text);
         p.add(b);
@@ -121,6 +126,11 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
     }
 
+    /**
+     * Implements the GLEventListener display method.
+     * From here, all GLObjects and effects are drawn. Also, keyboard input is checked.
+     * @param glAD
+     */
     public void display(final GLAutoDrawable glAD) {
         long now = System.currentTimeMillis();
         game.step((now - lastMillis) / 1000.0f);
@@ -212,7 +222,10 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             Logger.getLogger(MainCanvas.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+/**
+ * Centers the display on the given point.
+ * @param p
+ */
     void lookAt(Point p) {
         xPos = (p.y - p.x) / 1.4f;
         yPos = (p.x + p.y) / 2.8f;
@@ -317,6 +330,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     public void displayChanged(final GLAutoDrawable arg0, final boolean arg1, final boolean arg2) {
     }
 
+    /**
+     * Handles the GLEventListener event.
+     * This method is called before first display and on fullscreen/mode changes,
+     * and must account for the fact that textures and display lists will need to be reloaded.
+     * @param glDrawable
+     */
     public void init(final GLAutoDrawable glDrawable) {
         //Called before first display and on fullscreen/mode changes
         glDrawable.setGL(new DebugGL(glDrawable.getGL()));
@@ -361,6 +380,14 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         }
     }
 
+    /**
+     * Called when the display changes shape
+     * @param glDrawable
+     * @param x
+     * @param y
+     * @param w
+     * @param h
+     */
     public void reshape(final GLAutoDrawable glDrawable, final int x, final int y, final int w, int h) {
         final GL gl = glDrawable.getGL();
         height = h;

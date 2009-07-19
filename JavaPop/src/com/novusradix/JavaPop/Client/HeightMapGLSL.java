@@ -15,7 +15,7 @@ import javax.media.opengl.*;
 import static javax.media.opengl.GL.*;
 
 /**
- *
+ * The class responsible for drawing the height map, if GLSL is available.
  * @author gef
  */
 public class HeightMapGLSL implements HeightMapImpl, GLObject {
@@ -262,6 +262,7 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
                 texid = 6;
                 break;
             case SWAMP:
+            case FUNGUS:
                 texid = 7;
                 break;
             case BASALT:

@@ -135,6 +135,10 @@ public class ServerGame extends TimerTask {
             persistentEffects.put(p, new HashMap<Class, Effect>());
         }
         
+        //A universal effect bucket, not tied to players:
+        persistentEffects.put(null, new HashMap<Class, Effect>());
+
+
         int numPeons = 3;
         nextPlayer:
         for (Map.Entry<ServerPlayer, Point> me : startingPosition.entrySet()) {
@@ -144,7 +148,7 @@ public class ServerGame extends TimerTask {
                     Point p2 = new Point(p.x + me.getValue().x, p.y + me.getValue().y);
                     if (heightMap.tileInBounds(p2.x, p2.y) && heightMap.getHeight(p2.x, p2.y) > 0) {
                         placed++;
-                        peons.addPeon(p2.x, p2.y, 200, me.getKey(), true);
+                        peons.addPeon(p2.x, p2.y, 200, me.getKey(), true, false);
                         if (placed == numPeons) {
                             continue nextPlayer;
                         }

@@ -1,7 +1,7 @@
 package com.novusradix.JavaPop;
 
 /**
- *
+ * This class is used in several places where directions need to be passed. By passing a <code>Direction</code>, the receiving function can figure out which is the leading edge of a tile and reason accordingly.
  * @author gef
  */
 public enum Direction {

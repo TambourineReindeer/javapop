@@ -15,8 +15,7 @@ public class Sprog extends Message {
      */
     private static final long serialVersionUID = 1L;
     private int x,  y;
-    private boolean primaryAction;
-
+   
     public Sprog(Point p) {
         x = p.x;
         y = p.y;
