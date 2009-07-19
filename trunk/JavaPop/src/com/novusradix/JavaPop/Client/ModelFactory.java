@@ -5,7 +5,7 @@ import java.net.URL;
 import java.util.HashMap;
 
 /**
- *
+ * Loads and keeps models in a map given a URL.
  * @author gef
  */
 public class ModelFactory {

@@ -1,5 +1,5 @@
 /*
- * This class performs the network functions of the local client.
+ * 
  */
 package com.novusradix.JavaPop.Client;
 
@@ -20,7 +20,7 @@ import com.novusradix.JavaPop.Messaging.Tools.SetBehaviour;
 import java.net.SocketException;
 
 /**
- *
+ * This class performs the network functions of the local client.
  * @author gef
  */
 public class Client implements Runnable {

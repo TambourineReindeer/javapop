@@ -1,6 +1,7 @@
 package com.novusradix.JavaPop.Client.Tools;
 
 import com.novusradix.JavaPop.Client.Client;
+import com.novusradix.JavaPop.Messaging.Tools.Plague;
 import java.awt.Point;
 
 /**
@@ -15,6 +16,8 @@ public class PlagueTool extends Tool {
 
     @Override
     public void PrimaryDown(Point p) {
+        client.sendMessage(new Plague(p));
+
     }
 
     public String getIconName() {

@@ -44,10 +44,10 @@ public class ServerHouses {
         hds = new Vector<HouseUpdate.Detail>();
     }
 
-    public void addHouse(int x, int y, ServerPlayer player, float strength, boolean leader) {
+    public void addHouse(int x, int y, ServerPlayer player, float strength, boolean leader, boolean infected) {
         synchronized (allHouses) {
             if (canBuild(x, y)) {
-                ServerHouse h = new ServerHouse(x, y, player, strength);
+                ServerHouse h = new ServerHouse(x, y, player, strength, infected);
                 allHouses.put(x + y * game.heightMap.width, h);
                 if (leader) {
                     leaderHouses.put(player, h);
@@ -65,6 +65,13 @@ public class ServerHouses {
 
     public ServerHouse getLeaderHouse(ServerPlayer p) {
         return leaderHouses.get(p);
+    }
+
+    public void infectWithPlague(int x, int y) {
+        ServerHouse victim = getHouse(x, y);
+        if (victim != null) {
+            victim.infectWithPlague();
+        }
     }
 
     private Collection<ServerHouse> affectedHouses(SortedSet<Integer> mapChanges) {
@@ -131,10 +138,8 @@ public class ServerHouses {
                 if (newmap[h.pos.x][h.pos.y] != HOUSE) {
                     i.remove();
                     removeHouse(h);
-                }
-                else
-                {
-                    h.serverPlayer.houseMana +=h.strength;
+                } else {
+                    h.serverPlayer.houseMana += h.strength;
                 }
             }
         }
@@ -156,12 +161,12 @@ public class ServerHouses {
 
     private Peon removeHouse(ServerHouse h) {
         boolean leader = leaderHouses.containsValue(h);
-        hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.serverPlayer, -1, 0));
+        hds.add(new HouseUpdate.Detail(h.id, h.pos.x, h.pos.y, h.serverPlayer, -1, 0, h.isInfected()));
         if (leader) {
             leaderHouses.remove(h.serverPlayer);
         }
         if (h.strength > 0) {
-            return game.peons.addPeon(h.pos.x, h.pos.y, h.strength, h.serverPlayer, leader);
+            return game.peons.addPeon(h.pos.x, h.pos.y, h.strength, h.serverPlayer, leader, h.isInfected());
         }
         return null;
     }
@@ -234,8 +239,9 @@ public class ServerHouses {
 
         private ServerPlayer serverPlayer;
         private boolean changed;
+        private boolean infected;
 
-        public ServerHouse(int x, int y, ServerPlayer player, float strength) {
+        public ServerHouse(int x, int y, ServerPlayer player, float strength, boolean infected) {
             id = x + y * game.heightMap.width;
             changed = true;
             pos = new Point(x, y);
@@ -245,6 +251,7 @@ public class ServerHouses {
             this.strength = strength;
             setLevel();
             newHouses.add(x + y * game.heightMap.width);
+            this.infected = infected;
         }
 
         public void damage(float i) {
@@ -254,20 +261,27 @@ public class ServerHouses {
             }
         }
 
+        public void infectWithPlague() {
+            if (!infected) {
+                infected = true;
+                changed = true;
+            }
+        }
+
         public void sprog() {
             strength /= 2;
             boolean leader = leaderHouses.containsValue(this);
             if (leader) {
                 leaderHouses.remove(serverPlayer);
             }
-            game.peons.addPeon(pos.x, pos.y, strength, serverPlayer, leader);
+            game.peons.addPeon(pos.x, pos.y, strength, serverPlayer, leader, infected);
 
             changed = true;
         }
 
         public Peon knockDown() {
             boolean leader = leaderHouses.containsValue(this);
-            Peon p = game.peons.addPeon(pos.x, pos.y, strength, serverPlayer, leader);
+            Peon p = game.peons.addPeon(pos.x, pos.y, strength, serverPlayer, leader, infected);
             strength = 0;
             return p;
         }
@@ -275,19 +289,26 @@ public class ServerHouses {
         public Peon.State addPeon(Peon p, boolean leader) {
             changed = true;
             if (p.player == player) {
+                //Same player, i.e. peon merging with house
                 strength += p.strength;
                 if (leader) {
                     leaderHouses.put(serverPlayer, this);
                     changed = true;
                 }
+                if (p.isInfected()) {
+                    this.infectWithPlague();
+                }
                 return Peon.State.SETTLED;
             }
 
+            //different player, i.e. a fight
             strength -= p.strength;
             if (strength < 0) {
+                //attacker wins
+                infected=p.isInfected();
                 if (leaderHouses.containsValue(this)) {
                     leaderHouses.remove(serverPlayer);
-                    serverPlayer.setPapalMagnet(pos.x,pos.y);
+                    serverPlayer.setPapalMagnet(pos.x, pos.y);
                 }
                 player = p.player;
                 serverPlayer = p.player;
@@ -318,12 +339,11 @@ public class ServerHouses {
             }
             int px, py;
             for (px = pos.x - radius; px <= pos.x + radius; px++) {
-                for (py = pos.y - radius; py <= pos.y + radius; py++)
-                {
+                for (py = pos.y - radius; py <= pos.y + radius; py++) {
 
-                        if (game.heightMap.tileInBounds(px, py) && game.heightMap.getTile(px, py).isFertile) {
-                            game.heightMap.setTile(px, py, Tile.BURNT);
-                        }
+                    if (game.heightMap.tileInBounds(px, py) && game.heightMap.getTile(px, py).isFertile) {
+                        game.heightMap.setTile(px, py, Tile.BURNT);
+                    }
 
                 }
             }
@@ -386,15 +406,20 @@ public class ServerHouses {
                 if (leader) {
                     leaderHouses.remove(serverPlayer);
                 }
-                game.peons.addPeon(pos.x, pos.y, strength - houseStrength, serverPlayer, leader);
+                game.peons.addPeon(pos.x, pos.y, strength - houseStrength, serverPlayer, leader, infected);
 
                 strength = houseStrength;
             }
 
             if (changed) {
                 changed = false;
-                hds.add(new HouseUpdate.Detail(id, pos.x, pos.y, serverPlayer, level, strength));
+                hds.add(new HouseUpdate.Detail(id, pos.x, pos.y, serverPlayer, level, strength, infected));
             }
+        }
+
+        @Override
+        public boolean isInfected() {
+            return infected;
         }
     }
 }

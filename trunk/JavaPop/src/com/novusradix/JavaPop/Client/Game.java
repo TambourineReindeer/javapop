@@ -1,5 +1,4 @@
 /*
- * This class is the container for all data required by an active game instance.
  * 
  */
 package com.novusradix.JavaPop.Client;
@@ -15,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * This class is the container for all data required by an active game instance.
  *
  * @author gef
  */

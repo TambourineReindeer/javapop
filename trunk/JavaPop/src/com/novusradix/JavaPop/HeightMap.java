@@ -11,12 +11,19 @@ import java.awt.Point;
 import java.util.Set;
 
 /**
- *
+ * Aspects of a heightmap that are common to client and server are defined here.
  * @author gef
  */
 public abstract class HeightMap {
- 
-    public final int width,  breadth;
+
+    /**
+     * The x axis size of the map
+     */
+    public final int width;
+    /**
+     * The y axis size of the map
+     */
+    public final int breadth;
 
     public HeightMap(Dimension mapSize) {
         width = mapSize.width;

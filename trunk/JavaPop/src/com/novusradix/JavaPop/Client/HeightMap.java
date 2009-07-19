@@ -1,7 +1,4 @@
-/*
- * This class is the client side map. It specifies creation, response to server update messages, and rendering.
- * Other client classes can also query points on the map.
- */
+
 package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Math.Matrix4;
@@ -16,12 +13,16 @@ import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.*;
-
+/**
+ * This class is the client side map. It specifies creation, response to server update messages, and rendering.
+ * Other client classes can also query points on the map.
+ * @author gef
+ */
 public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObject {
 
     HeightMapImpl implementation;
     GLObject renderer;
-    private Map<Point, MutableFloat> rocks;
+    final private Map<Point, MutableFloat> rocks;
     private Model rock,  tree;
     private float lastTime;
     public EarthquakeRenderer earthquakeRenderer;
@@ -85,16 +86,16 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObj
 
     public void addRocks(Set<Point> r) {
         synchronized (rocks) {
-            for (Point p : r) {
-                rocks.put(p, new MutableFloat(0));
+            for (Point tempPoint : r) {
+                rocks.put(tempPoint, new MutableFloat(0));
             }
         }
     }
 
     public void removeRocks(Set<Point> r) {
         synchronized (rocks) {
-            for (Point p : r) {
-                rocks.remove(p);
+            for (Point tempPoint : r) {
+                rocks.remove(tempPoint);
             }
         }
     }
@@ -102,14 +103,14 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObj
     private void stepRocks(float elapsedTime) {
         Entry<Point, MutableFloat> e;
         MutableFloat f;
-        Point p;
+        Point tempPoint;
         Boolean sea;
         Iterator<Entry<Point, MutableFloat>> i = rocks.entrySet().iterator();
         while (i.hasNext()) {
             e = i.next();
             f = e.getValue();
-            p = e.getKey();
-            sea = isSeaLevel(p.x, p.y);
+            tempPoint = e.getKey();
+            sea = isSeaLevel(tempPoint.x, tempPoint.y);
             if (sea) {
                 f.f = Math.max(0.0f, f.f - elapsedTime / 2.0f);
             } else {

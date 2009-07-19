@@ -7,7 +7,7 @@ import javax.media.opengl.GL;
 import static java.lang.Math.*;
 
 /**
- *
+ * Client specific Player implementation
  * @author gef
  */
 public class Player implements GLObject,com.novusradix.JavaPop.Player  {

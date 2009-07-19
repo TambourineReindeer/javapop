@@ -31,7 +31,7 @@ public class Houses implements AbstractHouses {
         }
     }
 
-    public void updateHouse(int id, int x, int y, Player p, int level, float strength) {
+    public void updateHouse(int id, int x, int y, Player p, int level, float strength, boolean infected) {
         synchronized (houses) {
             if (level < 0) {
                 //remove
@@ -50,7 +50,7 @@ public class Houses implements AbstractHouses {
                         playerHouses.put(p, h);
                     }
                 } else {
-                    House h = new House(x,y, p, level);
+                    House h = new House(x,y, p, level, infected);
                     houses.put(id, h);
                     playerHouses.put(p, h);
                 }
@@ -77,12 +77,19 @@ public class Houses implements AbstractHouses {
 
         public final int x;
         public final int y;
+        public boolean infected;
 
-        public House(int px, int py, Player player, int level) {
+        public House(int px, int py, Player player, int level, boolean infected) {
             x=px;y=py;
             map[x][y] = HOUSE;
             this.level = level;
             this.player = player;
+            this.infected = infected;
+        }
+
+        @Override
+        public boolean isInfected() {
+            return infected;
         }
     }
 

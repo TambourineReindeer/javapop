@@ -1,6 +1,4 @@
-/*
- * The main window for the active game.
- */
+
 package com.novusradix.JavaPop.Client;
 
 import com.novusradix.JavaPop.Messaging.Lobby.LeaveGame;
@@ -12,7 +10,7 @@ import javax.media.opengl.GLCapabilities;
 import javax.swing.JFrame;
 
 /**
- *
+ * The main window for the active game.
  * @author gef
  */
 public class GameFrame extends JFrame implements WindowListener {

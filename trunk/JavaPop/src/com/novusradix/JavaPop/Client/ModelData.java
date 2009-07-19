@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Data container and in/output class for <code>Model</code>
  * @author gef
  */
 public class ModelData implements Serializable {

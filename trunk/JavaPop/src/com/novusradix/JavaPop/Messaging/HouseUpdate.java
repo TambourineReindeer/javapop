@@ -35,7 +35,7 @@ public class HouseUpdate extends Message implements Externalizable {
     @Override
     public void execute() {
         for (Detail d : details) {
-            client.game.houses.updateHouse(d.id, d.x, d.y, client.game.players.get(d.playerId), d.level, d.strength);
+            client.game.houses.updateHouse(d.id, d.x, d.y, client.game.players.get(d.playerId), d.level, d.strength, d.infected);
         }
         client.game.houses.setLeaders(leaderHouses);
     }
@@ -47,14 +47,16 @@ public class HouseUpdate extends Message implements Externalizable {
         int level;
         int playerId;
         float strength;
+        boolean infected;
 
-        public Detail(int id, int x, int y, ServerPlayer p, int level, float strength) {
+        public Detail(int id, int x, int y, ServerPlayer p, int level, float strength, boolean infected) {
             this.id = id;
             this.x = x;
             this.y = y;
             this.playerId = p.getId();
             this.level = level;
             this.strength = strength;
+            this.infected = infected;
         }
 
         private Detail() {
@@ -73,6 +75,7 @@ public class HouseUpdate extends Message implements Externalizable {
             out.writeInt(d.playerId);
             out.writeInt(d.level);
             out.writeFloat(d.strength);
+            out.writeBoolean(d.infected);
         }
         out.writeInt(leaderHouses.size());
         for (Entry<Integer, Integer> e : leaderHouses.entrySet()) {
@@ -92,6 +95,7 @@ public class HouseUpdate extends Message implements Externalizable {
             d.playerId = in.readInt();
             d.level = in.readInt();
             d.strength = in.readFloat();
+            d.infected =in.readBoolean();
             details.add(d);
         }
         i = in.readInt();

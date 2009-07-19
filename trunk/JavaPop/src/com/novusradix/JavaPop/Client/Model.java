@@ -15,7 +15,8 @@ import static javax.media.opengl.GL.*;
 import javax.media.opengl.GLException;
 
 /**
- *
+ * A generic 3D model class.
+ * Clips rendering to the current view volume, given a model radius.
  * @author gef
  */
 public class Model {
@@ -92,7 +93,7 @@ public class Model {
         clip = true;
     }
 
-    /* Call to set the color that will be used after the next prepare()
+    /** Call to set the color that will be used after the next prepare()
      * Does not have to be called in an OpenGL thread
      */
     public void setColor(float r, float g, float b, float a) {
@@ -103,7 +104,7 @@ public class Model {
 
     }
 
-    /* Call to set the color that will be used in the next display()
+    /** Call to set the color that will be used in the next display()
      * Has to be called in an OpenGL thread
      * Can be called after prepare()
      */
@@ -135,7 +136,7 @@ public class Model {
         }
     }
 
-    /* Call before display()
+    /** Call before display()
      * Has to be called in an OpenGL thread
      */
     public void prepare(GL gl) {
@@ -219,7 +220,8 @@ public class Model {
         }
     }
 
-    /* Displays the model
+    /**
+     * Displays the model
      * Has to be called in an OpenGL thread
      * Must be called after prepare()
      */
@@ -247,7 +249,8 @@ public class Model {
         }
     }
 
-    /* Initialises the model. Compiles shaders etc.
+    /**
+     * Initialises the model. Compiles shaders etc.
      * If not called before prepare(), it will be called automatically from there.
      * Has to be called in an OpenGL thread
      */

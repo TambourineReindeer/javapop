@@ -10,12 +10,12 @@ import java.util.logging.Logger;
 import javax.media.opengl.GL;
 
 /**
- *
+ * This class draws the earthquake effects on the client.
  * @author gef
  */
 public class EarthquakeRenderer implements GLObject {
 
-    private HashMap<Integer, QuakeTile> tiles;
+    private final HashMap<Integer, QuakeTile> tiles;
     private Game g;
     private int stride;
     private Model side,  corner;

@@ -5,7 +5,6 @@ import com.novusradix.JavaPop.Math.Vector2;
 import com.novusradix.JavaPop.Messaging.PeonUpdate;
 import com.novusradix.JavaPop.Server.ServerGame;
 import com.novusradix.JavaPop.Server.ServerHouses.ServerHouse;
-import com.novusradix.JavaPop.Server.ServerPeons.Action;
 import com.novusradix.JavaPop.Server.ServerPlayer;
 import com.novusradix.JavaPop.Server.ServerPlayer.PeonMode;
 import com.novusradix.JavaPop.Tile;
@@ -38,8 +37,9 @@ public class Peon {
     protected Point shortDest;
     protected boolean changed;
     protected float stateTimer = 0;
+    private boolean infected;
 
-    public Peon(float x, float y, float strength, ServerPlayer sp, ServerGame g) {
+    public Peon(float x, float y, float strength, boolean infected, ServerPlayer sp, ServerGame g) {
         id = nextId++;
         pos = new Vector2(x, y);
         shortDest = new Point(getPoint());
@@ -48,6 +48,7 @@ public class Peon {
         changed = true;
         player = sp;
         game = g;
+        this.infected = infected;
         pickNextShortDest();
 
     }
@@ -62,6 +63,7 @@ public class Peon {
         changed = true;
         player = p.player;
         game = p.game;
+        infected = p.isInfected();
         pickNextShortDest();
     }
 
@@ -73,6 +75,10 @@ public class Peon {
             p = new Point(fx, fy);
         }
         return p;
+    }
+
+    public boolean isInfected() {
+        return infected;
     }
 
     public PeonUpdate.Detail step(float seconds) {
@@ -103,6 +109,8 @@ public class Peon {
                         if (!game.peons.isLeader(this)) {
                             //merge    
                             other.strength += strength;
+                            if(infected)
+                                other.infectWithPlague();
                             return changeState(State.DEAD);
                         }
                     } else {
@@ -208,6 +216,10 @@ public class Peon {
         strength -= i;
     }
 
+    public void infectWithPlague() {
+        infected = true;
+    }
+
     public void setState(State s) {
         state = s;
         changed = true;
@@ -280,7 +292,7 @@ public class Peon {
         state = s;
         stateTimer = 0;
         changed = false;
-        return new PeonUpdate.Detail(id, state, pos.x, pos.y, shortDest.x, shortDest.y, dx, dy, player.getId());
+        return new PeonUpdate.Detail(id, state, pos.x, pos.y, shortDest.x, shortDest.y, dx, dy, player.getId(), infected);
     }
     Point temp = new Point();
 
@@ -423,7 +435,7 @@ public class Peon {
 
     private State tryBuildHouse() {
         if (game.houses.canBuild((int) pos.x, (int) pos.y)) {
-            game.houses.addHouse((int) pos.x, (int) pos.y, player, strength, game.peons.isLeader(this));
+            game.houses.addHouse((int) pos.x, (int) pos.y, player, strength, game.peons.isLeader(this), infected);
             return State.SETTLED;
         }
         return null;
