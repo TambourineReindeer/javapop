@@ -124,6 +124,7 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObj
         int x, y;
         rock.prepare(gl);
         gl.glUseProgram(0);
+        gl.glColor3f(1,1,1);
         synchronized (rocks) {
             for (Entry<Point, MutableFloat> e : rocks.entrySet()) {
                 x = e.getKey().x;
