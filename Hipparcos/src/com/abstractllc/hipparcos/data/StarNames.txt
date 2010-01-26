@@ -1,0 +1,272 @@
+0 Sol
+677 Alpheratz
+746 Caph
+1067 Algenib
+2081 Ankaa
+3179 Schedar
+3419 "Deneb Kaitos"
+3821 Achird
+3829 "Van Maanen 2"
+5447 Mirach
+6686 Ruchbah
+7588 Achernar
+8645 "Baten Kaitos"
+8796 "Caput Trianguli"
+8832 Mesarthim
+8886 Segin
+8903 Sheratan
+9487 "Al Rischa"
+9640 Almach
+9884 Hamal
+10826 Mira
+11767 Polaris
+12706 Kaffaljidhma
+13268 Miram
+13701 Azha
+13847 Acamar
+14135 Menkar
+14576 Algol
+14668 Misam
+14838 Botein
+15197 Zibal
+15863 Mirfak
+17378 Rana
+17448 Atiks
+17489 Celaeno
+17499 Electra
+17531 Taygeta
+17573 Maia
+17579 "Asterope A"
+17588 "Asterope B"
+17608 Merope
+17702 Alcyone
+17847 Atlas
+17851 Pleione
+18246 Menkhib
+18543 Zaurak
+19587 Beid
+20042 Theemin
+20889 Ain
+21421 Aldebaran
+21594 Sceptrum
+22449 Tabit
+23015 Hassaleh
+23453 Sadatoni
+23767 "Hoedus II"
+23875 Cursa
+24186 "Kapteyn's Star"
+24436 Rigel
+24608 Capella
+25336 Bellatrix
+25428 "El Nath"
+25606 Nihal
+25930 Mintaka
+25985 Arneb
+26207 Heka
+26220 "Trapezium AB"
+26221 "Trapezium C"
+26224 "Trapezium D"
+26241 Hatysa
+26311 Alnilam
+26634 Phact
+26727 Alnitak
+27366 Saiph
+27628 Wezn
+27989 Betelgeuse
+28360 Menkalinan
+29655 Propus
+30089 "Red Rectangle"
+30122 Furud
+30324 Murzim
+30343 "Tejat Posterior"
+30438 Canopus
+31646 "Plaskett's Star"
+31681 Alhena
+32246 Mebsuta
+32349 Sirius
+33579 Adhara
+34045 Muliphein
+34088 Mekbuda
+34444 Wesen
+35550 Wasat
+35904 Aludra
+36188 Gomeisa
+36208 "Luyten's Star"
+36850 Castor
+37229 Markeb
+37279 Procyon
+37826 Pollux
+38170 Azmidiske
+39429 Naos
+40167 Tegmeni
+41037 Avior
+41704 Muscida
+42556 Praesepe
+42806 "Asellus Borealis"
+42911 "Asellus Australis"
+44066 Acubens
+44127 Talitha
+44471 "Al Kaprah"
+44816 Alsuhail
+45238 Miaplacidus
+45556 Tureis
+46390 Alphard
+47508 Subra
+47908 "Ras Elased Australis"
+48455 "Ras Elased Borealis"
+49669 Regulus
+50335 Aldhafera
+50372 "Tania Borealis"
+50583 "Al Geiba"
+50801 "Tania Australis"
+53740 Alkes
+53910 Merak
+54061 Dubhe
+54872 Zozma
+54879 Chort
+55219 "Alula Borealis"
+56211 Gianfar
+57632 Denebola
+57757 Alaraph
+57939 "Groombridge 1830"
+58001 Phad
+59199 Alchita
+59316 Minkar
+59774 Megrez
+59803 Gienah
+60718 Acrux
+60965 Algorab
+61317 Asterion
+61359 Kraz
+61941 Porrima
+62956 Alioth
+63090 Minelauva
+63121 "Cor Caroli B"
+63125 "Cor Caroli A"
+63608 Vindemiatrix
+64241 Diadem
+65378 Mizar
+65474 Spica
+65477 Alcor
+66249 Heze
+67301 Benetnasch
+67927 Muphrid
+68702 Hadar
+68756 Thuban
+68933 Menkent
+69673 Arcturus
+70890 "Proxima Centauri"
+71075 Seginus
+71681 "Rigel Kentaurus B"
+71683 "Rigel Kentaurus A"
+72105 Mirak
+72487 Merga
+72603 "Zuben El Genubi A"
+72607 Kochab
+72622 "Zuben El Genubi B"
+73473 "Zuben Elakribi"
+73555 Nekkar
+73945 "Zuben Hakrabi"
+74785 "Zuben Eschamali"
+75097 Pherkad
+75411 "Alkalurops A"
+75415 "Alkalurops B"
+75458 "Ed Asich"
+75695 Nusakan
+76267 Gemma
+76333 "Zuben Elakrab"
+76534 Ceginus
+77070 "Unuk Al Hay"
+78401 Dschubba
+78820 "Graffias A"
+78821 "Graffias B"
+79374 Lesath
+79593 "Yed Prior"
+79882 "Yed Posterior"
+80112 "Al Niyat"
+80463 Kajam
+80763 Antares
+80816 Kornephoros
+82273 Atria
+82671 Grafias
+83608 Arrakis
+83895 "Nodus I"
+84012 Sabik
+84345 "Ras Algethi"
+84379 Sarin
+85670 Rastaban
+85693 Maasym
+85696 Lesuth
+85819 Kuma
+85822 Pherkard
+85927 Shaula
+86032 "Ras Alhague"
+86228 Sargas
+86614 Dziban
+86742 Cheleb
+87585 Grumium
+87833 Eltanin
+87937 "Barnard's Star"
+88567 "El Nasl A"
+88635 "El Nasl B"
+89642 Arkab
+89931 Media
+90185 "Kaus Australis"
+90496 "Kaus Borealis"
+91262 Vega
+92420 Sheliak
+92855 Nunki
+92946 Alya
+93194 Sulaphat
+93506 Ascella
+95241 "Arkab Prior"
+95294 "Arkab Posterior"
+95347 Rukbat
+95501 "Deneb Okab
+95947 "Albireo A"
+95951 "Albireo B"
+96295 "Campbell's Star"
+96757 Sham
+97278 Tarazed
+97433 Tyl
+97649 Altair
+98036 Alschain
+98298 "Cyg X-1"
+100027 "Al Giedi B"
+100064 "Al Giedi A"
+100325 "Dabih A"
+100345 "Dabih B"
+100453 Sadr
+100751 "Peacock Star"
+101769 Rotanev
+101958 Svalocin
+102098 Deneb
+102488 Gienah
+102618 "Al Bali"
+105199 Alderamin
+106032 Alfirk
+106278 "Sadal Sund"
+106985 Nashira
+107136 Azelfafage
+107259 Erakis
+107315 Enif
+107556 "Deneb Algiedi"
+109074 "Sadal Melik"
+109268 "Al Na'ir"
+110003 Ancha
+110395 Sadachbia
+110893 "Kruger 60"
+111710 Situla
+112029 Homam
+112158 Matar
+112247 "Babcock's Star"
+113136 Skat
+113368 Fomalhaut
+113881 Scheat
+113963 Markab
+115250 Kerb
+116727 "Er Rai"
+Bob
+Barry
+Jim
+Kate
