@@ -1,0 +1,94 @@
+1 Mercury
+2 Venus
+3 Earth
+4 Mars
+5 Jupiter
+6 Saturn
+7 Uranus
+8 Neptune
+9 Pluto
+"Erin's World"
+"Gef's World"
+"Greenland"
+"Keith's World"
+"Hell"
+"Heaven"
+"Utopia"
+"Dystopia"
+"Republix"
+"Gaia"
+"Dunroamin"
+"Arrakis"
+"Tatooine"
+"Thalassa"
+"LV-426"
+"Mongo"
+"Krypton"
+"Skaro"
+"Vulcan"
+"Juno"
+"Apollo"
+"Diana"
+"Cupid"
+"Minerva"
+"Ceres"
+"Proserpine"
+"Bacchus"
+"Vesta"
+"Janus"
+"Maia"
+"Zeus"
+"Poseidon"
+"Hades"
+"Hestia"
+"Hera"
+"Ares"
+"Athena"
+"Aphrodite"
+"Hermes"
+"Artemis"
+"Hephaestus"
+"Asclepius"
+"Demeter"
+"Persephone"
+"Dionysus"
+"Eros"
+"Hebe"
+"Eris"
+"Helius"
+"Thanatos"
+"Pan"
+"Nemesis"
+"Gaea"
+"Cronus"
+"Rhea"
+"Oceanus"
+"Tethys"
+"Hyperion"
+"Mnemosyne"
+"Themis"
+"Iapetus"
+"Coeus"
+"Crius"
+"Phoebe"
+"Thea"
+"Prometheus"
+"Epimetheus"
+"Atlas"
+"Metis"
+"Dione"
+Pandora
+Hypatia
+Beta
+Gamma
+Delta
+Alpha
+Iota
+Kappa
+Mu
+Nu
+Xi
+Pi
+Omega
+Theta
+Omicron
