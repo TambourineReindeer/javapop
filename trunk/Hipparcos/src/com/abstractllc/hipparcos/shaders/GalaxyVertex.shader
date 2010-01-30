@@ -7,7 +7,7 @@ void main(void)
     vec3 p =  vec3(gl_ModelViewMatrix * v);
     float dist = length(p);    
     gl_Position = gl_ModelViewProjectionMatrix * v;
-    gl_TexCoord[0].rgb = color*exposure/(dist*dist);
-    gl_PointSize = 10.0;
+    gl_TexCoord[1].rgb = color*exposure/(dist*dist);
+    gl_PointSize = 32.0;
     
 }
