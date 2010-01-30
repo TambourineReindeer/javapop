@@ -11,6 +11,7 @@ import java.nio.FloatBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.GL;
+import com.sun.opengl.util.texture.*;
 
 import static javax.media.opengl.GL.*;
 
@@ -27,6 +28,7 @@ public class GalaxyRenderer implements GLObject {
     private int[] vbos;
     private int shader;
     final private static int vertexStride = 8;
+    private Texture starTex;
 
     public GalaxyRenderer(HipparcosInstance hi) {
         this.hi = hi;
@@ -77,13 +79,19 @@ public class GalaxyRenderer implements GLObject {
         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vbos[0]);
         gl.glEnable(GL.GL_BLEND);
         gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE); //Additive
-        gl.glDisable(GL_TEXTURE_2D);
+        gl.glEnable(GL_TEXTURE_2D);
+        starTex.bind();
         gl.glUseProgram(shader);
+        gl.glEnable(GL.GL_POINT_SPRITE);
+        gl.glEnable(GL.GL_PROGRAM_POINT_SIZE_EXT);
+        gl.glPointParameterf(GL_POINT_SIZE_MAX, 32f);
+        gl.glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+
+        GLHelper.glHelper.setShaderUniform(gl, shader, "tex", 0);
         int loc = gl.glGetAttribLocation(shader, "color");
         gl.glVertexPointer(3, GL.GL_FLOAT, vertexStride * BufferUtil.SIZEOF_FLOAT, 0);
         gl.glVertexAttribPointer(loc, 3, GL_FLOAT, false, vertexStride * BufferUtil.SIZEOF_FLOAT, 3 * BufferUtil.SIZEOF_FLOAT);
         gl.glEnableVertexAttribArray(loc);
-        //gl.glColorPointer(3, GL.GL_FLOAT, vertexStride * BufferUtil.SIZEOF_FLOAT, 3 * BufferUtil.SIZEOF_FLOAT);
         GLHelper.glHelper.setShaderUniform(gl, shader, "exposure", exposure);
         gl.glDrawArrays(GL.GL_POINTS, 0, hi.hipEntries.size());
 
@@ -94,7 +102,6 @@ public class GalaxyRenderer implements GLObject {
     }
 
     public void init(GL gl) {
-
         if (vbos != null) {
             gl.glDeleteBuffers(1, vbos, 0);
         }
@@ -111,6 +118,11 @@ public class GalaxyRenderer implements GLObject {
         } catch (IOException ex) {
             Logger.getLogger(GalaxyRenderer.class.getName()).log(Level.SEVERE, null, ex);
         } catch (GLHelperException ex) {
+            Logger.getLogger(GalaxyRenderer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            starTex = GLHelper.glHelper.getTexture(gl, getClass().getResource("/com/abstractllc/hipparcos/textures/star32.png"));
+        } catch (IOException ex) {
             Logger.getLogger(GalaxyRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }
 

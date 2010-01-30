@@ -50,15 +50,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private Vector3f forward, up, right, position;
     private int[] mainFBOs;
     private int[] mainTextures;
-    private int[] bloomFBOs;
-    private int[] bloomTextures;
     private int[] luminanceDownsampleFBOs;
     private int[] luminanceDownsampleTextures;
     private int width, height;
     static final private int bloomBufferMax = 1;
     private int luminanceDownsampleBufferCount;
-    private int bloomBufferCount = 0;
-    private int downsampleShader, downsampleLogShader, toneMapShader, brightPassShader, filter5shader;
+   private int downsampleShader;
     private float exposure = 1;
     private float targetLuminance;
     private FloatBuffer luminancePixels;
@@ -72,8 +69,6 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         keys = new boolean[0x20e];
         mainFBOs = new int[1];
         mainTextures = new int[1];
-        bloomFBOs = new int[bloomBufferMax];
-        bloomTextures = new int[bloomBufferMax];
         addGLEventListener(this);
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -107,18 +102,12 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         }
         try {
             downsampleShader = GLHelper.glHelper.LoadShaderProgram(gl, null, "/com/abstractllc/hipparcos/shaders/DownsampleX2.shader");
-            //downsampleLogShader = GLHelper.glHelper.LoadShaderProgram(gl, null, "/com/abstractllc/hipparcos/shaders/DownsampleLog.shader");
-            toneMapShader = GLHelper.glHelper.LoadShaderProgram(gl, null, "/com/abstractllc/hipparcos/shaders/tonemap.shader");
-            brightPassShader = GLHelper.glHelper.LoadShaderProgram(gl, null, "/com/abstractllc/hipparcos/shaders/tonemap.shader");
-            filter5shader = GLHelper.glHelper.LoadShaderProgram(gl, null, "/com/abstractllc/hipparcos/shaders/5filter.shader");
-
+            
         } catch (IOException ex) {
             Logger.getLogger(GalaxyRenderer.class.getName()).log(Level.SEVERE, null, ex);
         } catch (GLHelperException ex) {
             Logger.getLogger(GalaxyRenderer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        gl.glGenTextures(bloomBufferMax, bloomTextures, 0);
-        gl.glGenFramebuffersEXT(bloomBufferMax, bloomFBOs, 0);
         gl.glGenTextures(1, mainTextures, 0);
         gl.glGenFramebuffersEXT(1, mainFBOs, 0);
         //luminance downsample textures and fbos are generated in reshape();
@@ -166,9 +155,8 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             }
             System.out.println(lum + ": " + exposure);
 
-            drawBloom(gl);
-
             composeScene(gl);
+            
             gl.glDisable(GL_TEXTURE_2D);
             gl.glMatrixMode(GL.GL_PROJECTION);
             gl.glPopMatrix();
@@ -219,7 +207,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
 
         //Main floating point render target
         gl.glBindTexture(GL.GL_TEXTURE_2D, mainTextures[0]);
-        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB16F_ARB, width, height, 0, GL.GL_RGBA, GL.GL_HALF_FLOAT_ARB, null);
+        gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB, width, height, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, null);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
         gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
         gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -228,9 +216,8 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, mainFBOs[0]);
         gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_COLOR_ATTACHMENT0_EXT, GL.GL_TEXTURE_2D, mainTextures[0], 0);
 
-        //Floating point luminance downsampling buffers
+        //luminance downsampling buffers
         setupLuminanceDownsampleBuffers(gl);
-        setupBloomBuffers(gl);
         gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, 0);
 
     }
@@ -291,46 +278,11 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private void composeScene(GL gl) {
         //Draw to default screen buffer
         gl.glViewport(0, 0, width, height);
-        gl.glUseProgram(toneMapShader);
-        GLHelper.glHelper.setShaderUniform(gl, toneMapShader, "tex", 0);
-        GLHelper.glHelper.setShaderUniform(gl, toneMapShader, "exposure", exposure);
+        gl.glUseProgram(0);
         gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, 0);
-        gl.glClearColor(0f, 0f, 0f, 0f);
-        gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         gl.glDisable(GL_BLEND);
         gl.glBindTexture(GL.GL_TEXTURE_2D, mainTextures[0]);
-        gl.glBegin(GL.GL_QUADS);
-        {
-            gl.glTexCoord2f(0, 0);
-            gl.glVertex2f(-1, -1);
-            gl.glTexCoord2f(1, 0);
-            gl.glVertex2f(1, -1);
-            gl.glTexCoord2f(1, 1);
-            gl.glVertex2f(1, 1);
-            gl.glTexCoord2f(0, 1);
-            gl.glVertex2f(-1, 1);
-        }
-        gl.glEnd();
-
-        gl.glUseProgram(0);
-
-        gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE); //Additive
-        gl.glEnable(GL_BLEND);
-        for (int i = 0; i < bloomBufferCount; i++) {
-            gl.glBindTexture(GL.GL_TEXTURE_2D, bloomTextures[i]);
-            gl.glBegin(GL.GL_QUADS);
-            {
-                gl.glTexCoord2f(0, 0);
-                gl.glVertex2f(-1, -1);
-                gl.glTexCoord2f(1, 0);
-                gl.glVertex2f(1, -1);
-                gl.glTexCoord2f(1, 1);
-                gl.glVertex2f(1, 1);
-                gl.glTexCoord2f(0, 1);
-                gl.glVertex2f(-1, 1);
-            }
-            gl.glEnd();
-        }
+        drawFullscreenQuad(gl);
     }
 
     private void drawFullscreenQuad(GL gl) {
@@ -375,18 +327,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             GLHelper.glHelper.setShaderUniform(gl, downsampleShader, "texelX", 1f / (width >> (i + 1)));
             GLHelper.glHelper.setShaderUniform(gl, downsampleShader, "texelY", 1f / (height >> (i + 1)));
 
-            gl.glBegin(GL.GL_QUADS);
-            {
-                gl.glTexCoord2f(0, 0);
-                gl.glVertex2f(-1, -1);
-                gl.glTexCoord2f(1, 0);
-                gl.glVertex2f(1, -1);
-                gl.glTexCoord2f(1, 1);
-                gl.glVertex2f(1, 1);
-                gl.glTexCoord2f(0, 1);
-                gl.glVertex2f(-1, 1);
-            }
-            gl.glEnd();
+            drawFullscreenQuad(gl);
         }
 
         float averageLuminance = 0;
@@ -497,32 +438,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             targetLuminance /= 1.01;
         }
     }
-
-    private void setupBloomBuffers(final GL gl) {
-        for (int i = 0; i < bloomBufferMax; i++) {
-            if (width >> (i + 1) <= 0 || height >> (i + 1) <= 0) {
-                break;
-            }
-            gl.glBindTexture(GL.GL_TEXTURE_2D, bloomTextures[i]);
-            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB16F_ARB, width >> (i + 1), height >> (i + 1), 0, GL.GL_RGB, GL.GL_HALF_FLOAT_ARB, null);
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
-            gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-            gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-            gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-            bloomBufferCount = i + 1;
-        }
-        gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
-        try {
-            for (int i = 0; i < bloomBufferCount; i++) {
-                gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, bloomFBOs[i]);
-                gl.glFramebufferTexture2DEXT(GL.GL_FRAMEBUFFER_EXT, GL.GL_COLOR_ATTACHMENT0_EXT, GL.GL_TEXTURE_2D, bloomTextures[i], 0);
-                GLHelper.glHelper.checkGLFrameBuffer(gl);
-            }
-        } catch (GLHelperException ex) {
-            Logger.getLogger(MainCanvas.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
+   
     private void setupLuminanceDownsampleBuffers(final GL gl) {
         int Log2width = 0;
         int Log2height = 0;
@@ -555,7 +471,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         }
         for (int i = 0; i < luminanceDownsampleBufferCount; i++) {
             gl.glBindTexture(GL.GL_TEXTURE_2D, luminanceDownsampleTextures[i]);
-            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB16F_ARB, width >> (i + 1), height >> (i + 1), 0, GL.GL_RGB, GL.GL_HALF_FLOAT_ARB, null);
+            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB, width >> (i + 1), height >> (i + 1), 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, null);
             gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
             gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
             gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -570,56 +486,5 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         } catch (GLHelperException ex) {
             Logger.getLogger(MainCanvas.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    private void drawBloom(GL gl) {
-        gl.glUseProgram(brightPassShader);
-        gl.glDisable(GL_BLEND);
-        GLHelper.glHelper.setShaderUniform(gl, brightPassShader, "exposure", exposure*4f);
-        GLHelper.glHelper.setShaderUniform(gl, brightPassShader, "tex", 0);
-        gl.glViewport(0, 0, width >> (1), height >> (1));
-
-        gl.glBindTexture(GL.GL_TEXTURE_2D, luminanceDownsampleTextures[0]);
-        gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, bloomFBOs[0]);
-        drawFullscreenQuad(gl);
-
-        gaussianX(gl, bloomTextures[0], luminanceDownsampleFBOs[0]);
-        gaussianX(gl, luminanceDownsampleTextures[0], bloomFBOs[0]);
-        
-        gaussianY(gl, bloomTextures[0], luminanceDownsampleFBOs[0]);
-        gaussianY(gl, luminanceDownsampleTextures[0], bloomFBOs[0]);
-
-
-
-    }
-
-    private void gaussianX(GL gl, int sourceTexture, int destFBO) {
-        gl.glUseProgram(filter5shader);
-        gl.glDisable(GL_BLEND);
-        GLHelper.glHelper.setShaderUniform(gl, brightPassShader, "source", 0);
-        gl.glBindTexture(GL.GL_TEXTURE_2D, sourceTexture);
-        gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, destFBO);
-        float texelWidth = 1.0f / (width >> 1);
-        float[] offsets = new float[]{-2 * texelWidth, 0, -1 * texelWidth, 0, 0, 0, 1 * texelWidth, 0, 2 * texelWidth, 0};
-        float gauss = 1.0f / (1 + 4 + 6 + 4 + 1);
-        float[] coefficients = new float[]{1 * gauss, 4 * gauss, 6 * gauss, 4 * gauss, 1 * gauss};
-        GLHelper.glHelper.setShaderUniform1fv(gl, filter5shader, "coefficients", coefficients);
-        GLHelper.glHelper.setShaderUniform2fv(gl, filter5shader, "offsets", offsets);
-        drawFullscreenQuad(gl);
-    }
-
-    private void gaussianY(GL gl, int sourceTexture, int destFBO) {
-        gl.glUseProgram(filter5shader);
-        gl.glDisable(GL_BLEND);
-        GLHelper.glHelper.setShaderUniform(gl, brightPassShader, "source", 0);
-        gl.glBindTexture(GL.GL_TEXTURE_2D, sourceTexture);
-        gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, destFBO);
-        float texelHeight = 1.0f / (height >> 1);
-        float[] offsets = new float[]{0, -2 * texelHeight, 0, -1 * texelHeight, 0, 0, 0, 1 * texelHeight, 0, 2 * texelHeight};
-        float gauss = 1.0f / (1 + 4 + 6 + 4 + 1);
-        float[] coefficients = new float[]{1 * gauss, 4 * gauss, 6 * gauss, 4 * gauss, 1 * gauss};
-        GLHelper.glHelper.setShaderUniform1fv(gl, filter5shader, "coefficients", coefficients);
-        GLHelper.glHelper.setShaderUniform2fv(gl, filter5shader, "offsets", offsets);
-        drawFullscreenQuad(gl);
     }
 }
