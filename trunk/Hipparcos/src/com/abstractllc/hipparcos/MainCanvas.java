@@ -43,6 +43,7 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     HipparcosInstance hi;
     private boolean[] keys;
     private GalaxyRenderer galaxyRenderer;
+    private Nebula nebula;
     private Robot robot;
     private Point screenOrigin;
     private boolean mouseGrabbed;
@@ -55,17 +56,22 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
     private int width, height;
     static final private int bloomBufferMax = 1;
     private int luminanceDownsampleBufferCount;
-   private int downsampleShader;
+    private int downsampleShader;
     private float exposure = 1;
     private float targetLuminance;
     private FloatBuffer luminancePixels;
     private int luminancePixelsWidth, luminancePixelsHeight;
+    private float a = -0.9629629f;
+    private float b = 2.791139f;
+    private float c = 1.85185185f;
+    private float d = 1.5f;
 
     public MainCanvas(GLCapabilities caps, HipparcosInstance hi) {
         super(caps);
 
         this.hi = hi;
         galaxyRenderer = new GalaxyRenderer(hi);
+        nebula = new Nebula(hi);
         keys = new boolean[0x20e];
         mainFBOs = new int[1];
         mainTextures = new int[1];
@@ -97,12 +103,13 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
             gl.setSwapInterval(1);
             GLHelper.glHelper.checkGL(gl);
             galaxyRenderer.init(gl);
+            nebula.init(gl);
         } catch (GLHelperException ex) {
             Logger.getLogger(MainCanvas.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             downsampleShader = GLHelper.glHelper.LoadShaderProgram(gl, null, "/com/abstractllc/hipparcos/shaders/DownsampleX2.shader");
-            
+
         } catch (IOException ex) {
             Logger.getLogger(GalaxyRenderer.class.getName()).log(Level.SEVERE, null, ex);
         } catch (GLHelperException ex) {
@@ -123,47 +130,53 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         GL gl = glAD.getGL();
         try {
             //Draw to floating point texture
-            gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, mainFBOs[0]);
-
+            boolean drawToTexture = false;
+            if (drawToTexture) {
+                gl.glBindFramebufferEXT(GL.GL_FRAMEBUFFER_EXT, mainFBOs[0]);
+            }
             GLHelper.glHelper.checkGL(gl);
             gl.glBlendFunc(GL.GL_ONE, GL.GL_ZERO); //Replace
             gl.glEnable(GL_BLEND);
             gl.glClearColor(0f, 0f, 0f, 0f);
             gl.glClear(GL.GL_COLOR_BUFFER_BIT);
             setViewMatrix(gl);
-            
-            
-        galaxyRenderer.display(gl, exposure);
+
+
+            //galaxyRenderer.display(gl, exposure);
+            nebula.display(gl, exposure);
+
 
             //Set matrices for full screen quad rendering
-            gl.glMatrixMode(GL.GL_MODELVIEW);
-            gl.glPushMatrix();
-            gl.glLoadIdentity();
-            gl.glMatrixMode(GL.GL_PROJECTION);
-            gl.glPushMatrix();
-            gl.glLoadIdentity();
-            gl.glEnable(GL.GL_TEXTURE_2D);
+            if (drawToTexture) {
+                gl.glMatrixMode(GL.GL_MODELVIEW);
+                gl.glPushMatrix();
+                gl.glLoadIdentity();
+                gl.glMatrixMode(GL.GL_PROJECTION);
+                gl.glPushMatrix();
+                gl.glLoadIdentity();
+                gl.glEnable(GL.GL_TEXTURE_2D);
 
-            float lum = getSceneLuminance(gl);
-            float targetExposure = targetLuminance / lum;
-            exposure = 0.99f * exposure + 0.01f * targetExposure;
-            if (exposure < 0.02f) {
-                exposure = 0.02f;
+                float lum = getSceneLuminance(gl);
+                float targetExposure = targetLuminance / lum;
+                exposure = 0.99f * exposure + 0.01f * targetExposure;
+                if (exposure < 0.02f) {
+                    exposure = 0.02f;
+                }
+                if (exposure > 5f) {
+                    exposure = 5f;
+                }
+                System.out.println(lum + ": " + exposure);
+
+                composeScene(gl);
+
+                gl.glDisable(GL_TEXTURE_2D);
+                gl.glMatrixMode(GL.GL_PROJECTION);
+                gl.glPopMatrix();
+                gl.glMatrixMode(GL.GL_MODELVIEW);
+                gl.glPopMatrix();
+
+                gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
             }
-            if (exposure > 5f) {
-                exposure = 5f;
-            }
-            System.out.println(lum + ": " + exposure);
-
-            composeScene(gl);
-            
-            gl.glDisable(GL_TEXTURE_2D);
-            gl.glMatrixMode(GL.GL_PROJECTION);
-            gl.glPopMatrix();
-            gl.glMatrixMode(GL.GL_MODELVIEW);
-            gl.glPopMatrix();
-
-            gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
             gl.glFlush();
 
         } catch (GLHelper.GLHelperException glhe) {
@@ -409,11 +422,13 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         forward.normalize();
         up.cross(right, forward);
         float speed;
-
+        float paramDelta;
         if (keys[VK_SHIFT]) {
             speed = 1.0f;
+            paramDelta = -0.01f;
         } else {
             speed = 0.1f;
+            paramDelta = 0.01f;
         }
 
         if (keys[VK_W]) {
@@ -437,8 +452,34 @@ public class MainCanvas extends GLCanvas implements GLEventListener, KeyListener
         if (keys[VK_DOWN]) {
             targetLuminance /= 1.01;
         }
+
+        boolean newNebula = false;
+        if (keys[VK_1]) {
+            a+=paramDelta;
+            newNebula = true;
+        }
+        if (keys[VK_2]) {
+            b+=paramDelta;
+            newNebula = true;
+        }
+        if (keys[VK_3]) {
+            c+=paramDelta;
+            newNebula = true;
+        }
+        if (keys[VK_4]) {
+            d+=paramDelta;
+            newNebula = true;
+        }
+
+        if(newNebula)
+        {
+            nebula.changeParams(a, b, c, d);
+            newNebula = false;
+            System.out.println(a+", "+b+", "+c+", "+d);
+        }
+
     }
-   
+
     private void setupLuminanceDownsampleBuffers(final GL gl) {
         int Log2width = 0;
         int Log2height = 0;
