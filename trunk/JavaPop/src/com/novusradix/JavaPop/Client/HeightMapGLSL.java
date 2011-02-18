@@ -259,13 +259,15 @@ public class HeightMapGLSL implements HeightMapImpl, GLObject {
                 texid = 5;
                 break;
             case BURNT:
+            case FUNGUS_SEED:
                 texid = 6;
                 break;
             case SWAMP:
-            case FUNGUS:
+            case FUNGUS_LIVE:
                 texid = 7;
                 break;
-            case BASALT:
+   case FUNGUS_DORMANT:
+                     case BASALT:
                 texid = 8;
                 break;
             case EARTHQUAKE:
