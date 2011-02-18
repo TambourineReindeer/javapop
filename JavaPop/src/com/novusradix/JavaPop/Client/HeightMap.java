@@ -118,13 +118,14 @@ public class HeightMap extends com.novusradix.JavaPop.HeightMap implements GLObj
             }
         }
     }
+
     Vector3 p = new Vector3();
 
     private void renderRocks(GL gl) {
         int x, y;
         rock.prepare(gl);
         gl.glUseProgram(0);
-        gl.glColor3f(1,1,1);
+        gl.glColor4f(1, 1, 1, 1);
         synchronized (rocks) {
             for (Entry<Point, MutableFloat> e : rocks.entrySet()) {
                 x = e.getKey().x;

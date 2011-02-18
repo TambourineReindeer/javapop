@@ -1,6 +1,5 @@
 package com.novusradix.JavaPop.Messaging;
 
-import com.novusradix.JavaPop.Server.ServerPeons;
 import com.novusradix.JavaPop.Server.Peons.Peon;
 import com.novusradix.JavaPop.Server.ServerPlayer;
 import java.io.Externalizable;

@@ -265,12 +265,14 @@ public class HeightMapNoShader implements HeightMapImpl, GLObject {
                 texid = 5;
                 break;
             case BURNT:
+            case FUNGUS_SEED:
                 texid = 6;
                 break;
             case SWAMP:
-            case FUNGUS:
+            case FUNGUS_LIVE:
                 texid = 7;
                 break;
+            case FUNGUS_DORMANT:
             case BASALT:
                 texid = 63;
                 break;

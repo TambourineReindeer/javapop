@@ -19,6 +19,9 @@ public class FungusTool extends Tool {
         client.sendMessage(new Fungus(p));
     }
 
+    public void PrimaryUp(Point p) {
+    }
+
     public String getIconName() {
         return "/com/novusradix/JavaPop/icons/Fungus.png";
     }

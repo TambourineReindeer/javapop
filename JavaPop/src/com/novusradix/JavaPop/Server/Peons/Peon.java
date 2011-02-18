@@ -153,7 +153,7 @@ public class Peon {
                 }
             case DROWNING:
                 if (game.heightMap.getTile(getPoint().x, getPoint().y) == Tile.SEA) {
-                    strength -= seconds * 10f;
+                    strength -= seconds * 100f;
                     break;
                 }
             case WAITING:

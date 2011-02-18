@@ -13,7 +13,9 @@ public enum Tile {
     BURNT(false, false, false, false, Action.NONE),
     FARM(false, false, true, false, Action.NONE),
     SWAMP(false, false, false, false, Action.FALL),
-    FUNGUS(false, false, false, false, Action.FALL),
+    FUNGUS_SEED(false, false, false, false, Action.NONE),
+    FUNGUS_LIVE(false, false, false, false, Action.FALL),
+    FUNGUS_DORMANT(false, false, false, false, Action.FALL),
     ROCK(false, true, false, true, Action.NONE),
     TREE(false, false, true, false, Action.NONE),
     BASALT(true, true, false, false, Action.NONE),
@@ -37,7 +39,7 @@ public enum Tile {
      * @param sealevel  Can the tile exist at sealevel? If not, it will change to SEA if it is flattened to sea level.
      * @param slope Can the tile exist on a slope? If not, it will be replaced by EMPTY_SLOPE if it becomes sloped.
      * @param fertile   Can houses use this land as farmland?
-     * @param obstruction   Can people walk on the tile?
+     * @param obstruction   Can people walk on the tile? (Even if it will kill them)
      * @param peonAction What action should be performed on a peon when he enters the tile?
      */
     private Tile(boolean sealevel, boolean slope, boolean fertile, boolean obstruction ,Action peonAction) {
