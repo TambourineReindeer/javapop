@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+"
+  codebase="http://javapop.googlecode.com/svn/wiki/"
+  href="javapop.jnlp">
+    <information>
+        <title>Javapop</title>
+        <vendor>Gef</vendor>
+        <homepage href="http://javapop.googlecode.com/"/>
+        <description>A Populous-like game in Java</description>
+        <offline-allowed/>
+    </information>
+    <resources>
+        <j2se version="1.5+" initial-heap-size="64m" max-heap-size="256m"/>
+        <jar href="JavaPopSigned.jar" main="true"/>
+        <jar href="swing-layout-1.0.3signed.jar" />
+        <extension name="jogl" href="http://download.java.net/media/jogl/builds/archive/jsr-231-webstart-current/jogl.jnlp" />
+    </resources>
+    <security>
+        <all-permissions/>
+    </security>
+    <application-desc>
+    </application-desc>
+</jnlp>
